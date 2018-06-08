@@ -26,25 +26,39 @@
 
 (require 's)
 
+(defvar-local deadgrep--current-file nil)
+
+(defun deadgrep--process-sentinel (process string)
+  "Update the ag buffer associated with PROCESS as complete."
+  (let ((buffer (process-buffer process)))
+    (when (buffer-live-p buffer)
+      (with-current-buffer buffer
+        ;; The remaining output must now be a completed line.
+        (let ((inhibit-read-only t))
+          (save-excursion
+            (goto-char (point-max))
+            (insert "done\n" string "\n-----")))))))
+
 (defun deadgrep--process-filter (process output)
   (with-current-buffer (process-buffer process)
     (let ((inhibit-read-only t)
           (lines (s-lines output)))
-      (setq wh/l (car lines))
       (save-excursion
         (goto-char (point-max))
         (dolist (line lines)
           (unless (s-blank? line)
-            (setq line (deadgrep--propertize-line line))
-            (insert
-             (nth 0 line)
-             "_"
-             (nth 1 line)
-             "_"
-             (nth 2 line)
-             "\n")))))))
+            (-let [(filename line-num content) (deadgrep--split-line line)]
+              (unless (equal filename deadgrep--current-file)
+                (insert filename "\n")
+                (setq deadgrep--current-file filename))
+              (insert
+               (propertize
+                (s-pad-right 5 " " line-num)
+                'face 'font-lock-comment-face)
+               content
+               "\n"))))))))
 
-(defun deadgrep--propertize-line (line)
+(defun deadgrep--split-line (line)
   "Given a raw LINE of output from rg, apply properties."
   (let* ((parts (s-split (rx (1+ "\x1b[" (+ digit) "m")) line))
          (filename (nth 1 parts))
@@ -77,22 +91,32 @@ join the parts into one string with hit highlighting."
    "rg --color=ansi --no-heading --with-filename --fixed-strings -- \"%s\""
    (shell-quote-argument search-term)))
 
+(defun deadgrep--buffer (search-term)
+  (let* ((buf (get-buffer-create "*deadgrep*")))
+    (with-current-buffer buf
+      (erase-buffer)
+      (insert "Search term: " search-term "\n"
+              "Directory: "
+              (abbreviate-file-name default-directory)
+              "\n\n")
+      (setq deadgrep--current-file nil))
+    buf))
+
 (defun deadgrep (search-term)
   "Start a ripgrep search for SEARCH-TERM.
 
 If called with a prefix, create the results buffer without
 starting the search."
   (interactive "sSearch term: ")
-  (let* ((buf (get-buffer-create "*deadgrep*")))
+  (let* ((buf (deadgrep--buffer search-term)))
     (switch-to-buffer buf)
-    (erase-buffer)
-    (insert "Search term: " search-term "\n\n")
     (let ((process
            (start-process-shell-command
             (format "rg %s" search-term)
             buf
             (deadgrep--format-command search-term))))
-      (set-process-filter process #'deadgrep--process-filter))))
+      (set-process-filter process #'deadgrep--process-filter)
+      (set-process-sentinel process #'deadgrep--process-sentinel))))
 
 (provide 'deadgrep)
 ;;; deadgrep.el ends here
