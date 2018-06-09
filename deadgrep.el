@@ -4,6 +4,8 @@
 
 ;; Author: Wilfred Hughes <me@wilfred.me.uk>
 ;; Keywords: tools
+;; Version: 0.1
+;; Package-Requires: ((emacs "25.1") (dash "2.12.0") (s "1.11.0"))
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -25,6 +27,7 @@
 ;;; Code:
 
 (require 's)
+(require 'dash)
 
 (defvar-local deadgrep--current-file nil)
 
