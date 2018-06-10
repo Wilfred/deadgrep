@@ -33,6 +33,9 @@
 
 (defvar-local deadgrep--current-file nil)
 (defvar-local deadgrep--spinner nil)
+(defvar-local deadgrep--remaining-output nil
+  "We can't guarantee that our process filter will always receive whole lines.
+We save the last line here, in case we need to append more text to it.")
 
 (defun deadgrep--process-sentinel (process string)
   "Update the ag buffer associated with PROCESS as complete."
@@ -44,17 +47,34 @@
           nil)))))
 
 (defun deadgrep--process-filter (process output)
+  ;; If we had an unfinished line from our last call, include that.
+  (when deadgrep--remaining-output
+    (setq output (concat deadgrep--remaining-output output))
+    (setq deadgrep--remaining-output nil))
+
   (with-current-buffer (process-buffer process)
     (let ((inhibit-read-only t)
           (lines (s-lines output)))
+      ;; Process filters run asynchronously, and don't guarantee that
+      ;; OUTPUT ends with a complete line. Save the last line for
+      ;; later processing.
+      (setq deadgrep--remaining-output (-last-item lines))
+      (setq lines (butlast lines))
+
       (save-excursion
         (goto-char (point-max))
         (dolist (line lines)
           (unless (s-blank? line)
             (-let [(filename line-num content) (deadgrep--split-line line)]
-              (unless (equal filename deadgrep--current-file)
-                (insert filename "\n")
-                (setq deadgrep--current-file filename))
+              (cond
+               ;; This is the first file we've seen, print the heading.
+               ((null deadgrep--current-file)
+                (insert filename "\n"))
+               ;; This is a new file, print the heading with a spacer.
+               ((not (equal deadgrep--current-file filename))
+                (insert "\n" filename "\n")))
+              (setq deadgrep--current-file filename)
+
               (insert
                (propertize
                 (s-pad-right 5 " " line-num)
@@ -74,7 +94,7 @@
     (setq line-content-parts
           (cons line-content-start
                 (-drop 1 line-content-parts)))
-    
+
     (list filename line-num
           (deadgrep--propertize-hits line-content-parts))))
 
