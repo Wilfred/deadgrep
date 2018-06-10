@@ -22,7 +22,9 @@
 
 ;;; Commentary:
 
-;; 
+;; Perform text searches with the speed of ripgrep and the comfort of
+;; emacs. This is a bespoke mode that does not rely on
+;; compilation-mode, but tries to be a perfect fit for ripgrep.
 
 ;;; Code:
 
