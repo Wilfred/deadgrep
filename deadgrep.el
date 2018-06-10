@@ -41,9 +41,7 @@
       (with-current-buffer buffer
         ;; The remaining output must now be a completed line.
         (let ((inhibit-read-only t))
-          (save-excursion
-            (goto-char (point-max))
-            (insert "done\n" string "\n-----")))))))
+          nil)))))
 
 (defun deadgrep--process-filter (process output)
   (with-current-buffer (process-buffer process)
