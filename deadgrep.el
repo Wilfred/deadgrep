@@ -33,6 +33,7 @@
 (require 'dash)
 (require 'spinner)
 
+(defvar-local deadgrep--search-term nil)
 (defvar-local deadgrep--current-file nil)
 (defvar-local deadgrep--spinner nil)
 (defvar-local deadgrep--remaining-output nil
@@ -122,20 +123,26 @@ join the parts into one string with hit highlighting."
    (shell-quote-argument search-term)))
 
 (defun deadgrep--buffer (search-term directory)
-  (let* ((buf (get-buffer-create "*deadgrep*")))
+  (let* ((buf (get-buffer-create
+               (format "*deadgrep %s*" search-term))))
     (with-current-buffer buf
       (setq default-directory directory)
       (let ((inhibit-read-only t))
+        ;; This needs to happen first, as it clobbers all buffer-local
+        ;; variables.
+        (deadgrep-mode)
+
         (erase-buffer)
         (insert "Search term: " search-term "\n"
                 "Directory: "
                 (abbreviate-file-name default-directory)
                 "\n\n"))
-      (setq buffer-read-only t)
+
+      (setq deadgrep--search-term search-term)
       (setq deadgrep--current-file nil)
       (setq deadgrep--spinner (spinner-create 'progress-bar t))
-      (spinner-start deadgrep--spinner)
-      (deadgrep-mode))
+      (spinner-start deadgrep--spinner))
+    (setq buffer-read-only t)
     buf))
 
 (define-derived-mode deadgrep-mode special-mode
@@ -159,22 +166,37 @@ join the parts into one string with hit highlighting."
 (define-key deadgrep-mode-map (kbd "RET") #'deadgrep--visit-result)
 (define-key deadgrep-mode-map (kbd "<mouse-2>") #'deadgrep--visit-result)
 
+;; TODO: should these be public commands?
+(define-key deadgrep-mode-map (kbd "g") #'deadgrep--restart)
+
+(defun deadgrep--start (search-term)
+  "Start a ripgrep search."
+  (let ((process
+         (start-process-shell-command
+          (format "rg %s" search-term)
+          (current-buffer)
+          (deadgrep--format-command search-term))))
+    (set-process-filter process #'deadgrep--process-filter)
+    (set-process-sentinel process #'deadgrep--process-sentinel)))
+
+(defun deadgrep--restart ()
+  (interactive)
+  (let ((inhibit-read-only t))
+    ;; TODO: preserve header
+    (erase-buffer)
+
+    (deadgrep--start deadgrep--search-term)))
+
 ;;;###autoload
 (defun deadgrep (search-term)
   "Start a ripgrep search for SEARCH-TERM.
 
-If called with a prefix, create the results buffer without
+TODO: If called with a prefix, create the results buffer without
 starting the search."
   (interactive "sSearch term: ")
   (let* ((buf (deadgrep--buffer search-term default-directory)))
     (switch-to-buffer buf)
-    (let ((process
-           (start-process-shell-command
-            (format "rg %s" search-term)
-            buf
-            (deadgrep--format-command search-term))))
-      (set-process-filter process #'deadgrep--process-filter)
-      (set-process-sentinel process #'deadgrep--process-sentinel))))
+    (deadgrep--start search-term)))
 
 (provide 'deadgrep)
 ;;; deadgrep.el ends here
