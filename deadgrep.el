@@ -5,7 +5,7 @@
 ;; Author: Wilfred Hughes <me@wilfred.me.uk>
 ;; Keywords: tools
 ;; Version: 0.1
-;; Package-Requires: ((emacs "25.1") (dash "2.12.0") (s "1.11.0"))
+;; Package-Requires: ((emacs "25.1") (dash "2.12.0") (s "1.11.0") (spinner "1.7.3"))
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -29,8 +29,10 @@
 (require 'cl-lib)
 (require 's)
 (require 'dash)
+(require 'spinner)
 
 (defvar-local deadgrep--current-file nil)
+(defvar-local deadgrep--spinner nil)
 
 (defun deadgrep--process-sentinel (process string)
   "Update the ag buffer associated with PROCESS as complete."
@@ -95,16 +97,25 @@ join the parts into one string with hit highlighting."
    "rg --color=ansi --no-heading --with-filename --fixed-strings -- \"%s\""
    (shell-quote-argument search-term)))
 
-(defun deadgrep--buffer (search-term)
+(defun deadgrep--buffer (search-term directory)
   (let* ((buf (get-buffer-create "*deadgrep*")))
     (with-current-buffer buf
-      (erase-buffer)
-      (insert "Search term: " search-term "\n"
-              "Directory: "
-              (abbreviate-file-name default-directory)
-              "\n\n")
-      (setq deadgrep--current-file nil))
+      (setq default-directory directory)
+      (let ((inhibit-read-only t))
+        (erase-buffer)
+        (insert "Search term: " search-term "\n"
+                "Directory: "
+                (abbreviate-file-name default-directory)
+                "\n\n"))
+      (setq buffer-read-only t)
+      (setq deadgrep--current-file nil)
+      (setq deadgrep--spinner (spinner-create 'progress-bar t))
+      (spinner-start deadgrep--spinner)
+      (deadgrep-mode))
     buf))
+
+(define-derived-mode deadgrep-mode special-mode
+  '("Deadgrep" (:eval (spinner-print deadgrep--spinner))))
 
 (defun deadgrep (search-term)
   "Start a ripgrep search for SEARCH-TERM.
@@ -112,7 +123,7 @@ join the parts into one string with hit highlighting."
 If called with a prefix, create the results buffer without
 starting the search."
   (interactive "sSearch term: ")
-  (let* ((buf (deadgrep--buffer search-term)))
+  (let* ((buf (deadgrep--buffer search-term default-directory)))
     (switch-to-buffer buf)
     (let ((process
            (start-process-shell-command
