@@ -26,6 +26,7 @@
 
 ;;; Code:
 
+(require 'cl-lib)
 (require 's)
 (require 'dash)
 
@@ -82,7 +83,7 @@
 join the parts into one string with hit highlighting."
   (let* ((propertized-parts
           (--map-indexed
-           (if (evenp it-index)
+           (if (cl-evenp it-index)
                it
              (propertize it 'face 'match))
            parts))
