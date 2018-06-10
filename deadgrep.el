@@ -46,6 +46,8 @@ We save the last line here, in case we need to append more text to it.")
         (let ((inhibit-read-only t))
           nil)))))
 
+(defconst deadgrep--position-column-width 5)
+
 (defun deadgrep--process-filter (process output)
   ;; If we had an unfinished line from our last call, include that.
   (when deadgrep--remaining-output
@@ -65,7 +67,14 @@ We save the last line here, in case we need to append more text to it.")
         (goto-char (point-max))
         (dolist (line lines)
           (unless (s-blank? line)
-            (-let [(filename line-num content) (deadgrep--split-line line)]
+            (-let* (((filename line-num content) (deadgrep--split-line line))
+                    (formatted-line-num
+                     (s-pad-right deadgrep--position-column-width " " line-num))
+                    (pretty-line-num
+                     (propertize formatted-line-num
+                                 'face 'font-lock-comment-face
+                                 'deadgrep-filename filename
+                                 'deadgrep-line-number (string-to-number line-num))))
               (cond
                ;; This is the first file we've seen, print the heading.
                ((null deadgrep--current-file)
@@ -75,12 +84,7 @@ We save the last line here, in case we need to append more text to it.")
                 (insert "\n" filename "\n")))
               (setq deadgrep--current-file filename)
 
-              (insert
-               (propertize
-                (s-pad-right 5 " " line-num)
-                'face 'font-lock-comment-face)
-               content
-               "\n"))))))))
+              (insert pretty-line-num content "\n"))))))))
 
 (defun deadgrep--split-line (line)
   "Given a raw LINE of output from rg, apply properties."
@@ -135,6 +139,25 @@ join the parts into one string with hit highlighting."
 (define-derived-mode deadgrep-mode special-mode
   '("Deadgrep" (:eval (spinner-print deadgrep--spinner))))
 
+(defun deadgrep--visit-result ()
+  "Goto the search result at point."
+  (interactive)
+  (let* ((pos (line-beginning-position))
+         (file-name (get-text-property pos 'deadgrep-filename))
+         (line-number (get-text-property pos 'deadgrep-line-number))
+         (column-offset
+          (max (- (current-column) deadgrep--position-column-width)
+               0)))
+    (when file-name
+      (find-file file-name)
+      (goto-char (point-min))
+      (forward-line (1- line-number))
+      (forward-char column-offset))))
+
+(define-key deadgrep-mode-map (kbd "RET") #'deadgrep--visit-result)
+(define-key deadgrep-mode-map (kbd "<mouse-2>") #'deadgrep--visit-result)
+
+;;;###autoload
 (defun deadgrep (search-term)
   "Start a ripgrep search for SEARCH-TERM.
 
