@@ -45,6 +45,9 @@ We save the last line here, in case we need to append more text to it.")
   (let ((buffer (process-buffer process)))
     (when (buffer-live-p buffer)
       (with-current-buffer buffer
+        ;; rg has terminated, so stop the spinner.
+        (spinner-stop deadgrep--spinner)
+
         ;; The remaining output must now be a completed line.
         (let ((inhibit-read-only t))
           nil)))))
@@ -122,6 +125,12 @@ join the parts into one string with hit highlighting."
    "rg --color=ansi --no-heading --with-filename --fixed-strings -- \"%s\""
    (shell-quote-argument search-term)))
 
+(defun deadgrep--write-heading ()
+  (insert "Search term: " deadgrep--search-term "\n"
+          "Directory: "
+          (abbreviate-file-name default-directory)
+          "\n\n"))
+
 (defun deadgrep--buffer (search-term directory)
   (let* ((buf (get-buffer-create
                (format "*deadgrep %s*" search-term))))
@@ -131,17 +140,11 @@ join the parts into one string with hit highlighting."
         ;; This needs to happen first, as it clobbers all buffer-local
         ;; variables.
         (deadgrep-mode)
-
         (erase-buffer)
-        (insert "Search term: " search-term "\n"
-                "Directory: "
-                (abbreviate-file-name default-directory)
-                "\n\n"))
 
-      (setq deadgrep--search-term search-term)
-      (setq deadgrep--current-file nil)
-      (setq deadgrep--spinner (spinner-create 'progress-bar t))
-      (spinner-start deadgrep--spinner))
+        (setq deadgrep--search-term search-term)
+        (setq deadgrep--current-file nil)
+        (deadgrep--write-heading)))
     (setq buffer-read-only t)
     buf))
 
@@ -171,6 +174,8 @@ join the parts into one string with hit highlighting."
 
 (defun deadgrep--start (search-term)
   "Start a ripgrep search."
+  (setq deadgrep--spinner (spinner-create 'progress-bar t))
+  (spinner-start deadgrep--spinner)
   (let ((process
          (start-process-shell-command
           (format "rg %s" search-term)
@@ -182,9 +187,8 @@ join the parts into one string with hit highlighting."
 (defun deadgrep--restart ()
   (interactive)
   (let ((inhibit-read-only t))
-    ;; TODO: preserve header
     (erase-buffer)
-
+    (deadgrep--write-heading)
     (deadgrep--start deadgrep--search-term)))
 
 ;;;###autoload
