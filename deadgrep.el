@@ -40,7 +40,48 @@
   "We can't guarantee that our process filter will always receive whole lines.
 We save the last line here, in case we need to append more text to it.")
 
-(defun deadgrep--process-sentinel (process string)
+(defconst deadgrep--position-column-width 5)
+
+(defun deadgrep--insert-output (output &optional finished)
+  "Propertize OUTPUT from rigrep and write to the current buffer."
+  ;; If we had an unfinished line from our last call, include that.
+  (when deadgrep--remaining-output
+    (setq output (concat deadgrep--remaining-output output))
+    (setq deadgrep--remaining-output nil))
+
+  (let ((inhibit-read-only t)
+        (lines (s-lines output)))
+    ;; Process filters run asynchronously, and don't guarantee that
+    ;; OUTPUT ends with a complete line. Save the last line for
+    ;; later processing.
+    (unless finished
+      (setq deadgrep--remaining-output (-last-item lines))
+      (setq lines (butlast lines)))
+
+    (save-excursion
+      (goto-char (point-max))
+      (dolist (line lines)
+        (unless (s-blank? line)
+          (-let* (((filename line-num content) (deadgrep--split-line line))
+                  (formatted-line-num
+                   (s-pad-right deadgrep--position-column-width " " line-num))
+                  (pretty-line-num
+                   (propertize formatted-line-num
+                               'face 'font-lock-comment-face
+                               'deadgrep-filename filename
+                               'deadgrep-line-number (string-to-number line-num))))
+            (cond
+             ;; This is the first file we've seen, print the heading.
+             ((null deadgrep--current-file)
+              (insert filename "\n"))
+             ;; This is a new file, print the heading with a spacer.
+             ((not (equal deadgrep--current-file filename))
+              (insert "\n" filename "\n")))
+            (setq deadgrep--current-file filename)
+
+            (insert pretty-line-num content "\n")))))))
+
+(defun deadgrep--process-sentinel (process _output)
   "Update the ag buffer associated with PROCESS as complete."
   (let ((buffer (process-buffer process)))
     (when (buffer-live-p buffer)
@@ -48,11 +89,7 @@ We save the last line here, in case we need to append more text to it.")
         ;; rg has terminated, so stop the spinner.
         (spinner-stop deadgrep--spinner)
 
-        ;; The remaining output must now be a completed line.
-        (let ((inhibit-read-only t))
-          nil)))))
-
-(defconst deadgrep--position-column-width 5)
+        (deadgrep--insert-output "" t)))))
 
 (defun deadgrep--process-filter (process output)
   ;; If we had an unfinished line from our last call, include that.
@@ -60,37 +97,9 @@ We save the last line here, in case we need to append more text to it.")
     (setq output (concat deadgrep--remaining-output output))
     (setq deadgrep--remaining-output nil))
 
-  (with-current-buffer (process-buffer process)
-    (let ((inhibit-read-only t)
-          (lines (s-lines output)))
-      ;; Process filters run asynchronously, and don't guarantee that
-      ;; OUTPUT ends with a complete line. Save the last line for
-      ;; later processing.
-      (setq deadgrep--remaining-output (-last-item lines))
-      (setq lines (butlast lines))
-
-      (save-excursion
-        (goto-char (point-max))
-        (dolist (line lines)
-          (unless (s-blank? line)
-            (-let* (((filename line-num content) (deadgrep--split-line line))
-                    (formatted-line-num
-                     (s-pad-right deadgrep--position-column-width " " line-num))
-                    (pretty-line-num
-                     (propertize formatted-line-num
-                                 'face 'font-lock-comment-face
-                                 'deadgrep-filename filename
-                                 'deadgrep-line-number (string-to-number line-num))))
-              (cond
-               ;; This is the first file we've seen, print the heading.
-               ((null deadgrep--current-file)
-                (insert filename "\n"))
-               ;; This is a new file, print the heading with a spacer.
-               ((not (equal deadgrep--current-file filename))
-                (insert "\n" filename "\n")))
-              (setq deadgrep--current-file filename)
-
-              (insert pretty-line-num content "\n"))))))))
+  (when (buffer-live-p (process-buffer process))
+    (with-current-buffer (process-buffer process)
+      (deadgrep--insert-output output))))
 
 (defun deadgrep--split-line (line)
   "Given a raw LINE of output from rg, apply properties."
