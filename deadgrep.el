@@ -81,7 +81,7 @@ We save the last line here, in case we need to append more text to it.")
 
             (insert pretty-line-num content "\n")))))))
 
-(defun deadgrep--process-sentinel (process _output)
+(defun deadgrep--process-sentinel (process output)
   "Update the ag buffer associated with PROCESS as complete."
   (let ((buffer (process-buffer process)))
     (when (buffer-live-p buffer)
@@ -89,7 +89,12 @@ We save the last line here, in case we need to append more text to it.")
         ;; rg has terminated, so stop the spinner.
         (spinner-stop deadgrep--spinner)
 
-        (deadgrep--insert-output "" t)))))
+        (deadgrep--insert-output "" t)
+
+        ;; Report any errors that occurred.
+        (unless (equal output "finished\n")
+          (let ((inhibit-read-only t))
+            (insert output)))))))
 
 (defun deadgrep--process-filter (process output)
   ;; If we had an unfinished line from our last call, include that.
@@ -131,7 +136,7 @@ join the parts into one string with hit highlighting."
 
 (defun deadgrep--format-command (search-term)
   (format
-   "rg --color=ansi --no-heading --with-filename --fixed-strings -- \"%s\""
+   "rg --color=ansi --no-heading --with-filename --fixed-strings -- %s"
    (shell-quote-argument search-term)))
 
 (defun deadgrep--write-heading ()
