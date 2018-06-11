@@ -153,8 +153,8 @@ join the parts into one string with hit highlighting."
 
         (setq deadgrep--search-term search-term)
         (setq deadgrep--current-file nil)
-        (deadgrep--write-heading)))
-    (setq buffer-read-only t)
+        (deadgrep--write-heading))
+      (setq buffer-read-only t))
     buf))
 
 (define-derived-mode deadgrep-mode special-mode
