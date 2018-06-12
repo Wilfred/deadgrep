@@ -35,6 +35,7 @@
 
 (defvar-local deadgrep--search-term nil)
 (defvar-local deadgrep--search-type 'literal)
+(defvar-local deadgrep--search-case 'smart)
 
 (defvar-local deadgrep--current-file nil)
 (defvar-local deadgrep--spinner nil)
@@ -145,16 +146,24 @@ join the parts into one string with hit highlighting."
   (setq deadgrep--search-type (button-get button 'search-type))
   (deadgrep--restart))
 
+(define-button-type 'deadgrep-case
+  'action #'deadgrep--case
+  'case nil
+  'help-echo "Change case sensitivity")
+
+(defun deadgrep--case (button)
+  (setq deadgrep--search-case (button-get button 'case))
+  (deadgrep--restart))
+
 (defun deadgrep--button (text type &rest properties)
   ;; `make-text-button' mutates the string to add properties, so copy
   ;; TEXT first.
   (setq text (substring-no-properties text))
   (apply #'make-text-button text nil :type type properties))
 
-(defun deadgrep--format-command (search-term search-type)
+(defun deadgrep--format-command (search-term search-type case)
   (format
-   ;; TODO: --smart-case
-   "rg --color=ansi --no-heading --with-filename %s -- %s"
+   "rg --color=ansi --no-heading --with-filename %s %s -- %s"
    (cond
     ((eq search-type 'literal)
      "--fixed-strings")
@@ -162,6 +171,15 @@ join the parts into one string with hit highlighting."
      "")
     (t
      (error "Unknown search type: %s" search-type)))
+   (cond
+    ((eq case 'smart)
+     "--smart-case")
+    ((eq case 'sensitive)
+     "--case-sensitive")
+    ((eq case 'ignore)
+     "--ignore-case")
+    (t
+     (error "Unknown case: %s" case)))
    (shell-quote-argument search-term)))
 
 (defun deadgrep--write-heading ()
@@ -178,7 +196,23 @@ join the parts into one string with hit highlighting."
             (deadgrep--button "regexp" 'deadgrep-type
                               'search-type 'regexp))
 
-          "\n"
+          "\nCase: "
+          (if (eq deadgrep--search-case 'smart)
+              "smart"
+            (deadgrep--button "smart" 'deadgrep-case
+                              'case 'smart))
+          " "
+          (if (eq deadgrep--search-case 'sensitive)
+              "sensitive"
+            (deadgrep--button "sensitive" 'deadgrep-case
+                              'case 'sensitive))
+          " "
+          (if (eq deadgrep--search-case 'ignore)
+              "ignore"
+            (deadgrep--button "ignore" 'deadgrep-case
+                              'case 'ignore))
+
+          "\n\n"
           "Directory: "
           (abbreviate-file-name default-directory)
           "\n\n"))
@@ -224,7 +258,7 @@ join the parts into one string with hit highlighting."
 ;; TODO: should these be public commands?
 (define-key deadgrep-mode-map (kbd "g") #'deadgrep--restart)
 
-(defun deadgrep--start (search-term search-type)
+(defun deadgrep--start (search-term search-type case)
   "Start a ripgrep search."
   (setq deadgrep--spinner (spinner-create 'progress-bar t))
   (spinner-start deadgrep--spinner)
@@ -232,7 +266,7 @@ join the parts into one string with hit highlighting."
          (start-process-shell-command
           (format "rg %s" search-term)
           (current-buffer)
-          (deadgrep--format-command search-term search-type))))
+          (deadgrep--format-command search-term search-type case))))
     (set-process-filter process #'deadgrep--process-filter)
     (set-process-sentinel process #'deadgrep--process-sentinel)))
 
@@ -240,9 +274,13 @@ join the parts into one string with hit highlighting."
   (interactive)
   (let ((inhibit-read-only t))
     (erase-buffer)
+    (setq deadgrep--current-file nil)
+
     (deadgrep--write-heading)
     (deadgrep--start
-     deadgrep--search-term deadgrep--search-type)))
+     deadgrep--search-term
+     deadgrep--search-type
+     deadgrep--search-case)))
 
 ;;;###autoload
 (defun deadgrep (search-term)
@@ -253,7 +291,10 @@ starting the search."
   (interactive "sSearch term: ")
   (let* ((buf (deadgrep--buffer search-term default-directory)))
     (switch-to-buffer buf)
-    (deadgrep--start search-term deadgrep--search-type)))
+    (deadgrep--start
+     search-term
+     deadgrep--search-type
+     deadgrep--search-case)))
 
 (provide 'deadgrep)
 ;;; deadgrep.el ends here
