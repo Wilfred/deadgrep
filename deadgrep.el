@@ -155,6 +155,16 @@ join the parts into one string with hit highlighting."
   (setq deadgrep--search-case (button-get button 'case))
   (deadgrep--restart))
 
+(define-button-type 'deadgrep-directory
+  'action #'deadgrep--directory
+  'help-echo "Change base directory")
+
+(defun deadgrep--directory (_button)
+  (setq default-directory
+        (expand-file-name
+         (read-directory-name "Search files in: ")))
+  (deadgrep--restart))
+
 (defun deadgrep--button (text type &rest properties)
   ;; `make-text-button' mutates the string to add properties, so copy
   ;; TEXT first.
@@ -214,12 +224,17 @@ join the parts into one string with hit highlighting."
 
           "\n\n"
           "Directory: "
-          (abbreviate-file-name default-directory)
+          (deadgrep--button
+           (abbreviate-file-name default-directory)
+           'deadgrep-directory)
+
           "\n\n"))
 
 (defun deadgrep--buffer (search-term directory)
   (let* ((buf (get-buffer-create
-               (format "*deadgrep %s*" search-term))))
+               (format "*deadgrep %s %s*"
+                       search-term
+                       (abbreviate-file-name directory)))))
     (with-current-buffer buf
       (setq default-directory directory)
       (let ((inhibit-read-only t))
