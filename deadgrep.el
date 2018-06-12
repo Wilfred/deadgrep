@@ -237,15 +237,32 @@ join the parts into one string with hit highlighting."
 (define-derived-mode deadgrep-mode special-mode
   '("Deadgrep" (:eval (spinner-print deadgrep--spinner))))
 
+(defun deadgrep--current-column ()
+  "Get the current column position in char terms.
+This treats tabs as 1 and ignores the line numbers in the results
+buffer."
+  (let* ((line-start (line-beginning-position))
+         (line-number
+          (get-text-property line-start 'deadgrep-line-number))
+         (line-number-width
+          (max deadgrep--position-column-width
+               (length (number-to-string line-number))))
+         (char-count 0))
+    (save-excursion
+      (while (not (equal (point) line-start))
+        (cl-incf char-count)
+        (backward-char 1)))
+    (max
+     (- char-count line-number-width)
+     0)))
+
 (defun deadgrep--visit-result ()
   "Goto the search result at point."
   (interactive)
   (let* ((pos (line-beginning-position))
          (file-name (get-text-property pos 'deadgrep-filename))
          (line-number (get-text-property pos 'deadgrep-line-number))
-         (column-offset
-          (max (- (current-column) deadgrep--position-column-width)
-               0)))
+         (column-offset (deadgrep--current-column)))
     (when file-name
       (find-file file-name)
       (goto-char (point-min))
