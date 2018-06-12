@@ -1,9 +1,23 @@
 # deadgrep: use ripgrep from Emacs
 
-## Alternatives
+deadgrep.el is the fast, beautiful text search that your Emacs
+deserves.
 
-* https://github.com/Wilfred/ag.el/
-* https://github.com/dajva/rg.el
-* https://github.com/nlamirault/ripgrep.el
-* https://github.com/nlamirault/socyl
+picture.
+
+## Saving Keystrokes
+
+## Instant Feedback
+
+deadgrep.el uses a spinner, and any change in filters immediately
+searches again.
+
+## Easy Filtering
+
+## Character-Perfect Positioning
+
+## Folding
+
+## Complementary Projects
+
 * `counsel-ag`
