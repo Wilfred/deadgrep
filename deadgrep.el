@@ -36,6 +36,7 @@
 (defvar-local deadgrep--search-term nil)
 (defvar-local deadgrep--search-type 'literal)
 (defvar-local deadgrep--search-case 'smart)
+(defvar-local deadgrep--file-type 'all)
 
 (defvar-local deadgrep--current-file nil)
 (defvar-local deadgrep--spinner nil)
@@ -157,6 +158,22 @@ join the parts into one string with hit highlighting."
   (setq deadgrep--search-case (button-get button 'case))
   (deadgrep--restart))
 
+(define-button-type 'deadgrep-file-type
+  'action #'deadgrep--file-type
+  'case nil
+  'help-echo "Change case sensitivity")
+
+(defun deadgrep--file-type (button)
+  (let ((file-type (button-get button 'file-type)))
+    (cond
+     ((eq file-type 'all)
+      (setq deadgrep--file-type file-type))
+     ((eq file-type 'type)
+      (setq deadgrep--file-type (cons file-type "elisp")))
+     (t
+      (error "unknown file type: %S" file-type))))
+  (deadgrep--restart))
+
 (define-button-type 'deadgrep-directory
   'action #'deadgrep--directory
   'help-echo "Change base directory")
@@ -175,7 +192,7 @@ join the parts into one string with hit highlighting."
 
 (defun deadgrep--format-command (search-term search-type case)
   (format
-   "rg --color=ansi --no-heading --with-filename %s %s -- %s"
+   "rg --color=ansi --no-heading --with-filename %s %s %s -- %s"
    (cond
     ((eq search-type 'literal)
      "--fixed-strings")
@@ -192,6 +209,14 @@ join the parts into one string with hit highlighting."
      "--ignore-case")
     (t
      (error "Unknown case: %s" case)))
+   ;; TODO: pass this as an argument.
+   (cond
+    ((eq deadgrep--file-type 'all)
+     "")
+    ((eq (car-safe deadgrep--file-type) 'type)
+     (format "--type %s" (cdr deadgrep--file-type)))
+    (t
+     (error "Unknown file-type: %S" deadgrep--file-type)))
    (shell-quote-argument search-term)))
 
 (defun deadgrep--write-heading ()
@@ -224,11 +249,21 @@ join the parts into one string with hit highlighting."
             (deadgrep--button "ignore" 'deadgrep-case
                               'case 'ignore))
 
-          "\n\n"
-          "Directory: "
+          "\n\nDirectory: "
           (deadgrep--button
            (abbreviate-file-name default-directory)
            'deadgrep-directory)
+          "\nFiles: "
+          (if (eq deadgrep--file-type 'all)
+              "all"
+            (deadgrep--button "all" 'deadgrep-file-type
+                              'file-type 'all))
+          " "
+          (if (eq (car-safe deadgrep--file-type) 'type)
+              (format "type:%s" (cdr deadgrep--file-type))
+            (deadgrep--button "type" 'deadgrep-file-type
+                              'file-type 'type))
+          " extension"
 
           "\n\n"))
 
