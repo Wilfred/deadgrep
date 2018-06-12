@@ -96,8 +96,10 @@ We save the last line here, in case we need to append more text to it.")
 
         ;; Report any errors that occurred.
         (unless (equal output "finished\n")
-          (let ((inhibit-read-only t))
-            (insert output)))))))
+          (save-excursion
+            (let ((inhibit-read-only t))
+              (goto-char (point-max))
+              (insert output))))))))
 
 (defun deadgrep--process-filter (process output)
   ;; If we had an unfinished line from our last call, include that.
@@ -304,11 +306,16 @@ buffer."
 
 (defun deadgrep--restart ()
   (interactive)
-  (let ((inhibit-read-only t))
+  (let ((start-point (point))
+        (inhibit-read-only t))
     (erase-buffer)
     (setq deadgrep--current-file nil)
 
     (deadgrep--write-heading)
+    ;; If the point was in the heading, ensure that we restore its
+    ;; position.
+    (goto-char (min (point-max) start-point))
+
     (deadgrep--start
      deadgrep--search-term
      deadgrep--search-type
