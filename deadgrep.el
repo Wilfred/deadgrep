@@ -34,6 +34,8 @@
 (require 'spinner)
 
 (defvar-local deadgrep--search-term nil)
+(defvar-local deadgrep--search-type 'literal)
+
 (defvar-local deadgrep--current-file nil)
 (defvar-local deadgrep--spinner nil)
 (defvar-local deadgrep--remaining-output nil
@@ -134,13 +136,49 @@ join the parts into one string with hit highlighting."
          (joined (apply #'concat propertized-parts)))
     joined))
 
-(defun deadgrep--format-command (search-term)
+(define-button-type 'deadgrep-type
+  'action #'deadgrep--search-type
+  'search-type nil
+  'help-echo "Change search type")
+
+(defun deadgrep--search-type (button)
+  (setq deadgrep--search-type (button-get button 'search-type))
+  (deadgrep--restart))
+
+(defun deadgrep--button (text type &rest properties)
+  ;; `make-text-button' mutates the string to add properties, so copy
+  ;; TEXT first.
+  (setq text (substring-no-properties text))
+  (apply #'make-text-button text nil :type type properties))
+
+(defun deadgrep--format-command (search-term search-type)
   (format
-   "rg --color=ansi --no-heading --with-filename --fixed-strings -- %s"
+   ;; TODO: --smart-case
+   "rg --color=ansi --no-heading --with-filename %s -- %s"
+   (cond
+    ((eq search-type 'literal)
+     "--fixed-strings")
+    ((eq search-type 'regexp)
+     "")
+    (t
+     (error "Unknown search type: %s" search-type)))
    (shell-quote-argument search-term)))
 
 (defun deadgrep--write-heading ()
   (insert "Search term: " deadgrep--search-term "\n"
+          "Search type: "
+
+          (if (eq deadgrep--search-type 'literal)
+              "literal"
+            (deadgrep--button "literal" 'deadgrep-type
+                              'search-type 'literal))
+          " "
+          (if (eq deadgrep--search-type 'regexp)
+              "regexp"
+            (deadgrep--button "regexp" 'deadgrep-type
+                              'search-type 'regexp))
+
+          "\n"
           "Directory: "
           (abbreviate-file-name default-directory)
           "\n\n"))
@@ -186,7 +224,7 @@ join the parts into one string with hit highlighting."
 ;; TODO: should these be public commands?
 (define-key deadgrep-mode-map (kbd "g") #'deadgrep--restart)
 
-(defun deadgrep--start (search-term)
+(defun deadgrep--start (search-term search-type)
   "Start a ripgrep search."
   (setq deadgrep--spinner (spinner-create 'progress-bar t))
   (spinner-start deadgrep--spinner)
@@ -194,7 +232,7 @@ join the parts into one string with hit highlighting."
          (start-process-shell-command
           (format "rg %s" search-term)
           (current-buffer)
-          (deadgrep--format-command search-term))))
+          (deadgrep--format-command search-term search-type))))
     (set-process-filter process #'deadgrep--process-filter)
     (set-process-sentinel process #'deadgrep--process-sentinel)))
 
@@ -203,7 +241,8 @@ join the parts into one string with hit highlighting."
   (let ((inhibit-read-only t))
     (erase-buffer)
     (deadgrep--write-heading)
-    (deadgrep--start deadgrep--search-term)))
+    (deadgrep--start
+     deadgrep--search-term deadgrep--search-type)))
 
 ;;;###autoload
 (defun deadgrep (search-term)
@@ -214,7 +253,7 @@ starting the search."
   (interactive "sSearch term: ")
   (let* ((buf (deadgrep--buffer search-term default-directory)))
     (switch-to-buffer buf)
-    (deadgrep--start search-term)))
+    (deadgrep--start search-term deadgrep--search-type)))
 
 (provide 'deadgrep)
 ;;; deadgrep.el ends here
