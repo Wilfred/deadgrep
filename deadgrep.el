@@ -369,14 +369,36 @@ buffer."
      deadgrep--search-type
      deadgrep--search-case)))
 
+(defun deadgrep--read-search-term ()
+  "Read a search term from the minibuffer.
+If region is active, return that immediately. Otherwise, offer
+the current word as a default."
+  (if (use-region-p)
+      (buffer-substring-no-properties (region-beginning) (region-end))
+    (let* ((sym (symbol-at-point))
+           (sym-name (when sym (symbol-name sym)))
+           ;; TODO: prompt should say search string or search regexp
+           ;; as appropriate.
+           (prompt
+            (if sym
+                (format "Search term (default %s): " sym)
+              "Search term: "))
+           (user-input
+            (read-from-minibuffer
+             prompt nil nil nil nil sym-name)))
+      (if (equal user-input "")
+          sym-name
+        user-input))))
+
 ;;;###autoload
-(defun deadgrep (search-term)
+(defun deadgrep ()
   "Start a ripgrep search for SEARCH-TERM.
 
 TODO: If called with a prefix, create the results buffer without
 starting the search."
-  (interactive "sSearch term: ")
-  (let* ((buf (deadgrep--buffer search-term default-directory)))
+  (interactive)
+  (let* ((search-term (deadgrep--read-search-term))
+         (buf (deadgrep--buffer search-term default-directory)))
     (switch-to-buffer buf)
     (deadgrep--start
      search-term
