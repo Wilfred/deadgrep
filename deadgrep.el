@@ -223,9 +223,10 @@ join the parts into one string with hit highlighting."
 (defun deadgrep--write-heading ()
   (insert (propertize "Search term: "
                       'face 'font-lock-comment-face)
-          ;; TODO: highlight regexp metachars
-          (propertize deadgrep--search-term
-                      'face 'font-lock-string-face)
+          (if (eq deadgrep--search-type 'regexp)
+              (deadgrep--propertize-regexp deadgrep--search-term)
+            (propertize deadgrep--search-term
+                        'face 'font-lock-string-face))
           "\n"
           (propertize "Search type: "
                       'face 'font-lock-comment-face)
@@ -278,6 +279,28 @@ join the parts into one string with hit highlighting."
           " extension"
 
           "\n\n"))
+
+(defun deadgrep--propertize-regexp (regexp)
+  "Given a string REGEXP representing a search term with regular
+expression syntax, highlight the metacharacters.
+Returns a copy of REGEXP with properties set."
+  (setq regexp (copy-seq regexp))
+
+  ;; TODO: confirm this is the corect set.
+  (let ((metachars '("(" ")" "[" "]" "{" "}"
+                     "|"  "." "+" "*"))
+        (prev-char nil))
+    (--each-indexed (string-to-list regexp)
+      (put-text-property
+       it-index (1+ it-index)
+       'face
+       (if (member (string it) metachars)
+           ;; TODO: I've seen a more appropriate face in some styles,
+           ;; find out what to use instead here.
+           'font-lock-constant-face
+         'font-lock-string-face)
+       regexp)))
+  regexp)
 
 (defun deadgrep--buffer (search-term directory)
   (let* ((buf (get-buffer-create
