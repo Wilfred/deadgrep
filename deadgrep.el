@@ -327,6 +327,7 @@ buffer."
       (forward-char column-offset))))
 
 (define-key deadgrep-mode-map (kbd "RET") #'deadgrep--visit-result)
+;; TODO: we should still be able to click on buttons.
 (define-key deadgrep-mode-map (kbd "<mouse-2>") #'deadgrep--visit-result)
 
 ;; TODO: should these be public commands?
