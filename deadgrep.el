@@ -74,6 +74,7 @@ We save the last line here, in case we need to append more text to it.")
                                'face 'font-lock-comment-face
                                'deadgrep-filename filename
                                'deadgrep-line-number (string-to-number line-num))))
+            (setq filename (propertize filename 'face 'bold))
             (cond
              ;; This is the first file we've seen, print the heading.
              ((null deadgrep--current-file)
@@ -220,7 +221,11 @@ join the parts into one string with hit highlighting."
    (shell-quote-argument search-term)))
 
 (defun deadgrep--write-heading ()
-  (insert "Search term: " deadgrep--search-term "\n"
+  (insert "Search term: "
+          ;; TODO: highlight regexp metachars
+          (propertize deadgrep--search-term
+                      'face 'font-lock-string-face)
+          "\n"
           "Search type: "
 
           (if (eq deadgrep--search-type 'literal)
