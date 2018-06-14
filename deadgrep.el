@@ -221,12 +221,14 @@ join the parts into one string with hit highlighting."
    (shell-quote-argument search-term)))
 
 (defun deadgrep--write-heading ()
-  (insert "Search term: "
+  (insert (propertize "Search term: "
+                      'face 'font-lock-comment-face)
           ;; TODO: highlight regexp metachars
           (propertize deadgrep--search-term
                       'face 'font-lock-string-face)
           "\n"
-          "Search type: "
+          (propertize "Search type: "
+                      'face 'font-lock-comment-face)
 
           (if (eq deadgrep--search-type 'literal)
               "literal"
@@ -237,8 +239,9 @@ join the parts into one string with hit highlighting."
               "regexp"
             (deadgrep--button "regexp" 'deadgrep-type
                               'search-type 'regexp))
-
-          "\nCase: "
+          "\n"
+          (propertize "Case: "
+                      'face 'font-lock-comment-face)
           (if (eq deadgrep--search-case 'smart)
               "smart"
             (deadgrep--button "smart" 'deadgrep-case
@@ -254,11 +257,15 @@ join the parts into one string with hit highlighting."
             (deadgrep--button "ignore" 'deadgrep-case
                               'case 'ignore))
 
-          "\n\nDirectory: "
+          "\n\n"
+          (propertize "Directory: "
+                      'face 'font-lock-comment-face)
           (deadgrep--button
            (abbreviate-file-name default-directory)
            'deadgrep-directory)
-          "\nFiles: "
+          "\n"
+          (propertize "Files: "
+                      'face 'font-lock-comment-face)
           (if (eq deadgrep--file-type 'all)
               "all"
             (deadgrep--button "all" 'deadgrep-file-type
