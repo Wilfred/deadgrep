@@ -287,19 +287,20 @@ Returns a copy of REGEXP with properties set."
   (setq regexp (copy-seq regexp))
 
   ;; TODO: confirm this is the corect set.
-  (let ((metachars '("(" ")" "[" "]" "{" "}"
-                     "|"  "." "+" "*"))
+  (let ((metachars
+         '(?\( ?\) ?\[ ?\] ?\{ ?\} ?| ?. ?+ ?*))
         (prev-char nil))
     (--each-indexed (string-to-list regexp)
       (put-text-property
        it-index (1+ it-index)
        'face
-       (if (member (string it) metachars)
-           ;; TODO: I've seen a more appropriate face in some styles,
+       (if (and (memq it metachars) (not (equal prev-char ?\\)))
+           ;; TODO: I've seen a more appropriate face in some themes,
            ;; find out what to use instead here.
            'font-lock-constant-face
          'font-lock-string-face)
-       regexp)))
+       regexp)
+      (setq prev-char it)))
   regexp)
 
 (defun deadgrep--buffer (search-term directory)
