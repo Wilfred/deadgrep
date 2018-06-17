@@ -488,10 +488,7 @@ the current word as a default."
 
 ;;;###autoload
 (defun deadgrep ()
-  "Start a ripgrep search for SEARCH-TERM.
-
-TODO: If called with a prefix, create the results buffer without
-starting the search."
+  "Start a ripgrep search for SEARCH-TERM."
   (interactive)
   (let* ((search-term (deadgrep--read-search-term))
          (buf (deadgrep--buffer search-term default-directory)))
