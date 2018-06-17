@@ -36,6 +36,13 @@
 (defvar deadgrep-executable
   "rg")
 
+(defvar deadgrep-max-buffers
+  5
+  "Deadgrep will kill the least recently used results buffer
+if there are more than this many.
+
+To disable cleanup entirely, set this variable to nil.")
+
 (defvar-local deadgrep--search-term nil)
 (defvar-local deadgrep--search-type 'literal)
 (defvar-local deadgrep--search-case 'smart)
@@ -389,8 +396,25 @@ Returns a copy of REGEXP with properties set."
 
 (defun deadgrep--buffer (search-term directory)
   (let* ((initial-filename (buffer-file-name))
-         (buf (get-buffer-create
-               (deadgrep--buffer-name search-term directory))))
+         (buf-name (deadgrep--buffer-name search-term directory))
+         (buf (get-buffer buf-name)))
+    (unless buf
+      ;; If we need to create the buffer, ensure we don't exceed
+      ;; `deadgrep-max-buffers' by killing the least recently used.
+      (when (numberp deadgrep-max-buffers)
+        (let* ((buffers (buffer-list))
+               (helpful-bufs (--filter (with-current-buffer it
+                                         (eq major-mode 'deadgrep-mode))
+                                       buffers))
+               ;; `buffer-list' seems to be ordered by most recently
+               ;; visited first, so keep those.
+               (excess-buffers (-drop (1- deadgrep-max-buffers) helpful-bufs)))
+          ;; Kill buffers so we have one buffer less than the maximum
+          ;; before we create a new one.
+          (-each excess-buffers #'kill-buffer)))
+
+      (setq buf (get-buffer-create buf-name)))
+    
     (with-current-buffer buf
       (setq default-directory directory)
       (let ((inhibit-read-only t))
