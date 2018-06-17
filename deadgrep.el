@@ -73,15 +73,18 @@ We save the last line here, in case we need to append more text to it.")
                    (propertize formatted-line-num
                                'face 'font-lock-comment-face
                                'deadgrep-filename filename
-                               'deadgrep-line-number (string-to-number line-num))))
-            (setq filename (propertize filename 'face 'bold))
+                               'deadgrep-line-number (string-to-number line-num)))
+                  (pretty-filename
+                   (propertize filename
+                               'face 'bold
+                               'deadgrep-filename filename)))
             (cond
              ;; This is the first file we've seen, print the heading.
              ((null deadgrep--current-file)
-              (insert filename "\n"))
+              (insert pretty-filename "\n"))
              ;; This is a new file, print the heading with a spacer.
              ((not (equal deadgrep--current-file filename))
-              (insert "\n" filename "\n")))
+              (insert "\n" pretty-filename "\n")))
             (setq deadgrep--current-file filename)
 
             (insert pretty-line-num content "\n")))))))
@@ -371,12 +374,13 @@ buffer."
   (let* ((pos (line-beginning-position))
          (file-name (get-text-property pos 'deadgrep-filename))
          (line-number (get-text-property pos 'deadgrep-line-number))
-         (column-offset (deadgrep--current-column)))
+         (column-offset (when line-number (deadgrep--current-column))))
     (when file-name
       (find-file file-name)
       (goto-char (point-min))
-      (forward-line (1- line-number))
-      (forward-char column-offset))))
+      (when line-number
+        (forward-line (1- line-number))
+        (forward-char column-offset)))))
 
 (define-key deadgrep-mode-map (kbd "RET") #'deadgrep-visit-result)
 ;; TODO: we should still be able to click on buttons.
