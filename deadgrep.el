@@ -40,6 +40,7 @@
 (defvar-local deadgrep--search-type 'literal)
 (defvar-local deadgrep--search-case 'smart)
 (defvar-local deadgrep--file-type 'all)
+(defvar-local deadgrep--initial-filename nil)
 
 (defvar-local deadgrep--current-file nil)
 (defvar-local deadgrep--spinner nil)
@@ -207,16 +208,33 @@ join the parts into one string with hit highlighting."
   'help-echo "Change case sensitivity")
 
 (defun deadgrep--file-type (button)
-  (let ((file-type (button-get button 'file-type)))
+  (let ((button-type (button-get button 'file-type)))
     (cond
-     ((eq file-type 'all)
-      (setq deadgrep--file-type file-type))
-     ((eq file-type 'type)
+     ((eq button-type 'all)
+      (setq deadgrep--file-type 'all))
+     ((eq button-type 'type)
       (let ((new-file-type
              (completing-read "File type: " (deadgrep--type-list))))
         (setq deadgrep--file-type (cons 'type new-file-type))))
+     ((eq button-type 'glob)
+      (let ((glob
+             (read-from-minibuffer
+              "Glob: "
+              (cond
+               ;; If we already have a glob pattern, edit it.
+               ((eq (car-safe deadgrep--file-type) 'glob)
+                (cdr deadgrep--file-type))
+               ;; If the initial file had a file name of the form
+               ;; foo.bar, offer *.bar as the initial glob.
+               ((and deadgrep--initial-filename
+                     (file-name-extension deadgrep--initial-filename))
+                (format "*.%s"
+                        (file-name-extension deadgrep--initial-filename)))
+               (t
+                "")))))
+        (setq deadgrep--file-type (cons 'glob glob))))
      (t
-      (error "unknown file type: %S" file-type))))
+      (error "unknown button type: %S" button-type))))
   (deadgrep-restart))
 
 (define-button-type 'deadgrep-directory
@@ -263,6 +281,9 @@ join the parts into one string with hit highlighting."
      "")
     ((eq (car-safe deadgrep--file-type) 'type)
      (format "--type %s" (cdr deadgrep--file-type)))
+    ((eq (car-safe deadgrep--file-type) 'glob)
+     (format "--type-add 'custom:%s' --type custom"
+             (cdr deadgrep--file-type)))
     (t
      (error "Unknown file-type: %S" deadgrep--file-type)))
    (shell-quote-argument search-term)))
@@ -325,8 +346,12 @@ join the parts into one string with hit highlighting."
           (if (eq (car-safe deadgrep--file-type) 'type)
               (format ":%s" (cdr deadgrep--file-type))
             "")
-          " extension"
-
+          " "
+          (deadgrep--button "glob" 'deadgrep-file-type
+                            'file-type 'glob)
+          (if (eq (car-safe deadgrep--file-type) 'glob)
+              (format ":%s" (cdr deadgrep--file-type))
+            "")
           "\n\n"))
 
 ;; TODO: could we do this in the minibuffer too?
@@ -358,7 +383,8 @@ Returns a copy of REGEXP with properties set."
           (abbreviate-file-name directory)))
 
 (defun deadgrep--buffer (search-term directory)
-  (let* ((buf (get-buffer-create
+  (let* ((initial-filename (buffer-file-name))
+         (buf (get-buffer-create
                (deadgrep--buffer-name search-term directory))))
     (with-current-buffer buf
       (setq default-directory directory)
@@ -370,6 +396,7 @@ Returns a copy of REGEXP with properties set."
 
         (setq deadgrep--search-term search-term)
         (setq deadgrep--current-file nil)
+        (setq deadgrep--initial-filename initial-filename)
         (deadgrep--write-heading))
       (setq buffer-read-only t))
     buf))
