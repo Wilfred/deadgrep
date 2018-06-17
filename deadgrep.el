@@ -471,9 +471,8 @@ the current word as a default."
   (if (use-region-p)
       (buffer-substring-no-properties (region-beginning) (region-end))
     (let* ((sym (symbol-at-point))
-           ;; TODO: this can lead to unwanted syntax highlighting. We
-           ;; should always highlight in a consistent face.
-           (sym-name (when sym (symbol-name sym)))
+           (sym-name (when sym
+                       (substring-no-properties (symbol-name sym))))
            ;; TODO: prompt should say search string or search regexp
            ;; as appropriate.
            (prompt
