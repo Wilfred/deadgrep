@@ -77,11 +77,16 @@ We save the last line here, in case we need to append more text to it.")
          ;; Ignore blank lines.
          ((s-blank? line))
          ;; If we don't have a color code, ripgrep must be complaining
-         ;; about something (e.g. common when zero matches for a
-         ;; type).
+         ;; about something (e.g. zero matches for a
+         ;; glob, or permission denied on some directories).
          ((not (s-matches-p deadgrep--color-code line))
-          (insert line "\n"))
+          (when deadgrep--current-file
+            (setq deadgrep--current-file nil)
+            (insert "\n"))
+          (insert line "\n\n"))
          (t
+          ;; TODO: Handle epically long lines (e.g. minified files) by
+          ;; truncating at some limit.
           (-let* (((filename line-num content) (deadgrep--split-line line))
                   (formatted-line-num
                    (s-pad-right deadgrep--position-column-width " " line-num))
