@@ -236,7 +236,7 @@ join the parts into one string with hit highlighting."
                 (format "*.%s"
                         (file-name-extension deadgrep--initial-filename)))
                (t
-                "")))))
+                "*")))))
         (setq deadgrep--file-type (cons 'glob glob))))
      (t
       (error "unknown button type: %S" button-type))))
