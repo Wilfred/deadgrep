@@ -154,7 +154,7 @@ join the parts into one string with hit highlighting."
          deadgrep--search-term))
   (rename-buffer
    (deadgrep--buffer-name deadgrep--search-term default-directory))
-  (deadgrep--restart))
+  (deadgrep-restart))
 
 (define-button-type 'deadgrep-type
   'action #'deadgrep--search-type
@@ -163,7 +163,7 @@ join the parts into one string with hit highlighting."
 
 (defun deadgrep--search-type (button)
   (setq deadgrep--search-type (button-get button 'search-type))
-  (deadgrep--restart))
+  (deadgrep-restart))
 
 (define-button-type 'deadgrep-case
   'action #'deadgrep--case
@@ -172,7 +172,7 @@ join the parts into one string with hit highlighting."
 
 (defun deadgrep--case (button)
   (setq deadgrep--search-case (button-get button 'case))
-  (deadgrep--restart))
+  (deadgrep-restart))
 
 (define-button-type 'deadgrep-file-type
   'action #'deadgrep--file-type
@@ -188,7 +188,7 @@ join the parts into one string with hit highlighting."
       (setq deadgrep--file-type (cons file-type "elisp")))
      (t
       (error "unknown file type: %S" file-type))))
-  (deadgrep--restart))
+  (deadgrep-restart))
 
 (define-button-type 'deadgrep-directory
   'action #'deadgrep--directory
@@ -200,7 +200,7 @@ join the parts into one string with hit highlighting."
          (read-directory-name "Search files in: ")))
   (rename-buffer
    (deadgrep--buffer-name deadgrep--search-term default-directory))
-  (deadgrep--restart))
+  (deadgrep-restart))
 
 (defun deadgrep--button (text type &rest properties)
   ;; `make-text-button' mutates the string to add properties, so copy
@@ -365,7 +365,7 @@ buffer."
      (- char-count line-number-width)
      0)))
 
-(defun deadgrep--visit-result ()
+(defun deadgrep-visit-result ()
   "Goto the search result at point."
   (interactive)
   (let* ((pos (line-beginning-position))
@@ -378,12 +378,11 @@ buffer."
       (forward-line (1- line-number))
       (forward-char column-offset))))
 
-(define-key deadgrep-mode-map (kbd "RET") #'deadgrep--visit-result)
+(define-key deadgrep-mode-map (kbd "RET") #'deadgrep-visit-result)
 ;; TODO: we should still be able to click on buttons.
-(define-key deadgrep-mode-map (kbd "<mouse-2>") #'deadgrep--visit-result)
+(define-key deadgrep-mode-map (kbd "<mouse-2>") #'deadgrep-visit-result)
 
-;; TODO: should these be public commands?
-(define-key deadgrep-mode-map (kbd "g") #'deadgrep--restart)
+(define-key deadgrep-mode-map (kbd "g") #'deadgrep-restart)
 
 (defun deadgrep--item-p (pos)
   "Is there something at POS that we can interact with?"
@@ -444,7 +443,7 @@ This will either be a button, a filename, or a search result."
     (set-process-filter process #'deadgrep--process-filter)
     (set-process-sentinel process #'deadgrep--process-sentinel)))
 
-(defun deadgrep--restart ()
+(defun deadgrep-restart ()
   (interactive)
   (let ((start-point (point))
         (inhibit-read-only t))
