@@ -142,6 +142,18 @@ join the parts into one string with hit highlighting."
          (joined (apply #'concat propertized-parts)))
     joined))
 
+(define-button-type 'deadgrep-search-term
+  'action #'deadgrep--search-term
+  'help-echo "Change search term")
+
+(defun deadgrep--search-term (_button)
+  (setq deadgrep--search-term
+        ;; TODO: say string or regexp
+        (read-from-minibuffer
+         "search term: "
+         deadgrep--search-term))
+  (deadgrep--restart))
+
 (define-button-type 'deadgrep-type
   'action #'deadgrep--search-type
   'search-type nil
@@ -227,6 +239,8 @@ join the parts into one string with hit highlighting."
           (if (eq deadgrep--search-type 'regexp)
               (deadgrep--propertize-regexp deadgrep--search-term)
             deadgrep--search-term)
+          " "
+          (deadgrep--button "change" 'deadgrep-search-term)
           "\n"
           (propertize "Search type: "
                       'face 'font-lock-comment-face)
