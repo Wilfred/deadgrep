@@ -192,6 +192,15 @@ join the parts into one string with hit highlighting."
   (setq deadgrep--search-case (button-get button 'case))
   (deadgrep-restart))
 
+(defun deadgrep--type-list ()
+  "Query the rg executable for available file types."
+  (let* ((output (shell-command-to-string (format "%s --type-list" deadgrep-executable)))
+         (lines (s-lines (s-trim output)))
+         (types (--map
+                 (-first-item (s-split (rx ":") it))
+                 lines)))
+    types))
+
 (define-button-type 'deadgrep-file-type
   'action #'deadgrep--file-type
   'case nil
@@ -203,7 +212,9 @@ join the parts into one string with hit highlighting."
      ((eq file-type 'all)
       (setq deadgrep--file-type file-type))
      ((eq file-type 'type)
-      (setq deadgrep--file-type (cons file-type "elisp")))
+      (let ((new-file-type
+             (completing-read "File type: " (deadgrep--type-list))))
+        (setq deadgrep--file-type (cons 'type new-file-type))))
      (t
       (error "unknown file type: %S" file-type))))
   (deadgrep-restart))
@@ -309,10 +320,11 @@ join the parts into one string with hit highlighting."
             (deadgrep--button "all" 'deadgrep-file-type
                               'file-type 'all))
           " "
+          (deadgrep--button "type" 'deadgrep-file-type
+                            'file-type 'type)
           (if (eq (car-safe deadgrep--file-type) 'type)
-              (format "type:%s" (cdr deadgrep--file-type))
-            (deadgrep--button "type" 'deadgrep-file-type
-                              'file-type 'type))
+              (format ":%s" (cdr deadgrep--file-type))
+            "")
           " extension"
 
           "\n\n"))
