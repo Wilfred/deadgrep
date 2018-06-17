@@ -33,6 +33,9 @@
 (require 'dash)
 (require 'spinner)
 
+(defvar deadgrep-executable
+  "rg")
+
 (defvar-local deadgrep--search-term nil)
 (defvar-local deadgrep--search-type 'literal)
 (defvar-local deadgrep--search-case 'smart)
@@ -213,7 +216,8 @@ join the parts into one string with hit highlighting."
 
 (defun deadgrep--format-command (search-term search-type case)
   (format
-   "rg --color=ansi --no-heading --with-filename %s %s %s -- %s"
+   "%s --color=ansi --no-heading --with-filename %s %s %s -- %s"
+   deadgrep-executable
    (cond
     ((eq search-type 'literal)
      "--fixed-strings")
