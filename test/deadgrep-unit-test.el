@@ -4,8 +4,9 @@
   ;; Plain text.
   (let ((result (deadgrep--propertize-regexp "foo")))
     (should
-     (eq (get-text-property 0 'face result)
-         'font-lock-string-face)))
+     (not
+      (eq (get-text-property 0 'face result)
+          'font-lock-constant-face))))
   ;; Regexp metacharacter.
   (let ((result (deadgrep--propertize-regexp ".")))
     (should
@@ -14,5 +15,6 @@
   ;; Escaped metacharacter.
   (let ((result (deadgrep--propertize-regexp "\\.")))
     (should
-     (eq (get-text-property 1 'face result)
-         'font-lock-string-face))))
+     (not
+      (eq (get-text-property 1 'face result)
+          'font-lock-constant-face)))))

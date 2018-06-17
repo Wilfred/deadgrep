@@ -226,8 +226,7 @@ join the parts into one string with hit highlighting."
                       'face 'font-lock-comment-face)
           (if (eq deadgrep--search-type 'regexp)
               (deadgrep--propertize-regexp deadgrep--search-term)
-            (propertize deadgrep--search-term
-                        'face 'font-lock-string-face))
+            deadgrep--search-term)
           "\n"
           (propertize "Search type: "
                       'face 'font-lock-comment-face)
@@ -293,15 +292,14 @@ Returns a copy of REGEXP with properties set."
          '(?\( ?\) ?\[ ?\] ?\{ ?\} ?| ?. ?+ ?*))
         (prev-char nil))
     (--each-indexed (string-to-list regexp)
-      (put-text-property
-       it-index (1+ it-index)
-       'face
-       (if (and (memq it metachars) (not (equal prev-char ?\\)))
-           ;; TODO: I've seen a more appropriate face in some themes,
-           ;; find out what to use instead here.
-           'font-lock-constant-face
-         'font-lock-string-face)
-       regexp)
+      (when (and (memq it metachars) (not (equal prev-char ?\\)))
+        (put-text-property
+         it-index (1+ it-index)
+         'face
+         ;; TODO: I've seen a more appropriate face in some themes,
+         ;; find out what to use instead here.
+         'font-lock-constant-face
+         regexp))
       (setq prev-char it)))
   regexp)
 
