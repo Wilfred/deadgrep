@@ -150,8 +150,10 @@ join the parts into one string with hit highlighting."
   (setq deadgrep--search-term
         ;; TODO: say string or regexp
         (read-from-minibuffer
-         "search term: "
+         "Search term: "
          deadgrep--search-term))
+  (rename-buffer
+   (deadgrep--buffer-name deadgrep--search-term default-directory))
   (deadgrep--restart))
 
 (define-button-type 'deadgrep-type
@@ -196,6 +198,8 @@ join the parts into one string with hit highlighting."
   (setq default-directory
         (expand-file-name
          (read-directory-name "Search files in: ")))
+  (rename-buffer
+   (deadgrep--buffer-name deadgrep--search-term default-directory))
   (deadgrep--restart))
 
 (defun deadgrep--button (text type &rest properties)
@@ -317,11 +321,14 @@ Returns a copy of REGEXP with properties set."
       (setq prev-char it)))
   regexp)
 
+(defun deadgrep--buffer-name (search-term directory)
+  (format "*deadgrep %s %s*"
+          search-term
+          (abbreviate-file-name directory)))
+
 (defun deadgrep--buffer (search-term directory)
   (let* ((buf (get-buffer-create
-               (format "*deadgrep %s %s*"
-                       search-term
-                       (abbreviate-file-name directory)))))
+               (deadgrep--buffer-name search-term directory))))
     (with-current-buffer buf
       (setq default-directory directory)
       (let ((inhibit-read-only t))
