@@ -303,7 +303,7 @@ join the parts into one string with hit highlighting."
   "Given a string REGEXP representing a search term with regular
 expression syntax, highlight the metacharacters.
 Returns a copy of REGEXP with properties set."
-  (setq regexp (copy-seq regexp))
+  (setq regexp (copy-sequence regexp))
 
   ;; TODO: see https://docs.rs/regex/1.0.0/regex/#syntax
   (let ((metachars
