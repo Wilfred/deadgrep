@@ -471,7 +471,10 @@ This will either be a button, a filename, or a search result."
         (cl-decf pos)))
     ;; Regardless of direction, ensure point is at the beginning of
     ;; the item.
-    (while (deadgrep--item-p (1- pos))
+    (while (and (if forward-p
+                    (< pos (point-max))
+                  (> pos (point-min)))
+                (deadgrep--item-p (1- pos)))
       (cl-decf pos))
     ;; If we reached an item (we aren't at the first/last item), then
     ;; go to it.
