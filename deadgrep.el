@@ -385,6 +385,53 @@ buffer."
 ;; TODO: should these be public commands?
 (define-key deadgrep-mode-map (kbd "g") #'deadgrep--restart)
 
+(defun deadgrep--item-p (pos)
+  "Is there something at POS that we can interact with?"
+  (or (button-at pos)
+      (get-text-property pos 'deadgrep-filename)))
+
+(defun deadgrep--move (forward-p)
+  "Move to the next item.
+This will either be a button, a filename, or a search result."
+  (interactive)
+  (let ((pos (point)))
+    ;; If point is initially on an item, move past it.
+    (while (and (deadgrep--item-p pos)
+                (if forward-p
+                    (< pos (point-max))
+                  (> pos (point-min))))
+      (if forward-p
+          (cl-incf pos)
+        (cl-decf pos)))
+    ;; Find the next item.
+    (while (and (not (deadgrep--item-p pos))
+                (if forward-p
+                    (< pos (point-max))
+                  (> pos (point-min))))
+      (if forward-p
+          (cl-incf pos)
+        (cl-decf pos)))
+    ;; Regardless of direction, ensure point is at the beginning of
+    ;; the item.
+    (while (deadgrep--item-p (1- pos))
+      (cl-decf pos))
+    (goto-char pos)))
+
+(defun deadgrep-forward ()
+  "Move forward to the next item.
+This will either be a button, a filename, or a search result."
+  (interactive)
+  (deadgrep--move t))
+
+(defun deadgrep-backward ()
+  "Move backward to the previous item.
+This will either be a button, a filename, or a search result."
+  (interactive)
+  (deadgrep--move nil))
+
+(define-key deadgrep-mode-map (kbd "TAB") #'deadgrep-forward)
+(define-key deadgrep-mode-map (kbd "<backtab>") #'deadgrep-backward)
+
 (defun deadgrep--start (search-term search-type case)
   "Start a ripgrep search."
   (setq deadgrep--spinner (spinner-create 'progress-bar t))
