@@ -129,6 +129,7 @@ We save the last line here, in case we need to append more text to it.")
     (list filename line-num
           (deadgrep--propertize-hits line-content-parts))))
 
+;; TODO: this doesn't work with \d when there are consecutive digits.
 (defun deadgrep--propertize-hits (parts)
   "Given a list of PARTS, where every other part is a hit,
 join the parts into one string with hit highlighting."
@@ -280,13 +281,14 @@ join the parts into one string with hit highlighting."
 
           "\n\n"))
 
+;; TODO: could we do this in the minibuffer too?
 (defun deadgrep--propertize-regexp (regexp)
   "Given a string REGEXP representing a search term with regular
 expression syntax, highlight the metacharacters.
 Returns a copy of REGEXP with properties set."
   (setq regexp (copy-seq regexp))
 
-  ;; TODO: confirm this is the corect set.
+  ;; TODO: see https://docs.rs/regex/1.0.0/regex/#syntax
   (let ((metachars
          '(?\( ?\) ?\[ ?\] ?\{ ?\} ?| ?. ?+ ?*))
         (prev-char nil))
@@ -400,6 +402,8 @@ the current word as a default."
   (if (use-region-p)
       (buffer-substring-no-properties (region-beginning) (region-end))
     (let* ((sym (symbol-at-point))
+           ;; TODO: this can lead to unwanted syntax highlighting. We
+           ;; should always highlight in a consistent face.
            (sym-name (when sym (symbol-name sym)))
            ;; TODO: prompt should say search string or search regexp
            ;; as appropriate.
