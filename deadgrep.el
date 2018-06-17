@@ -49,6 +49,10 @@ We save the last line here, in case we need to append more text to it.")
 
 (defconst deadgrep--position-column-width 5)
 
+(defconst deadgrep--color-code
+  (rx (1+ "\x1b[" (+ digit) "m"))
+  "Regular expression for an ANSI color code.")
+
 (defun deadgrep--insert-output (output &optional finished)
   "Propertize OUTPUT from rigrep and write to the current buffer."
   ;; If we had an unfinished line from our last call, include that.
@@ -68,7 +72,15 @@ We save the last line here, in case we need to append more text to it.")
     (save-excursion
       (goto-char (point-max))
       (dolist (line lines)
-        (unless (s-blank? line)
+        (cond
+         ;; Ignore blank lines.
+         ((s-blank? line))
+         ;; If we don't have a color code, ripgrep must be complaining
+         ;; about something (e.g. common when zero matches for a
+         ;; type).
+         ((not (s-matches-p deadgrep--color-code line))
+          (insert line "\n"))
+         (t
           (-let* (((filename line-num content) (deadgrep--split-line line))
                   (formatted-line-num
                    (s-pad-right deadgrep--position-column-width " " line-num))
@@ -90,7 +102,7 @@ We save the last line here, in case we need to append more text to it.")
               (insert "\n" pretty-filename "\n")))
             (setq deadgrep--current-file filename)
 
-            (insert pretty-line-num content "\n")))))))
+            (insert pretty-line-num content "\n"))))))))
 
 (defun deadgrep--process-sentinel (process output)
   "Update the ag buffer associated with PROCESS as complete."
@@ -121,7 +133,7 @@ We save the last line here, in case we need to append more text to it.")
 
 (defun deadgrep--split-line (line)
   "Given a raw LINE of output from rg, apply properties."
-  (let* ((parts (s-split (rx (1+ "\x1b[" (+ digit) "m")) line))
+  (let* ((parts (s-split deadgrep--color-code line))
          (filename (nth 1 parts))
          (line-num (nth 3 parts))
          (line-content-parts (-drop 4 parts))
