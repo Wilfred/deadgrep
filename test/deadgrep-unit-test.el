@@ -62,3 +62,12 @@
     (deadgrep-backward)
     (should
      (deadgrep--item-p (point)))))
+
+(ert-deftest deadgrep--split-line ()
+  (-let* ((line
+           "[0m[35mdeadgrep.el[0m:[0m[32m123[0m:    (when ([0m[31m[1mbuffer-live[0m-p buffer)")
+          ((filename line-num line) (deadgrep--split-line line)))
+    (should
+     (equal filename "deadgrep.el"))
+    (should
+     (equal line-num "123"))))
