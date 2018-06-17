@@ -171,7 +171,7 @@ join the parts into one string with hit highlighting."
          "Search term: "
          deadgrep--search-term))
   (rename-buffer
-   (deadgrep--buffer-name deadgrep--search-term default-directory))
+   (deadgrep--buffer-name deadgrep--search-term default-directory) t)
   (deadgrep-restart))
 
 (define-button-type 'deadgrep-type
