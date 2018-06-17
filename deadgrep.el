@@ -473,7 +473,10 @@ This will either be a button, a filename, or a search result."
     ;; the item.
     (while (deadgrep--item-p (1- pos))
       (cl-decf pos))
-    (goto-char pos)))
+    ;; If we reached an item (we aren't at the first/last item), then
+    ;; go to it.
+    (when (deadgrep--item-p pos)
+      (goto-char pos))))
 
 (defun deadgrep-forward ()
   "Move forward to the next item.
