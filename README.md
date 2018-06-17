@@ -1,4 +1,4 @@
-# deadgrep: use ripgrep from Emacs
+# deadgrep: use ripgrep from Emacs [![Build Status](https://travis-ci.org/Wilfred/deadgrep.svg?branch=master)](https://travis-ci.org/Wilfred/deadgrep)
 
 deadgrep.el is the fast, beautiful text search that your Emacs
 deserves.
