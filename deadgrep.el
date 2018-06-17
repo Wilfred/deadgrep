@@ -567,7 +567,7 @@ the current word as a default."
            ;; as appropriate.
            (prompt
             (if sym
-                (format "Search term (default %s): " sym)
+                (format "Search term (default %s): " sym-name)
               "Search term: "))
            (user-input
             (read-from-minibuffer
