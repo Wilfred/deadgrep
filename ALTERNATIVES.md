@@ -8,6 +8,8 @@ your workflow.
 [Counsel](https://github.com/abo-abo/swiper) provides the command
 `counsel-rg` (and similar commands `counsel-ag` and `counsel-ack`).
 
+![screenshot](counsel_rg_screenshot.png)
+
 These provide as-you-type search results. This is a different style of
 working to deadgrep.el, and it's a great complementary tool.
 
