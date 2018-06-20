@@ -523,8 +523,8 @@ This will either be a button, a filename, or a search result."
   (interactive)
   (deadgrep--move nil))
 
-(define-key deadgrep-mode-map (kbd "TAB") #'deadgrep-forward)
-(define-key deadgrep-mode-map (kbd "<backtab>") #'deadgrep-backward)
+(define-key deadgrep-mode-map (kbd "n") #'deadgrep-forward)
+(define-key deadgrep-mode-map (kbd "p") #'deadgrep-backward)
 
 (defun deadgrep--start (search-term search-type case)
   "Start a ripgrep search."
