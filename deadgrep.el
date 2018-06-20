@@ -45,7 +45,7 @@ if there are more than this many.
 To disable cleanup entirely, set this variable to nil.")
 
 (defvar-local deadgrep--search-term nil)
-(defvar-local deadgrep--search-type 'literal)
+(defvar-local deadgrep--search-type 'string)
 (defvar-local deadgrep--search-case 'smart)
 (defvar-local deadgrep--file-type 'all)
 (defvar-local deadgrep--initial-filename nil)
@@ -298,8 +298,10 @@ with Emacs text properties."
    "%s --color=ansi --no-heading --with-filename %s %s %s -- %s"
    deadgrep-executable
    (cond
-    ((eq search-type 'literal)
+    ((eq search-type 'string)
      "--fixed-strings")
+    ((eq search-type 'words)
+     "--fixed-strings --word-regexp")
     ((eq search-type 'regexp)
      "")
     (t
@@ -338,10 +340,15 @@ with Emacs text properties."
           (propertize "Search type: "
                       'face 'font-lock-comment-face)
 
-          (if (eq deadgrep--search-type 'literal)
-              "literal"
-            (deadgrep--button "literal" 'deadgrep-type
-                              'search-type 'literal))
+          (if (eq deadgrep--search-type 'string)
+              "string"
+            (deadgrep--button "string" 'deadgrep-type
+                              'search-type 'string))
+          " "
+          (if (eq deadgrep--search-type 'words)
+              "words"
+            (deadgrep--button "words" 'deadgrep-type
+                              'search-type 'words))
           " "
           (if (eq deadgrep--search-type 'regexp)
               "regexp"
