@@ -44,6 +44,9 @@ information. This is because ag.el is built on top of
 ag.el has a few tests, but coverage is significantly lower than
 deadgrep.
 
+ag.el has support for editing files from the results buffer, using
+[wgrep](https://github.com/mhayashi1120/Emacs-wgrep).
+
 ## rg.el
 
 [rg.el](https://github.com/dajva/rg.el) targets `rg`, and the results
@@ -79,3 +82,13 @@ tool that supports `rg` plus others.
 Socyl is also based on `compilation-mode`, and does not group results
 by file. As it's generic, users must specify a search backend, as well
 as specifying the directory on every invocation.
+
+## grep
+
+`M-x grep` is a built-in Emacs command.
+
+![screenshot](grep_screenshot.png)
+
+Users must specify the glob and the search term as part of a raw
+`grep` command. This means your `.gitignore` is ignored, unlike `rg`,
+`ag` or `ack`. This command also uses `compilation-mode`.
