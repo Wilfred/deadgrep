@@ -7,17 +7,26 @@
      (not
       (eq (get-text-property 0 'face result)
           'font-lock-constant-face))))
-  ;; Regexp metacharacter.
-  (let ((result (deadgrep--propertize-regexp ".")))
-    (should
-     (eq (get-text-property 0 'face result)
-         'font-lock-constant-face)))
+  ;; Regexp metacharacters
+  (let ((result (deadgrep--propertize-regexp "^.?$")))
+    (dotimes (i (length result))
+      (should
+       (eq (get-text-property i 'face result)
+           'font-lock-constant-face))))
   ;; Escaped metacharacter.
   (let ((result (deadgrep--propertize-regexp "\\.")))
     (should
      (not
       (eq (get-text-property 1 'face result)
-          'font-lock-constant-face)))))
+          'font-lock-constant-face))))
+  ;; Backslash escape sequence.
+  (let ((result (deadgrep--propertize-regexp "\\b")))
+    (should
+     (eq (get-text-property 0 'face result)
+         'font-lock-constant-face))
+    (should
+     (eq (get-text-property 1 'face result)
+         'font-lock-constant-face))))
 
 (ert-deftest deadgrep-smoke-test ()
   (cl-letf (((symbol-function 'read-from-minibuffer)

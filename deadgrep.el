@@ -425,12 +425,19 @@ expression syntax, highlight the metacharacters.
 Returns a copy of REGEXP with properties set."
   (setq regexp (copy-sequence regexp))
 
-  ;; TODO: see https://docs.rs/regex/1.0.0/regex/#syntax
+  ;; See https://docs.rs/regex/1.0.0/regex/#syntax
   (let ((metachars
-         '(?\( ?\) ?\[ ?\] ?\{ ?\} ?| ?. ?+ ?*))
+         ;; Characters that don't match themselves.
+         '(?\( ?\) ?\[ ?\] ?\{ ?\} ?| ?. ?+ ?* ?? ?^ ?$))
+        ;; Characters that have special regexp meaning when preceded
+        ;; with a backslash. This includes things like \b but not
+        ;; things like \n.
+        (escape-metachars
+         '(?A ?b ?B ?d ?D ?p ?s ?S ?w ?W ?z))
         (prev-char nil))
     (--each-indexed (string-to-list regexp)
-      (when (and (memq it metachars) (not (equal prev-char ?\\)))
+      (cond
+       ((and (memq it metachars) (not (equal prev-char ?\\)))
         (put-text-property
          it-index (1+ it-index)
          'face
@@ -438,6 +445,12 @@ Returns a copy of REGEXP with properties set."
          ;; find out what to use instead here.
          'font-lock-constant-face
          regexp))
+       ((and (memq it escape-metachars) (equal prev-char ?\\))
+        (put-text-property
+         (1- it-index) (1+ it-index)
+         'face 'font-lock-constant-face
+         regexp)))
+
       (setq prev-char it)))
   regexp)
 
