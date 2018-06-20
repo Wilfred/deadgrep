@@ -1,9 +1,9 @@
 # deadgrep: use ripgrep from Emacs [![Build Status](https://travis-ci.org/Wilfred/deadgrep.svg?branch=master)](https://travis-ci.org/Wilfred/deadgrep) [![Coverage Status](https://coveralls.io/repos/github/Wilfred/deadgrep/badge.svg?branch=master)](https://coveralls.io/github/Wilfred/deadgrep?branch=master)
 
-deadgrep.el is the fast, beautiful text search that your Emacs
+Deadgrep is the fast, beautiful text search that your Emacs
 deserves.
 
-![screenshot](deadgrep.png)
+![screenshot](deadgrep_screenshot.png)
 
 ## Installation
 
@@ -20,13 +20,13 @@ deserves.
 
 ## Super Fast
 
-deadgrep.el uses ripgrep for extremely fast text searches. It then
+Deadgrep uses ripgrep for extremely fast text searches. It then
 minimises keystrokes to get you results as soon as possible.
 
-If you change your search settings, deadgrep.el immediately re-runs
+If you change your search settings, deadgrep immediately re-runs
 the search.
 
-If you're searching a large project, then deadgrep.el shows a spinner
+If you're searching a large project, then deadgrep shows a spinner
 to give you feedback.
 
 ## Easy Filtering
@@ -37,6 +37,6 @@ buffer. Just push the relevant button.
 
 ## Alternative Projects
 
-I believe that deadgrep.el is the best tool for doing Emacs text
+I believe that deadgrep is the best tool for doing Emacs text
 searches, but there are some other great tools out there. See
 [ALTERNATIVES](ALTERNATIVES.md) for a discussion.
