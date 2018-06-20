@@ -20,20 +20,31 @@ deserves.
 
 ## Super Fast
 
-Deadgrep uses ripgrep for extremely fast text searches. It then
-minimises keystrokes to get you results as soon as possible.
+Deadgrep uses ripgrep for extremely fast text searches. It works hard
+to minimise your keystrokes, to get you results as soon as
+possible. Try running `M-x deadgrep` with a region highlighted.
 
 If you change your search settings, deadgrep immediately re-runs
 the search.
-
-If you're searching a large project, then deadgrep shows a spinner
-to give you feedback.
 
 ## Easy Filtering
 
 Didn't get the results you wanted? It's easy to change the search
 term, search type, or search directory, directly from the results
 buffer. Just push the relevant button.
+
+## Polish
+
+Deadgrep uses spinners to give you feedback on whether your search has
+finished.
+
+It highlights regexp syntax according to the syntax accepted by `rg`.
+
+Deadgrep handles minified files robustly.
+
+You can always jump to exactly the position that point is on, even
+when searching files that contain tab characters. You can also
+navigate to the file itself from the file headings.
 
 ## Alternative Projects
 
