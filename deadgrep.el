@@ -556,8 +556,8 @@ This will either be a button, a filename, or a search result."
 
 (defun deadgrep--read-search-term ()
   "Read a search term from the minibuffer.
-If region is active, return that immediately. Otherwise, offer
-the current word as a default."
+If region is active, return that immediately. Otherwise, prompt
+for a string, offering the current word as a default."
   (if (use-region-p)
       (buffer-substring-no-properties (region-beginning) (region-end))
     (let* ((sym (symbol-at-point))
