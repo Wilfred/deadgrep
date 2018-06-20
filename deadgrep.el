@@ -5,7 +5,7 @@
 ;; Author: Wilfred Hughes <me@wilfred.me.uk>
 ;; Keywords: tools
 ;; Version: 0.1
-;; Package-Requires: ((emacs "25.1") (dash "2.12.0") (s "1.11.0") (spinner "1.7.3"))
+;; Package-Requires: ((emacs "25.1") (dash "2.12.0") (s "1.11.0") (spinner "1.7.3") (projectile "0.14.0"))
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -32,6 +32,7 @@
 (require 's)
 (require 'dash)
 (require 'spinner)
+(autoload 'projectile-project-root "projectile")
 
 (defvar deadgrep-executable
   "rg")
@@ -576,12 +577,21 @@ for a string, offering the current word as a default."
           sym-name
         user-input))))
 
+(defun deadgrep--project-root (file-path)
+  "Guess the project root of the given FILE-PATH."
+  (or
+   (ignore-errors
+     ;; This raises an error if we're not in a project.
+     (projectile-project-root))
+   file-path))
+
 ;;;###autoload
 (defun deadgrep ()
   "Start a ripgrep search for SEARCH-TERM."
   (interactive)
   (let* ((search-term (deadgrep--read-search-term))
-         (buf (deadgrep--buffer search-term default-directory)))
+         (dir (deadgrep--project-root default-directory))
+         (buf (deadgrep--buffer search-term dir)))
     (switch-to-buffer buf)
     (deadgrep--start
      search-term
