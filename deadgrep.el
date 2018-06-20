@@ -59,7 +59,7 @@ We save the last line here, in case we need to append more text to it.")
 (defconst deadgrep--position-column-width 5)
 
 (defconst deadgrep--color-code
-  (rx (1+ "\x1b[" (+ digit) "m"))
+  (rx "\x1b[" (+ digit) "m")
   "Regular expression for an ANSI color code.")
 
 (defun deadgrep--insert-output (output &optional finished)
@@ -97,12 +97,13 @@ We save the last line here, in case we need to append more text to it.")
           ;; truncating at some limit.
           (-let* (((filename line-num content) (deadgrep--split-line line))
                   (formatted-line-num
-                   (s-pad-right deadgrep--position-column-width " " line-num))
+                   (s-pad-right deadgrep--position-column-width " "
+                                (number-to-string line-num)))
                   (pretty-line-num
                    (propertize formatted-line-num
                                'face 'font-lock-comment-face
                                'deadgrep-filename filename
-                               'deadgrep-line-number (string-to-number line-num)))
+                               'deadgrep-line-number line-num))
                   (pretty-filename
                    (propertize filename
                                'face 'bold
@@ -145,34 +146,58 @@ We save the last line here, in case we need to append more text to it.")
     (with-current-buffer (process-buffer process)
       (deadgrep--insert-output output))))
 
+(defun deadgrep--extract-regexp (pattern s)
+  "Search for PATTERN in S, and return the content of the first group."
+  (string-match pattern s)
+  (match-string 1 s))
+
+(defconst deadgrep--filename-regexp
+  (rx bos "\x1b[0m\x1b[35m" (group (+? anything)) "\x1b[")
+  "Extracts the filename from a ripgrep line with ANSI color sequences.
+We use the color sequences to extract the filename exactly, even
+if the path contains colons.")
+
+(defconst deadgrep--line-num-regexp
+  (rx "\x1b[32m" (group (+ digit)))
+  "Extracts the line number from a ripgrep line with ANSI color sequences.
+Ripgrep uses a unique color for line numbers, so we use that to
+extract the linue number exactly.")
+
+(defconst deadgrep--line-contents-regexp
+  (rx "\x1b[32m" (+ digit) "\x1b[0m" ":" (group (+ anything)))
+  "Extract the line contents from a ripgrep line with ANSI color sequences.
+Use the unique color for line numbers to ensure we start at the
+correct colon.
+
+Note that the text in the group will still contain color codes
+highlighting which parts matched the user's search term.")
+
+(defconst deadgrep--hit-regexp
+  (rx "\x1b[0m\x1b[31m\x1b[1m" (group (+? anything)) "\x1b[0m")
+  "Extract the portion of a line found by ripgrep that matches the user's input.
+This may occur multiple times in one line.")
+
 (defun deadgrep--split-line (line)
-  "Given a raw LINE of output from rg, apply properties."
-  (let* ((parts (s-split deadgrep--color-code line))
-         (filename (nth 1 parts))
-         (line-num (nth 3 parts))
-         (line-content-parts (-drop 4 parts))
-         ;; The very first part includes a colon, remove that.
-         (line-content-start
-          (substring (car line-content-parts) 1)))
-    (setq line-content-parts
-          (cons line-content-start
-                (-drop 1 line-content-parts)))
+  "Split out the components of a raw LINE of output from rg.
+Return the filename, line number, and the line content with ANSI
+color codes replaced with string properties."
+  (list
+   (deadgrep--extract-regexp deadgrep--filename-regexp line)
+   (string-to-number
+    (deadgrep--extract-regexp deadgrep--line-num-regexp line))
+   (deadgrep--propertize-hits
+    (deadgrep--extract-regexp deadgrep--line-contents-regexp line))))
 
-    (list filename line-num
-          (deadgrep--propertize-hits line-content-parts))))
-
-;; TODO: this doesn't work with \d when there are consecutive digits.
-(defun deadgrep--propertize-hits (parts)
-  "Given a list of PARTS, where every other part is a hit,
-join the parts into one string with hit highlighting."
-  (let* ((propertized-parts
-          (--map-indexed
-           (if (cl-evenp it-index)
-               it
-             (propertize it 'face 'match))
-           parts))
-         (joined (apply #'concat propertized-parts)))
-    joined))
+(defun deadgrep--propertize-hits (line-contents)
+  "Given LINE-CONTENTS from ripgrep, replace ANSI color codes
+with Emacs text properties."
+  (replace-regexp-in-string
+   deadgrep--hit-regexp
+   (lambda (s)
+     (propertize
+      (match-string 1 s)
+      'face 'match))
+   line-contents))
 
 (define-button-type 'deadgrep-search-term
   'action #'deadgrep--search-term
