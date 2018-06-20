@@ -501,7 +501,6 @@ buffer."
 
 (define-key deadgrep-mode-map (kbd "RET") #'deadgrep-visit-result)
 ;; TODO: we should still be able to click on buttons.
-(define-key deadgrep-mode-map (kbd "<mouse-2>") #'deadgrep-visit-result)
 
 (define-key deadgrep-mode-map (kbd "g") #'deadgrep-restart)
 
