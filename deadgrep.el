@@ -24,7 +24,7 @@
 ;;; Commentary:
 
 ;; Perform text searches with the speed of ripgrep and the comfort of
-;; emacs. This is a bespoke mode that does not rely on
+;; Emacs.  This is a bespoke mode that does not rely on
 ;; compilation-mode, but tries to be a perfect fit for ripgrep.
 
 ;; Install from MELPA, then `M-x ripgrep' will do a search!
@@ -142,7 +142,7 @@ We save the last line here, in case we need to append more text to it.")
             (insert "\n"))))))))
 
 (defun deadgrep--process-sentinel (process output)
-  "Update the ag buffer associated with PROCESS as complete."
+  "Update the deadgrep buffer associated with PROCESS as complete."
   (let ((buffer (process-buffer process)))
     (when (buffer-live-p buffer)
       (with-current-buffer buffer
@@ -294,7 +294,7 @@ with Emacs text properties."
                 "*")))))
         (setq deadgrep--file-type (cons 'glob glob))))
      (t
-      (error "unknown button type: %S" button-type))))
+      (error "Unknown button type: %S" button-type))))
   (deadgrep-restart))
 
 (define-button-type 'deadgrep-directory
@@ -351,6 +351,8 @@ with Emacs text properties."
    (shell-quote-argument search-term)))
 
 (defun deadgrep--write-heading ()
+  "Write the deadgrep heading with buttons reflecting the current
+search settings."
   (insert (propertize "Search term: "
                       'face 'font-lock-comment-face)
           (if (eq deadgrep--search-type 'regexp)
@@ -607,6 +609,7 @@ This will either be a button, a filename, or a search result."
     (set-process-sentinel process #'deadgrep--process-sentinel)))
 
 (defun deadgrep-restart ()
+  "Re-run ripgrep with the current search settings."
   (interactive)
   (let ((start-point (point))
         (inhibit-read-only t))
@@ -625,7 +628,7 @@ This will either be a button, a filename, or a search result."
 
 (defun deadgrep--read-search-term ()
   "Read a search term from the minibuffer.
-If region is active, return that immediately. Otherwise, prompt
+If region is active, return that immediately.  Otherwise, prompt
 for a string, offering the current word as a default."
   (if (use-region-p)
       (buffer-substring-no-properties (region-beginning) (region-end))
