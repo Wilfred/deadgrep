@@ -3,7 +3,7 @@
 Deadgrep is the fast, beautiful text search that your Emacs
 deserves.
 
-![screenshot](deadgrep_screenshot.png)
+![screenshot](docs/deadgrep_screenshot.png)
 
 ## Installation
 
@@ -50,4 +50,4 @@ navigate to the file itself from the file headings.
 
 I believe that deadgrep is the best tool for doing Emacs text
 searches, but there are some other great tools out there. See
-[ALTERNATIVES](ALTERNATIVES.md) for a discussion.
+[ALTERNATIVES](docs/ALTERNATIVES.md) for a discussion.
