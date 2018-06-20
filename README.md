@@ -33,14 +33,22 @@ Didn't get the results you wanted? It's easy to change the search
 term, search type, or search directory, directly from the results
 buffer. Just push the relevant button.
 
+![screenshot](docs/deadgrep_filters.png)
+
 ## Polish
 
 Deadgrep uses spinners to give you feedback on whether your search has
 finished.
 
+![screenshot](docs/deadgrep_spinner.png)
+
 It highlights regexp syntax according to the syntax accepted by `rg`.
 
+![screenshot](docs/deadgrep_highlight.png)
+
 Deadgrep handles minified files robustly.
+
+![screenshot](docs/deadgrep_truncated.png)
 
 You can always jump to exactly the position that point is on, even
 when searching files that contain tab characters. You can also
