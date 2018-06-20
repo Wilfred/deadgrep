@@ -38,7 +38,7 @@
   "rg")
 
 (defvar deadgrep-max-buffers
-  5
+  4
   "Deadgrep will kill the least recently used results buffer
 if there are more than this many.
 
