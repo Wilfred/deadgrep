@@ -8,7 +8,7 @@ your workflow.
 [Counsel](https://github.com/abo-abo/swiper) provides the command
 `counsel-rg` (and similar commands `counsel-ag` and `counsel-ack`).
 
-![screenshot](docs/counsel_rg_screenshot.png)
+![screenshot](./counsel_rg_screenshot.png)
 
 These provide as-you-type search results. This is a different style of
 working to deadgrep.el, and it's a great complementary tool.
@@ -35,7 +35,7 @@ ag.el has a lot of search commands to memorise:
 This only covers some of the possible filter combinations, and caused
 confusion for users who expected regexp search to be the default.
 
-![screenshot](docs/ag_screenshot.png)
+![screenshot](./ag_screenshot.png)
 
 Results buffers here are much busier, showing superfluous
 information. This is because ag.el is built on top of
@@ -52,7 +52,7 @@ ag.el has support for editing files from the results buffer, using
 [rg.el](https://github.com/dajva/rg.el) targets `rg`, and the results
 buffer shows what type of search occurred.
 
-![screenshot](docs/rg_el_screenshot.png)
+![screenshot](./rg_el_screenshot.png)
 
 However, it's still built on `compilation-mode`, and does not group
 results by file. It also (as far as I can tell) always prompts for a
@@ -66,7 +66,7 @@ rg.el is very thoroughly tested.
 projectile-ripgrep (part of the same project), is an alternative to
 rg.el.
 
-![screenshot](docs/ripgrep_el_screenshot.png)
+![screenshot](./ripgrep_el_screenshot.png)
 
 This is also using `compilation-mode` without grouping
 results. `projectile-ripgrep` saves you needing to specify the search
@@ -77,7 +77,7 @@ directory (just like deadgrep and ag.el).
 [Socyl](https://github.com/nlamirault/socyl) is a generic text search
 tool that supports `rg` plus others.
 
-![screenshot](docs/socyl_screenshot.png)
+![screenshot](./socyl_screenshot.png)
 
 Socyl is also based on `compilation-mode`, and does not group results
 by file. As it's generic, users must specify a search backend, as well
@@ -87,7 +87,7 @@ as specifying the directory on every invocation.
 
 `M-x grep` is a built-in Emacs command.
 
-![screenshot](docs/grep_screenshot.png)
+![screenshot](./grep_screenshot.png)
 
 Users must specify the glob and the search term as part of a raw
 `grep` command. This means your `.gitignore` is ignored, unlike `rg`,
