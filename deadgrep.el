@@ -44,6 +44,17 @@ if there are more than this many.
 
 To disable cleanup entirely, set this variable to nil.")
 
+(defvar deadgrep-max-line-length
+  500
+  "Truncate lines if they are longer than this.
+
+Emacs performance can be really poor long lines, so this ensures
+that searching minified files does not slow down movement in
+results buffers.
+
+In extreme cases (100KiB+ single-line files), we can get a stack
+overflow on our regexp matchers if we don't apply this.")
+
 (defvar-local deadgrep--search-term nil)
 (defvar-local deadgrep--search-type 'string)
 (defvar-local deadgrep--search-case 'smart)
@@ -93,9 +104,12 @@ We save the last line here, in case we need to append more text to it.")
             (insert "\n"))
           (insert line "\n\n"))
          (t
-          ;; TODO: Handle epically long lines (e.g. minified files) by
-          ;; truncating at some limit.
-          (-let* (((filename line-num content) (deadgrep--split-line line))
+          (-let* ((truncate-p (> (length line) deadgrep-max-line-length))
+                  (line
+                   (if truncate-p
+                       (substring line 0 deadgrep-max-line-length)
+                     line))
+                  ((filename line-num content) (deadgrep--split-line line))
                   (formatted-line-num
                    (s-pad-right deadgrep--position-column-width " "
                                 (number-to-string line-num)))
@@ -117,7 +131,12 @@ We save the last line here, in case we need to append more text to it.")
               (insert "\n" pretty-filename "\n")))
             (setq deadgrep--current-file filename)
 
-            (insert pretty-line-num content "\n"))))))))
+            (insert pretty-line-num content)
+            (when truncate-p
+              (insert
+               (propertize " ... (truncated)"
+                           'face 'font-lock-comment-face)))
+            (insert "\n"))))))))
 
 (defun deadgrep--process-sentinel (process output)
   "Update the ag buffer associated with PROCESS as complete."
