@@ -10,8 +10,9 @@ your workflow.
 
 ![screenshot](./counsel_rg_screenshot.png)
 
-These provide as-you-type search results. This is a different style of
-working to deadgrep.el, and it's a great complementary tool.
+This uses counsel's incremental searching UI.
+
+**Great for**: As-you-type search results.
 
 ## ag.el
 
@@ -44,7 +45,8 @@ information. This is because ag.el is built on top of
 ag.el has a few tests, but coverage is significantly lower than
 deadgrep.
 
-ag.el has support for editing files from the results buffer, using
+**Great for**: Searching with `ag`, binding a different search to
+different keys, and editing files from the results buffer using
 [wgrep](https://github.com/mhayashi1120/Emacs-wgrep).
 
 ## rg.el
@@ -54,11 +56,12 @@ buffer shows what type of search occurred.
 
 ![screenshot](./rg_el_screenshot.png)
 
-However, it's still built on `compilation-mode`, and does not group
-results by file. It also (as far as I can tell) always prompts for a
-directory and a file type, requiring additional keystrokes.
+It's built on `compilation-mode`, and you can use `rg-group-result` to
+combine results.
 
-rg.el is very thoroughly tested.
+**Great for**: if you want a ripgrep tool with excellent test
+coverage, you have `compilation-mode` shortcuts, or if you do lots of
+searches for words (`rg-dwim` is excellent).
 
 ## ripgrep.el
 
@@ -69,8 +72,9 @@ rg.el.
 ![screenshot](./ripgrep_el_screenshot.png)
 
 This is also using `compilation-mode` without grouping
-results. `projectile-ripgrep` saves you needing to specify the search
-directory (just like deadgrep and ag.el).
+results. 
+
+**Great for**: ripgrep searches starting in the project root.
 
 ## socyl
 
@@ -80,8 +84,11 @@ tool that supports `rg` plus others.
 ![screenshot](./socyl_screenshot.png)
 
 Socyl is also based on `compilation-mode`, and does not group results
-by file. As it's generic, users must specify a search backend, as well
-as specifying the directory on every invocation.
+by file AFAICS. As it's generic, users must specify a search backend,
+as well as specifying the directory.
+
+**Great for**: Using the same search UI with multiple different search
+tools.
 
 ## grep
 
@@ -92,3 +99,5 @@ as specifying the directory on every invocation.
 Users must specify the glob and the search term as part of a raw
 `grep` command. This means your `.gitignore` is ignored, unlike `rg`,
 `ag` or `ack`. This command also uses `compilation-mode`.
+
+**Great for**: Doing a text search using only built-in tools.
