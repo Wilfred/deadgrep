@@ -38,7 +38,7 @@
 (autoload 'projectile-project-root "projectile")
 
 (defvar deadgrep-executable
-  "rg")
+  (executable-find "rg"))
 
 (defvar deadgrep-max-buffers
   4
