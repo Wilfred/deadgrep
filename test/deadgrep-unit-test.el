@@ -81,6 +81,18 @@
     (should
      (equal line-num 123))))
 
+(ert-deftest deadgrep--split-line--propertize ()
+  (let* ((raw-line "[0m[31m[1mfoo[0m bar")
+         (line (deadgrep--propertize-hits raw-line)))
+    (should
+     (eq (get-text-property 0 'face line) 'match)))
+  ;; Some users are seeing color codes in a different order. Ensure we
+  ;; handle that too.
+  (let* ((raw-line "[0m[1m[31mfoo[0m bar")
+         (line (deadgrep--propertize-hits raw-line)))
+    (should
+     (eq (get-text-property 0 'face line) 'match))))
+
 (ert-deftest deadgrep--split-line--consecutive ()
   "Ensure we correctly handle immediately consecutive results."
   (-let* ((raw-line

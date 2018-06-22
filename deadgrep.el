@@ -195,7 +195,17 @@ Note that the text in the group will still contain color codes
 highlighting which parts matched the user's search term.")
 
 (defconst deadgrep--hit-regexp
-  (rx "\x1b[0m\x1b[31m\x1b[1m" (group (+? anything)) "\x1b[0m")
+  (rx-to-string
+   `(seq
+     ;; A reset color code.
+     "\x1b[0m"
+     ;; Two color codes, bold and color (any order).
+     (regexp ,deadgrep--color-code)
+     (regexp ,deadgrep--color-code)
+     ;; The actual text.
+     (group (+? anything))
+     ;; A reset color code again.
+     "\x1b[0m"))
   "Extract the portion of a line found by ripgrep that matches the user's input.
 This may occur multiple times in one line.")
 
