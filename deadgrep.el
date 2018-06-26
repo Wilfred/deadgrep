@@ -327,7 +327,7 @@ with Emacs text properties."
 
 (defun deadgrep--format-command (search-term search-type case)
   (format
-   "%s --color=ansi --no-heading --with-filename %s %s %s -- %s"
+   "%s --color=ansi --line-number --no-heading --with-filename %s %s %s -- %s ."
    deadgrep-executable
    (cond
     ((eq search-type 'string)
