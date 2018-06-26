@@ -1,6 +1,6 @@
 # v0.2
 
-No changes yet.
+Fixed Windows (PR by @iquiw).
 
 # v0.1
 
