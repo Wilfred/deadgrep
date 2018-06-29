@@ -81,6 +81,29 @@
     (should
      (equal line-num 123))))
 
+(ert-deftest deadgrep--split-line--context ()
+  "Ensure we split a line correctly when using -A, -B or -C
+context arguments to ripgrep."
+  (-let* ((raw-line
+           "[0m[35mdeadgrep.el[0m-[0m[32m123[0m-    (when (buffer-live-p buffer)")
+          ((filename line-num line) (deadgrep--split-line raw-line)))
+    (should
+     (equal filename "deadgrep.el"))
+    (should
+     (equal line-num 123))
+    (should
+     (equal line "    (when (buffer-live-p buffer)")))
+  ;; Context lines can even be empty.
+  (-let* ((raw-line
+           "[0m[35memr.el[0m-[0m[32m67[0m-")
+          ((filename line-num line) (deadgrep--split-line raw-line)))
+    (should
+     (equal filename "emr.el"))
+    (should
+     (equal line-num 67))
+    (should
+     (equal line ""))))
+
 (ert-deftest deadgrep--split-line--windows ()
   (-let* ((raw-line
            "[0m[36mtest\\deadgrep.el[0m:[0m[32m456[0m:    (when ([0m[31m[1mbuffer-live[0m-p buffer)")

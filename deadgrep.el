@@ -62,6 +62,9 @@ overflow on our regexp matchers if we don't apply this.")
 (defvar-local deadgrep--search-type 'string)
 (defvar-local deadgrep--search-case 'smart)
 (defvar-local deadgrep--file-type 'all)
+(defvar-local deadgrep--context nil
+  "When set, also show context of results.
+This is stored as a cons cell of integers (lines-before . lines-after).")
 (defvar-local deadgrep--initial-filename nil)
 
 (defvar-local deadgrep--current-file nil)
@@ -98,6 +101,9 @@ We save the last line here, in case we need to append more text to it.")
         (cond
          ;; Ignore blank lines.
          ((s-blank? line))
+         ;; Ignore -- lines, which are used as a context separator
+         ;; when calling ripgrep with context flags.
+         ((string= line "--"))
          ;; If we don't have a color code, ripgrep must be complaining
          ;; about something (e.g. zero matches for a
          ;; glob, or permission denied on some directories).
@@ -186,7 +192,7 @@ Ripgrep uses a unique color for line numbers, so we use that to
 extract the linue number exactly.")
 
 (defconst deadgrep--line-contents-regexp
-  (rx "\x1b[32m" (+ digit) "\x1b[0m" ":" (group (+ anything)))
+  (rx "\x1b[32m" (+ digit) "\x1b[0m" (or ":" "-") (group (* anything)))
   "Extract the line contents from a ripgrep line with ANSI color sequences.
 Use the unique color for line numbers to ensure we start at the
 correct colon.
@@ -263,6 +269,30 @@ with Emacs text properties."
   (setq deadgrep--search-case (button-get button 'case))
   (deadgrep-restart))
 
+(define-button-type 'deadgrep-context
+  'action #'deadgrep--context
+  'context nil
+  'help-echo "Show/hide context around match")
+
+(defun deadgrep--context (button)
+  ;; deadgrep--context takes the value of (before . after) when set.
+  (setq deadgrep--context
+        (cl-case (button-get button 'context)
+          ((nil)
+           nil)
+          (before
+           (cons
+            (read-number "Show N lines before: ")
+            (or (cdr-safe deadgrep--context) 0)))
+          (after
+           (cons
+            (or (car-safe deadgrep--context) 0)
+            (read-number "Show N lines after: ")))
+          (t
+           (error "Unknown context type"))))
+
+  (deadgrep-restart))
+
 (defun deadgrep--type-list ()
   "Query the rg executable for available file types."
   (let* ((output (shell-command-to-string (format "%s --type-list" deadgrep-executable)))
@@ -325,9 +355,11 @@ with Emacs text properties."
   (setq text (substring-no-properties text))
   (apply #'make-text-button text nil :type type properties))
 
-(defun deadgrep--format-command (search-term search-type case)
+(defun deadgrep--format-command (search-term search-type case context)
+  "Return a command string that we can execute in a shell
+to obtain ripgrep results."
   (format
-   "%s --color=ansi --line-number --no-heading --with-filename %s %s %s -- %s ."
+   "%s --color=ansi --line-number --no-heading --with-filename %s %s %s %s -- %s ."
    deadgrep-executable
    (cond
     ((eq search-type 'string)
@@ -358,6 +390,10 @@ with Emacs text properties."
              (cdr deadgrep--file-type)))
     (t
      (error "Unknown file-type: %S" deadgrep--file-type)))
+   (if context
+       (format "--before-context %s --after-context %s"
+               (car context) (cdr context))
+     "")
    (shell-quote-argument search-term)))
 
 (defun deadgrep--write-heading ()
@@ -405,6 +441,25 @@ search settings."
               "ignore"
             (deadgrep--button "ignore" 'deadgrep-case
                               'case 'ignore))
+          "\n"
+          (propertize "Context: "
+                      'face 'font-lock-comment-face)
+          (if deadgrep--context
+              (deadgrep--button "none" 'deadgrep-context
+                                'context nil)
+            "none")
+          " "
+          (deadgrep--button "before" 'deadgrep-context
+                            'context 'before)
+          (if deadgrep--context
+              (format ":%d" (car deadgrep--context))
+            "")
+          " "
+          (deadgrep--button "after" 'deadgrep-context
+                            'context 'after)
+          (if deadgrep--context
+              (format ":%d" (cdr deadgrep--context))
+            "")
 
           "\n\n"
           (propertize "Directory: "
@@ -614,7 +669,9 @@ This will either be a button, a filename, or a search result."
          (start-process-shell-command
           (format "rg %s" search-term)
           (current-buffer)
-          (deadgrep--format-command search-term search-type case))))
+          (deadgrep--format-command
+           search-term search-type case
+           deadgrep--context))))
     (set-process-filter process #'deadgrep--process-filter)
     (set-process-sentinel process #'deadgrep--process-sentinel)))
 
