@@ -698,7 +698,9 @@ This will either be a button, a filename, or a search result."
 If region is active, return that immediately.  Otherwise, prompt
 for a string, offering the current word as a default."
   (if (use-region-p)
-      (buffer-substring-no-properties (region-beginning) (region-end))
+      (prog1
+          (buffer-substring-no-properties (region-beginning) (region-end))
+        (deactivate-mark))
     (let* ((sym (symbol-at-point))
            (sym-name (when sym
                        (substring-no-properties (symbol-name sym))))
