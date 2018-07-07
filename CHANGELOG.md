@@ -1,6 +1,7 @@
 # v0.3
 
-No changes yet.
+Fixed an issue where active regions hang around after starting a
+search.
 
 # v0.2
 
