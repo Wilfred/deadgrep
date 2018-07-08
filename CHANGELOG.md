@@ -1,3 +1,7 @@
+# v0.4
+
+No changes yet.
+
 # v0.3
 
 Added the ability to collapse results from a specific file!
