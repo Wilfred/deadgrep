@@ -1,5 +1,7 @@
 # v0.3
 
+Added the ability to collapse results from a specific file!
+
 Deadgrep now re-uses search settings from the last search, so if you
 prefer regexp settings, you only need to set it once!
 

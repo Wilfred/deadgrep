@@ -140,6 +140,9 @@ We save the last line here, in case we need to append more text to it.")
               (insert "\n" pretty-filename "\n")))
             (setq deadgrep--current-file filename)
 
+            ;; TODO: apply the invisible property if the user decided
+            ;; to hide this filename before we finished finding
+            ;; results in it.
             (insert pretty-line-num content)
             (when truncate-p
               (insert
@@ -611,6 +614,56 @@ buffer."
 
 (define-key deadgrep-mode-map (kbd "g") #'deadgrep-restart)
 
+(defvar-local deadgrep--hidden-files nil
+  "An alist recording which files currently have their lines
+hidden in this deadgrep results buffer.
+
+Keys are interned filenames, so they compare with `eq'.")
+
+(defun deadgrep-toggle-file-results ()
+  "Show/hide the results of the file at point."
+  (interactive)
+  (let* ((pos (line-beginning-position))
+         (file-name (get-text-property pos 'deadgrep-filename))
+         (line-number (get-text-property pos 'deadgrep-line-number)))
+    (when (and file-name (not line-number))
+      ;; We're on a file heading.
+      (if (alist-get (intern file-name) deadgrep--hidden-files)
+          (deadgrep--show)
+        (deadgrep--hide)))))
+
+(defun deadgrep--show ()
+  (-let* ((pos (line-beginning-position))
+          (file-name (get-text-property pos 'deadgrep-filename))
+          ((start-pos end-pos) (alist-get (intern file-name) deadgrep--hidden-files)))
+    (remove-overlays start-pos end-pos 'invisible t)
+    (setf (alist-get (intern file-name) deadgrep--hidden-files)
+          nil)))
+
+(defun deadgrep--hide ()
+  "Hide the file results immediately after point."
+  (save-excursion
+    (let* ((pos (line-beginning-position))
+           (file-name (get-text-property pos 'deadgrep-filename))
+           (start-pos
+            (progn
+              (forward-line)
+              (point)))
+           (end-pos
+            (progn
+              (while (and
+                      (get-text-property (point) 'deadgrep-line-number)
+                      (not (bobp)))
+                (forward-line))
+              ;; Step over the newline.
+              (1+ (point))))
+           (o (make-overlay start-pos end-pos)))
+      (overlay-put o 'invisible t)
+      (setf (alist-get (intern file-name) deadgrep--hidden-files)
+            (list start-pos end-pos)))))
+
+(define-key deadgrep-mode-map (kbd "TAB") #'deadgrep-toggle-file-results)
+
 (defun deadgrep--item-p (pos)
   "Is there something at POS that we can interact with?"
   (or (button-at pos)
@@ -687,6 +740,7 @@ This will either be a button, a filename, or a search result."
         (inhibit-read-only t))
     (erase-buffer)
     (setq deadgrep--current-file nil)
+    (setq deadgrep--hidden-files nil)
 
     (deadgrep--write-heading)
     ;; If the point was in the heading, ensure that we restore its

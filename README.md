@@ -50,6 +50,10 @@ It highlights regexp syntax according to the syntax accepted by `rg`.
 
 ![screenshot](docs/deadgrep_highlight.png)
 
+You can collapse and expand files with `TAB`.
+
+![screenshot](docs/deadgrep_collapsed.png)
+
 Deadgrep handles minified files robustly.
 
 ![screenshot](docs/deadgrep_truncated.png)
