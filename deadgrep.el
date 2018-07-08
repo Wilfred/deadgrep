@@ -562,10 +562,9 @@ Returns a list ordered by the most recently accessed."
             ;; visited first.
             (buffer-list)))
 
-(defun deadgrep--buffer (search-term directory)
+(defun deadgrep--buffer (search-term directory initial-filename)
   "Create and initialise a search results buffer."
-  (let* ((initial-filename (buffer-file-name))
-         (buf-name (deadgrep--buffer-name search-term directory))
+  (let* ((buf-name (deadgrep--buffer-name search-term directory))
          (buf (get-buffer buf-name)))
     (unless buf
       ;; If we need to create the buffer, ensure we don't exceed
@@ -810,7 +809,11 @@ for a string, offering the current word as a default."
   (interactive)
   (let* ((search-term (deadgrep--read-search-term))
          (dir (deadgrep--project-root default-directory))
-         (buf (deadgrep--buffer search-term dir))
+         (buf (deadgrep--buffer
+               search-term
+               dir
+               (or deadgrep--initial-filename
+                   (buffer-file-name))))
          (last-results-buf (car-safe (deadgrep--buffers)))
          prev-search-type
          prev-search-case)
