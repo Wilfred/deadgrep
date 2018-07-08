@@ -9,8 +9,7 @@ deserves.
 
 1. Install [ripgrep](https://github.com/BurntSushi/ripgrep).
 
-2. Install deadgrep from MELPA (coming soon) or copy it into your
-   ~/.emacs.d.
+2. Install deadgrep from MELPA or copy it into your `~/.emacs.d`.
 
 3. (Optional) add deadgrep to a convenient shortcut. I like F5.
 
@@ -20,12 +19,18 @@ deserves.
 
 ## Super Fast
 
-Deadgrep uses ripgrep for extremely fast text searches. It works hard
-to minimise your keystrokes, to get you results as soon as
-possible. Try running `M-x deadgrep` with a region highlighted.
+Deadgrep uses ripgrep for extremely fast text searches.
 
-If you change your search settings, deadgrep immediately re-runs
-the search.
+If you change your search settings, deadgrep will immediately re-run
+your search.
+
+## Context Aware
+
+Deadgrep works hard to minimise your keystrokes. Try running `M-x
+deadgrep` with a region highlighted!
+
+Deadgrep uses the root of your current git project to search from. You
+can of course override this.
 
 If you prefer regexp searches, or prefer case-insensitive searches,
 deadgrep remembers. When you start a new search, it re-uses the
