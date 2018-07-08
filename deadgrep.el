@@ -301,7 +301,7 @@ with Emacs text properties."
   (let* ((output (shell-command-to-string (format "%s --type-list" deadgrep-executable)))
          (lines (s-lines (s-trim output)))
          (types (--map
-                 (-first-item (s-split (rx ":") it))
+                 (s-split (rx ": ") it)
                  lines)))
     types))
 
@@ -310,6 +310,26 @@ with Emacs text properties."
   'case nil
   'help-echo "Change case sensitivity")
 
+(defun deadgrep--read-file-type (filename)
+  "Read a ripgrep file type, defaulting to the type that matches FILENAME."
+  (let* ((types-and-exts (deadgrep--type-list))
+         (types (-map #'-first-item types-and-exts))
+         matching-type-and-ext)
+    ;; If we've been given a filename with an extension.
+    (when (and filename (file-name-extension filename))
+      ;; Get the first type whose list of extensions contains this extension.
+      (setq matching-type-and-ext
+            (-find
+             (-lambda ((_ extensions))
+               (s-contains-p
+                (format "*.%s" (file-name-extension filename))
+                extensions))
+             types-and-exts)))
+    (completing-read "File type: "
+                     types
+                     nil nil nil nil
+                     (car-safe matching-type-and-ext))))
+
 (defun deadgrep--file-type (button)
   (let ((button-type (button-get button 'file-type)))
     (cond
@@ -317,7 +337,7 @@ with Emacs text properties."
       (setq deadgrep--file-type 'all))
      ((eq button-type 'type)
       (let ((new-file-type
-             (completing-read "File type: " (deadgrep--type-list))))
+             (deadgrep--read-file-type deadgrep--initial-filename)))
         (setq deadgrep--file-type (cons 'type new-file-type))))
      ((eq button-type 'glob)
       (let ((glob

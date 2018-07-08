@@ -26,15 +26,18 @@ your search.
 
 ## Context Aware
 
-Deadgrep works hard to minimise your keystrokes. Try running `M-x
-deadgrep` with a region highlighted!
+Deadgrep works hard to minimise your keystrokes.
 
-Deadgrep uses the root of your current git project to search from. You
-can of course override this.
+**Search term**: If the region is active, deadgrep uses that.
 
-If you prefer regexp searches, or prefer case-insensitive searches,
-deadgrep remembers. When you start a new search, it re-uses the
-regexp and case settings from the previous search.
+**Search directory**: If your current file is in a git project,
+deadgrep uses that for your search directory.
+
+**Regexp and case sensitivity options**: Deadgrep re-uses whatever
+settings you used in your last search.
+
+**Globbing and file types**: Deadgrep suggests file types and globbing
+options that match the file you started the search from.
 
 ## Easy Filtering
 
