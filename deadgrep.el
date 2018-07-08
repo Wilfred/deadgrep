@@ -327,7 +327,7 @@ with Emacs text properties."
              types-and-exts)))
     (completing-read "File type: "
                      types
-                     nil nil nil nil
+                     nil t nil nil
                      (car-safe matching-type-and-ext))))
 
 (defun deadgrep--file-type (button)
