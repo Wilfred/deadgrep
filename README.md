@@ -27,6 +27,10 @@ possible. Try running `M-x deadgrep` with a region highlighted.
 If you change your search settings, deadgrep immediately re-runs
 the search.
 
+If you prefer regexp searches, or prefer case-insensitive searches,
+deadgrep remembers. When you start a new search, it re-uses the
+regexp and case settings from the previous search.
+
 ## Easy Filtering
 
 Didn't get the results you wanted? It's easy to change the search

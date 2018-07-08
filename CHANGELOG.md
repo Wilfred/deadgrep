@@ -1,5 +1,8 @@
 # v0.3
 
+Deadgrep now re-uses search settings from the last search, so if you
+prefer regexp settings, you only need to set it once!
+
 Fixed an issue where active regions hang around after starting a
 search.
 
