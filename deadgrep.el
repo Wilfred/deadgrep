@@ -683,6 +683,16 @@ Keys are interned filenames, so they compare with `eq'.")
 
 (define-key deadgrep-mode-map (kbd "TAB") #'deadgrep-toggle-file-results)
 
+(defun deadgrep-kill-process ()
+  "Kill the deadgrep process associated with the current buffer."
+  (interactive)
+  (if (get-buffer-process (current-buffer))
+      (interrupt-process)
+    (message "No process running.")))
+
+;; Keybinding chosen to match `kill-compilation'.
+(define-key deadgrep-mode-map (kbd "C-c C-k") #'deadgrep-kill-process)
+
 (defun deadgrep--item-p (pos)
   "Is there something at POS that we can interact with?"
   (or (button-at pos)
