@@ -5,7 +5,24 @@ deserves.
 
 ![screenshot](docs/deadgrep_screenshot.png)
 
-## Installation
+<!-- markdown-toc start - Don't edit this section. Run M-x markdown-toc-generate-toc again -->
+**Table of Contents**
+
+- [Usage](#usage)
+    - [Installation](#installation)
+    - [Keybindings](#keybindings)
+- [Features](#features)
+    - [Super Fast](#super-fast)
+    - [Context Aware](#context-aware)
+    - [Easy Filtering](#easy-filtering)
+    - [Polish](#polish)
+- [Alternative Projects](#alternative-projects)
+
+<!-- markdown-toc end -->
+
+## Usage
+
+### Installation
 
 1. Install [ripgrep](https://github.com/BurntSushi/ripgrep).
 
@@ -17,14 +34,26 @@ deserves.
 (global-set-key (kbd "<f5>") #'deadgrep)
 ```
 
-## Super Fast
+### Keybindings
+
+| Key                           | Action                                    |
+| ---                           | ---                                       |
+| <kbd>RET</kbd>                | Visit the result, file or button at point |
+| <kbd>n</kbd> and <kbd>p</kbd> | Move between results or buttons           |
+| <kbd>g</kbd>                  | Re-run the search                         |
+| <kbd>TAB</kbd>                | Expand/collapse results for a file        |
+| <kbd>C-c</kbd> <kbd>C-k</kbd> | Stop a running search                     |
+
+## Features
+
+### Super Fast
 
 Deadgrep uses ripgrep for extremely fast text searches.
 
 If you change your search settings, deadgrep will immediately re-run
 your search.
 
-## Context Aware
+### Context Aware
 
 Deadgrep works hard to minimise your keystrokes.
 
@@ -39,7 +68,7 @@ settings you used in your last search.
 **Globbing and file types**: Deadgrep suggests file types and globbing
 options that match the file you started the search from.
 
-## Easy Filtering
+### Easy Filtering
 
 Didn't get the results you wanted? It's easy to change the search
 term, search type, or search directory, directly from the results
@@ -47,7 +76,7 @@ buffer. Just push the relevant button.
 
 ![screenshot](docs/deadgrep_filters.png)
 
-## Polish
+### Polish
 
 Deadgrep uses spinners to give you feedback on whether your search has
 finished.
