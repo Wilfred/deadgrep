@@ -6,6 +6,9 @@ Deadgrep now treats search terms as a separate history list, rather
 than offering all previous minibuffer inputs. Document this
 functionality.
 
+Defined separate faces for the different styles by deadgrep, so users
+may customise them.
+
 When starting a search from another search buffer, remember the
 original file that the original search buffer was opened from. This
 ensures we can still offer useful globbing/file type defaults.
