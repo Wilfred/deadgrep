@@ -9,6 +9,11 @@ functionality.
 Defined separate faces for the different styles by deadgrep, so users
 may customise them.
 
+Deadgrep no longer shows 'exited abnormally with code 1'. The most
+common cause of this is simply a search term with zero results. We are
+now relying on deadgrep writing something to stderr if there are any
+other issues that caused an exit code of 1.
+
 When starting a search from another search buffer, remember the
 original file that the original search buffer was opened from. This
 ensures we can still offer useful globbing/file type defaults.

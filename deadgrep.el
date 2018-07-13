@@ -193,7 +193,10 @@ We save the last line here, in case we need to append more text to it.")
         (deadgrep--insert-output "" t)
 
         ;; Report any errors that occurred.
-        (unless (equal output "finished\n")
+        (unless (member output
+                        (list
+                         "exited abnormally with code 1\n"
+                         "finished\n"))
           (save-excursion
             (let ((inhibit-read-only t))
               (goto-char (point-max))
