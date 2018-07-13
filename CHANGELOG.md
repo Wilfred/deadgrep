@@ -2,6 +2,10 @@
 
 Added the ability to stop searches with `C-c C-k`.
 
+Deadgrep now treats search terms as a separate history list, rather
+than offering all previous minibuffer inputs. Document this
+functionality.
+
 When starting a search from another search buffer, remember the
 original file that the original search buffer was opened from. This
 ensures we can still offer useful globbing/file type defaults.

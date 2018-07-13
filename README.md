@@ -46,6 +46,13 @@ deserves.
 | <kbd>TAB</kbd>                | Expand/collapse results for a file        |
 | <kbd>C-c</kbd> <kbd>C-k</kbd> | Stop a running search                     |
 
+### Minibuffer
+
+You use the minibuffer to enter a new search term.
+
+You can also reuse a previous search term with <kbd>M-p</kbd> in the
+minibuffer. To edit the default search term, use <kbd>M-n</kbd>.
+
 ## Features
 
 ### Super Fast

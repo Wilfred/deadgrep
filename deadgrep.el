@@ -47,6 +47,10 @@ if there are more than this many.
 
 To disable cleanup entirely, set this variable to nil.")
 
+(defvar deadgrep-history
+  nil
+  "A list of the previous search terms.")
+
 (defvar deadgrep-max-line-length
   500
   "Truncate lines if they are longer than this.
@@ -785,25 +789,31 @@ This will either be a button, a filename, or a search result."
   "Read a search term from the minibuffer.
 If region is active, return that immediately.  Otherwise, prompt
 for a string, offering the current word as a default."
-  (if (use-region-p)
-      (prog1
-          (buffer-substring-no-properties (region-beginning) (region-end))
-        (deactivate-mark))
-    (let* ((sym (symbol-at-point))
-           (sym-name (when sym
-                       (substring-no-properties (symbol-name sym))))
-           ;; TODO: prompt should say search string or search regexp
-           ;; as appropriate.
-           (prompt
-            (if sym
-                (format "Search term (default %s): " sym-name)
-              "Search term: "))
-           (user-input
-            (read-from-minibuffer
-             prompt nil nil nil nil sym-name)))
-      (if (equal user-input "")
-          sym-name
-        user-input))))
+  (let (search-term)
+    (if (use-region-p)
+        (progn
+          (setq search-term
+                (buffer-substring-no-properties (region-beginning) (region-end)))
+          (deactivate-mark))
+      (let* ((sym (symbol-at-point))
+             (sym-name (when sym
+                         (substring-no-properties (symbol-name sym))))
+             ;; TODO: prompt should say search string or search regexp
+             ;; as appropriate.
+             (prompt
+              (if sym
+                  (format "Search term (default %s): " sym-name)
+                "Search term: "))
+             (user-input
+              ))
+        (setq search-term
+              (read-from-minibuffer
+               prompt nil nil nil 'deadgrep-history sym-name))
+        (when (equal search-term "")
+          (setq search-term sym-name))))
+    (unless (equal (car deadgrep-history) search-term)
+      (push search-term deadgrep-history))
+    search-term))
 
 (defun deadgrep--project-root (file-path)
   "Guess the project root of the given FILE-PATH."
