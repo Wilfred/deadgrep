@@ -832,9 +832,7 @@ for a string, offering the current word as a default."
              (prompt
               (if sym
                   (format "Search term (default %s): " sym-name)
-                "Search term: "))
-             (user-input
-              ))
+                "Search term: ")))
         (setq search-term
               (read-from-minibuffer
                prompt nil nil nil 'deadgrep-history sym-name))
