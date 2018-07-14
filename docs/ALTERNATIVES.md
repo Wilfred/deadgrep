@@ -90,6 +90,22 @@ as well as specifying the directory.
 **Great for**: Using the same search UI with multiple different search
 tools.
 
+## helm-rg
+
+[helm-rg](https://github.com/cosmicexplorer/helm-rg) targets Helm
+users.
+
+![screenshot](./helm_rg_screenshot.png)
+
+helm-rg is a [Helm](https://github.com/emacs-helm/helm) frontend for
+`rg`. In addition to the usual search features, it treats spaces in
+search terms specially so you don't need to worry about order. This
+neat feature means that `foo bar` is equivalent to
+`foo.*bar|bar.*foo`.
+
+**Great for**: Using rg with Helm, especially with multiple search
+terms.
+
 ## grep
 
 `M-x grep` is a built-in Emacs command.
