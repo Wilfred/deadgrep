@@ -18,6 +18,9 @@ When starting a search from another search buffer, remember the
 original file that the original search buffer was opened from. This
 ensures we can still offer useful globbing/file type defaults.
 
+Allow users to configure the function used to find the project root
+with `deadgrep-project-root-function`.
+
 # v0.3
 
 Added the ability to collapse results from a specific file!

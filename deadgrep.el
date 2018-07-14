@@ -35,7 +35,7 @@
 (require 's)
 (require 'dash)
 (require 'spinner)
-(autoload 'projectile-project-root "projectile")
+(require 'projectile)
 
 (defgroup deadgrep nil
   "A powerful text search UI using ripgrep."
@@ -51,6 +51,11 @@
 if there are more than this many.
 
 To disable cleanup entirely, set this variable to nil.")
+
+(defvar deadgrep-project-root-function
+  #'deadgrep--project-root
+  "Function called by `deadgrep' to work out the root directory
+to search from.")
 
 (defvar deadgrep-history
   nil
@@ -842,20 +847,17 @@ for a string, offering the current word as a default."
       (push search-term deadgrep-history))
     search-term))
 
-(defun deadgrep--project-root (file-path)
+(defun deadgrep--project-root ()
   "Guess the project root of the given FILE-PATH."
-  (or
-   (ignore-errors
-     ;; This raises an error if we're not in a project.
-     (projectile-project-root))
-   file-path))
+  (let ((projectile-require-project-root nil))
+    (projectile-project-root)))
 
 ;;;###autoload
 (defun deadgrep ()
   "Start a ripgrep search for SEARCH-TERM."
   (interactive)
   (let* ((search-term (deadgrep--read-search-term))
-         (dir (deadgrep--project-root default-directory))
+         (dir (funcall deadgrep-project-root-function))
          (buf (deadgrep--buffer
                search-term
                dir
