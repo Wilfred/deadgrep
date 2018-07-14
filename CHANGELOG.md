@@ -1,3 +1,7 @@
+# v0.5
+
+No changes yet.
+
 # v0.4
 
 Added the ability to stop searches with `C-c C-k`.
