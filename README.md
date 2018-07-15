@@ -13,6 +13,7 @@ deserves.
 - [Usage](#usage)
     - [Installation](#installation)
     - [Keybindings](#keybindings)
+    - [Minibuffer](#minibuffer)
 - [Features](#features)
     - [Super Fast](#super-fast)
     - [Context Aware](#context-aware)
@@ -38,13 +39,13 @@ deserves.
 
 ### Keybindings
 
-| Key                           | Action                                    |
-| ---                           | ---                                       |
-| <kbd>RET</kbd>                | Visit the result, file or button at point |
-| <kbd>n</kbd> and <kbd>p</kbd> | Move between results or buttons           |
-| <kbd>g</kbd>                  | Re-run the search                         |
-| <kbd>TAB</kbd>                | Expand/collapse results for a file        |
-| <kbd>C-c</kbd> <kbd>C-k</kbd> | Stop a running search                     |
+| Key                           | Action                                         |
+| ---                           | ---                                            |
+| <kbd>RET</kbd>                | Visit the result, file or push button at point |
+| <kbd>n</kbd> and <kbd>p</kbd> | Move between results or buttons                |
+| <kbd>g</kbd>                  | Re-run the search                              |
+| <kbd>TAB</kbd>                | Expand/collapse results for a file             |
+| <kbd>C-c</kbd> <kbd>C-k</kbd> | Stop a running search                          |
 
 ### Minibuffer
 
