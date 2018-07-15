@@ -6,27 +6,27 @@
     (should
      (not
       (eq (get-text-property 0 'face result)
-          'font-lock-constant-face))))
+          'deadgrep-regexp-metachar-face))))
   ;; Regexp metacharacters
   (let ((result (deadgrep--propertize-regexp "^.?$")))
     (dotimes (i (length result))
       (should
        (eq (get-text-property i 'face result)
-           'font-lock-constant-face))))
+           'deadgrep-regexp-metachar-face))))
   ;; Escaped metacharacter.
   (let ((result (deadgrep--propertize-regexp "\\.")))
     (should
      (not
       (eq (get-text-property 1 'face result)
-          'font-lock-constant-face))))
+          'deadgrep-regexp-metachar-face))))
   ;; Backslash escape sequence.
   (let ((result (deadgrep--propertize-regexp "\\b")))
     (should
      (eq (get-text-property 0 'face result)
-         'font-lock-constant-face))
+         'deadgrep-regexp-metachar-face))
     (should
      (eq (get-text-property 1 'face result)
-         'font-lock-constant-face))))
+         'deadgrep-regexp-metachar-face))))
 
 (ert-deftest deadgrep-smoke-test ()
   (cl-letf (((symbol-function 'read-from-minibuffer)
@@ -117,13 +117,13 @@ context arguments to ripgrep."
   (let* ((raw-line "[0m[31m[1mfoo[0m bar")
          (line (deadgrep--propertize-hits raw-line)))
     (should
-     (eq (get-text-property 0 'face line) 'match)))
+     (eq (get-text-property 0 'face line) 'deadgrep-match-face)))
   ;; Some users are seeing color codes in a different order. Ensure we
   ;; handle that too.
   (let* ((raw-line "[0m[1m[31mfoo[0m bar")
          (line (deadgrep--propertize-hits raw-line)))
     (should
-     (eq (get-text-property 0 'face line) 'match))))
+     (eq (get-text-property 0 'face line) 'deadgrep-match-face))))
 
 (ert-deftest deadgrep--split-line--consecutive ()
   "Ensure we correctly handle immediately consecutive results."
@@ -131,6 +131,6 @@ context arguments to ripgrep."
            "[0m[35mdeadgrep.el[0m:[0m[32m379[0m:  ;; see https://docs.rs/regex/[0m[31m[1m1.[0m[0m[31m[1m0.[0m0/regex/#syntax")
           ((_ _ line) (deadgrep--split-line raw-line)))
     (should
-     (eq (get-text-property 31 'face line) 'match))
+     (eq (get-text-property 31 'face line) 'deadgrep-match-face))
     (should
-     (eq (get-text-property 33 'face line) 'match))))
+     (eq (get-text-property 33 'face line) 'deadgrep-match-face))))
