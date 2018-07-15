@@ -134,3 +134,14 @@ context arguments to ripgrep."
      (eq (get-text-property 31 'face line) 'deadgrep-match-face))
     (should
      (eq (get-text-property 33 'face line) 'deadgrep-match-face))))
+
+(ert-deftest deadgrep--insert-output ()
+  "Ensure we can split raw output and insert in a buffer."
+  (with-temp-buffer
+    (deadgrep--insert-output
+     "[0m[35mdeadgrep.el[0m:[0m[32m379[0m:foobar"
+     t)
+    (should
+     (equal
+      (buffer-substring-no-properties (point-min) (point-max))
+      "deadgrep.el\n379  foobar\n"))))
