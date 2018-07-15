@@ -96,6 +96,11 @@ It highlights regexp syntax according to the syntax accepted by `rg`.
 
 ![screenshot](docs/deadgrep_highlight.png)
 
+When navigating to a line that matched, the relevant part of the line
+is temporarily highlighted.
+
+![screenshot](docs/deadgrep_highlight_relevant.png)
+
 You can collapse and expand files with `TAB`.
 
 ![screenshot](docs/deadgrep_collapsed.png)

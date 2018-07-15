@@ -1,6 +1,7 @@
 # v0.5
 
-No changes yet.
+When navigating to a matched line, flash the matched part of the line
+(inspired by the helm-rg readme!).
 
 # v0.4
 

@@ -652,19 +652,68 @@ buffer."
      (- char-count line-number-width)
      0)))
 
+(defun deadgrep--flash-column-offsets (start end)
+  "Temporarily highlight column offset from START to END."
+  (let* ((line-start (line-beginning-position))
+         (overlay (make-overlay
+                   (+ line-start start)
+                   (+ line-start end))))
+    (overlay-put overlay 'face 'highlight)
+    (run-with-timer 1.0 nil 'delete-overlay overlay)))
+
+(defun deadgrep--match-face-p (pos)
+  "Is there a match face at POS?"
+  (eq (get-text-property pos 'face) 'deadgrep-match-face))
+
+(defun deadgrep--match-positions ()
+  "Return a list of indexes of the current line's matches."
+  (let (positions)
+    (save-excursion
+      (beginning-of-line)
+
+      (let* ((line-number
+              (get-text-property (point) 'deadgrep-line-number))
+             (line-number-width
+              (max deadgrep--position-column-width
+                   (length (number-to-string line-number))))
+             (i 0)
+             (start-pos 0))
+
+        (forward-char line-number-width)
+
+        (while (and (not (looking-at "\n"))
+                    (not (bobp)))
+          ;; If we've just entered a match, record the start position.
+          (when (and (deadgrep--match-face-p (point))
+                     (not (deadgrep--match-face-p (1- (point)))))
+            (setq start-pos i))
+          ;; If we've just left a match, record the match range.
+          (when (and (not (deadgrep--match-face-p (point)))
+                     (deadgrep--match-face-p (1- (point))))
+            (push (list start-pos i) positions))
+
+          (setq i (1+ i))
+          (forward-char 1))))
+
+    (nreverse positions)))
+
 (defun deadgrep-visit-result ()
   "Goto the search result at point."
   (interactive)
   (let* ((pos (line-beginning-position))
          (file-name (get-text-property pos 'deadgrep-filename))
          (line-number (get-text-property pos 'deadgrep-line-number))
-         (column-offset (when line-number (deadgrep--current-column))))
+         (column-offset (when line-number (deadgrep--current-column)))
+         (match-positions (when line-number (deadgrep--match-positions))))
     (when file-name
       (find-file file-name)
       (goto-char (point-min))
       (when line-number
         (forward-line (1- line-number))
-        (forward-char column-offset)))))
+        (forward-char column-offset)
+        (-each match-positions
+          (-lambda ((start end))
+            (deadgrep--flash-column-offsets start end)))))))
 
 (define-key deadgrep-mode-map (kbd "RET") #'deadgrep-visit-result)
 ;; TODO: we should still be able to click on buttons.
