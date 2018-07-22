@@ -27,7 +27,8 @@ deserves.
 
 ### Installation
 
-1. Install [ripgrep](https://github.com/BurntSushi/ripgrep).
+1. Install [ripgrep](https://github.com/BurntSushi/ripgrep). You need
+   version 0.8 or later.
 
 2. Install deadgrep from MELPA or copy it into your `~/.emacs.d`.
 
