@@ -3,6 +3,9 @@
 When navigating to a matched line, flash the matched part of the line
 (inspired by the helm-rg readme!).
 
+Show a message when the search has finished. This helps clarify when
+searches finish really quickly but with zero results.
+
 # v0.4
 
 Added the ability to stop searches with `C-c C-k`.

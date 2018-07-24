@@ -205,7 +205,9 @@ We save the last line here, in case we need to append more text to it.")
           (save-excursion
             (let ((inhibit-read-only t))
               (goto-char (point-max))
-              (insert output))))))))
+              (insert output))))
+
+        (message "Deadgrep finished")))))
 
 (defun deadgrep--process-filter (process output)
   ;; If we had an unfinished line from our last call, include that.
