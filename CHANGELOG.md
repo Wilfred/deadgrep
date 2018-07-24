@@ -6,6 +6,9 @@ When navigating to a matched line, flash the matched part of the line
 Show a message when the search has finished. This helps clarify when
 searches finish really quickly but with zero results.
 
+Added a `deadgrep-debug` command to help users investigate issues and
+file bugs.
+
 # v0.4
 
 Added the ability to stop searches with `C-c C-k`.
