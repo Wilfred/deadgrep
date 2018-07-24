@@ -687,12 +687,12 @@ buffer."
               (max deadgrep--position-column-width
                    (length (number-to-string line-number))))
              (i 0)
-             (start-pos 0))
+             (start-pos 0)
+             (line-end-pos (line-end-position)))
 
         (forward-char line-number-width)
 
-        (while (and (not (looking-at "\n"))
-                    (not (bobp)))
+        (while (<= (point) line-end-pos)
           ;; If we've just entered a match, record the start position.
           (when (and (deadgrep--match-face-p (point))
                      (not (deadgrep--match-face-p (1- (point)))))
