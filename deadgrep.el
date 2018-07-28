@@ -358,7 +358,7 @@ with Emacs text properties."
 (define-button-type 'deadgrep-file-type
   'action #'deadgrep--file-type
   'case nil
-  'help-echo "Change case sensitivity")
+  'help-echo "Change file type")
 
 (defun deadgrep--read-file-type (filename)
   "Read a ripgrep file type, defaulting to the type that matches FILENAME."
