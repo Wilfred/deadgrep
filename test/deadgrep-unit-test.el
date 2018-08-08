@@ -145,3 +145,7 @@ context arguments to ripgrep."
      (equal
       (buffer-substring-no-properties (point-min) (point-max))
       "deadgrep.el\n379  foobar\n"))))
+
+(ert-deftest deadgrep-debug ()
+  "Smoke test."
+  (deadgrep-debug))
