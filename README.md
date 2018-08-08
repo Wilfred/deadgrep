@@ -43,6 +43,7 @@ deserves.
 | Key                           | Action                                         |
 | ---                           | ---                                            |
 | <kbd>RET</kbd>                | Visit the result, file or push button at point |
+| <kbd>o</kbd>                  | Visit the result in another window             |
 | <kbd>n</kbd> and <kbd>p</kbd> | Move between results or buttons                |
 | <kbd>g</kbd>                  | Re-run the search                              |
 | <kbd>TAB</kbd>                | Expand/collapse results for a file             |

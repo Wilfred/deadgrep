@@ -707,7 +707,7 @@ buffer."
 
     (nreverse positions)))
 
-(defun deadgrep-visit-result ()
+(defun deadgrep--visit-result (open-fn)
   "Goto the search result at point."
   (interactive)
   (let* ((pos (line-beginning-position))
@@ -716,7 +716,7 @@ buffer."
          (column-offset (when line-number (deadgrep--current-column)))
          (match-positions (when line-number (deadgrep--match-positions))))
     (when file-name
-      (find-file file-name)
+      (funcall open-fn file-name)
       (goto-char (point-min))
       (when line-number
         (forward-line (1- line-number))
@@ -725,7 +725,18 @@ buffer."
           (-lambda ((start end))
             (deadgrep--flash-column-offsets start end)))))))
 
+(defun deadgrep-visit-result-other-window ()
+  "Goto the search result at point, opening in another window."
+  (interactive)
+  (deadgrep--visit-result #'find-file-other-window))
+
+(defun deadgrep-visit-result ()
+  "Goto the search result at point."
+  (interactive)
+  (deadgrep--visit-result #'find-file))
+
 (define-key deadgrep-mode-map (kbd "RET") #'deadgrep-visit-result)
+(define-key deadgrep-mode-map (kbd "o") #'deadgrep-visit-result-other-window)
 ;; TODO: we should still be able to click on buttons.
 
 (define-key deadgrep-mode-map (kbd "g") #'deadgrep-restart)
