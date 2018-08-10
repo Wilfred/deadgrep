@@ -30,7 +30,9 @@ deserves.
 1. Install [ripgrep](https://github.com/BurntSushi/ripgrep). You need
    version 0.8 or later.
 
-2. Install deadgrep from MELPA or copy it into your `~/.emacs.d`.
+2. Install deadgrep from MELPA (do `M-x package-install`
+<kbd>RET</kbd> `deadgrep` within Emacs 25.1 or later),
+or copy it into your `~/.emacs.d`.
 
 3. (Optional) add deadgrep to a convenient shortcut. I like F5.
 
