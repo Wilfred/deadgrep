@@ -348,37 +348,68 @@ with Emacs text properties."
 
 (defun deadgrep--type-list ()
   "Query the rg executable for available file types."
+  ;; TODO: deduplicate. rg outputs both md and markdown.
   (let* ((output (shell-command-to-string (format "%s --type-list" deadgrep-executable)))
          (lines (s-lines (s-trim output)))
-         (types (--map
-                 (s-split (rx ": ") it)
-                 lines)))
-    types))
+         (types-and-exts
+          (--map
+           (s-split (rx ": ") it)
+           lines)))
+    (-map
+     (-lambda ((type exts))
+       (list type (s-split (rx ", ") exts)))
+     types-and-exts)))
 
 (define-button-type 'deadgrep-file-type
   'action #'deadgrep--file-type
   'case nil
   'help-echo "Change file type")
 
+(defun deadgrep--format-file-type (file-type extensions)
+  (let* ((max-exts 4)
+         (truncated (> (length extensions) max-exts)))
+    (when truncated
+      (setq extensions
+            (append (-take max-exts extensions)
+                    (list "..."))))
+    (format "%s (%s)"
+            file-type
+            (s-join ", " extensions))))
+
 (defun deadgrep--read-file-type (filename)
   "Read a ripgrep file type, defaulting to the type that matches FILENAME."
   (let* ((types-and-exts (deadgrep--type-list))
-         (types (-map #'-first-item types-and-exts))
-         matching-type-and-ext)
-    ;; If we've been given a filename with an extension.
+         (type-choices
+          (-map
+           (-lambda ((type exts))
+             (list
+              (deadgrep--format-file-type type exts)
+              type exts))
+           types-and-exts))
+         default
+         chosen)
+    ;; If we've been given a filename.
     (when (and filename (file-name-extension filename))
-      ;; Get the first type whose list of extensions contains this extension.
-      (setq matching-type-and-ext
-            (-find
-             (-lambda ((_ extensions))
-               (s-contains-p
-                (format "*.%s" (file-name-extension filename))
-                extensions))
-             types-and-exts)))
-    (completing-read "File type: "
-                     types
-                     nil t nil nil
-                     (car-safe matching-type-and-ext))))
+      ;; Try to find a file type that matches it.
+      (setq default
+            (car-safe
+             (-find
+              (-lambda ((_formatted-type . (_type-name extensions)))
+                (or
+                 ;; E.g. Ruby files include 'Gemfile'.
+                 (member filename extensions)
+                 ;; E.g. Ruby files include '*.rb'.
+                 ;; TODO: proper glob matching, e.g. for 'README*' too.
+                 (member
+                  (format "*.%s" (file-name-extension filename))
+                  extensions)))
+              type-choices))))
+    (setq chosen
+          (completing-read "File type: "
+                           type-choices
+                           nil t nil nil
+                           default))
+    (nth 1 (assoc chosen type-choices))))
 
 (defun deadgrep--file-type (button)
   (let ((button-type (button-get button 'file-type)))

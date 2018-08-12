@@ -13,6 +13,9 @@ Added a `deadgrep-visit-result-other-window` command (bound to
 <kbd>o</kbd>) for opening results in a separate window. This is handy
 if you want the results buffer to stay visible.
 
+Improved file type switcher: show extensions, and fixed an issue where
+the wrong default was offered.
+
 # v0.4
 
 Added the ability to stop searches with `C-c C-k`.
