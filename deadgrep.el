@@ -141,9 +141,12 @@ We save the last line here, in case we need to append more text to it.")
         (cond
          ;; Ignore blank lines.
          ((s-blank? line))
-         ;; Ignore -- lines, which are used as a context separator
-         ;; when calling ripgrep with context flags.
-         ((string= line "--"))
+         ;; Lines of just -- are used as a context separator when
+         ;; calling ripgrep with context flags.
+         ((string= line "--")
+          (insert
+           (propertize "---\n"
+                       'face 'deadgrep-meta-face)))
          ;; If we don't have a color code, ripgrep must be complaining
          ;; about something (e.g. zero matches for a
          ;; glob, or permission denied on some directories).

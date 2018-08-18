@@ -16,6 +16,9 @@ if you want the results buffer to stay visible.
 Improved file type switcher: show extensions, and fixed an issue where
 the wrong default was offered.
 
+Show a divider between results when showing context around the
+matching line.
+
 # v0.4
 
 Added the ability to stop searches with `C-c C-k`.
