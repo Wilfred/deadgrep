@@ -750,6 +750,13 @@ buffer."
          (column-offset (when line-number (deadgrep--current-column)))
          (match-positions (when line-number (deadgrep--match-positions))))
     (when file-name
+      (when overlay-arrow-position
+        (set-marker overlay-arrow-position nil))
+      ;; Show an arrow next to the last result viewed. This is
+      ;; consistent with `compilation-next-error-function' and also
+      ;; useful with `deadgrep-visit-result-other-window'.
+      (setq overlay-arrow-position (copy-marker pos))
+
       (funcall open-fn file-name)
       (goto-char (point-min))
       (when line-number
@@ -980,6 +987,8 @@ for a string, offering the current word as a default."
 
     (switch-to-buffer buf)
 
+    (setq next-error-function #'deadgrep-next-error)
+
     ;; If we have previous search settings, apply them to our new
     ;; search results buffer.
     (when last-results-buf
@@ -991,6 +1000,29 @@ for a string, offering the current word as a default."
      search-term
      deadgrep--search-type
      deadgrep--search-case)))
+
+(defun deadgrep-next-error (arg reset)
+  "Move to the next error.
+If ARG is given, move by that many errors.
+
+This is intended for use with `next-error-function', which see."
+  (when reset
+    (goto-char (point-min)))
+  (beginning-of-line)
+  (let ((direction (> arg 0)))
+    (setq arg (abs arg))
+
+    (while (and
+            (not (zerop arg))
+            (not (eobp)))
+      (if direction
+          (forward-line 1)
+        (forward-line -1))
+      ;; If we are on a specific result (not a heading), we have a line
+      ;; number.
+      (when (get-text-property (point) 'deadgrep-line-number)
+        (cl-decf arg))))
+  (deadgrep-visit-result-other-window))
 
 (defun deadgrep-debug ()
   "Show a buffer with some debug information about the current search."

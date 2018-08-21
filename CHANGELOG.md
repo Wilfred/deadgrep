@@ -1,3 +1,12 @@
+# v0.6
+
+`next-error` and `previous-error` now work, just like they do with
+`M-x grep`.
+
+When visiting a result, highlight the last visited result with an
+arrow. This is particularly useful when using
+`deadgrep-visit-result-other-window` or `next-error`.
+
 # v0.5
 
 When navigating to a matched line, flash the matched part of the line
