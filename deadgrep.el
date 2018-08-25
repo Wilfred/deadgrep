@@ -921,6 +921,7 @@ This will either be a button, a filename, or a search result."
     (erase-buffer)
     (setq deadgrep--current-file nil)
     (setq deadgrep--hidden-files nil)
+    (set-marker overlay-arrow-position nil)
 
     (deadgrep--write-heading)
     ;; If the point was in the heading, ensure that we restore its
