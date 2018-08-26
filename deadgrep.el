@@ -196,18 +196,20 @@ We save the last line here, in case we need to append more text to it.")
 
 (defun deadgrep--process-sentinel (process output)
   "Update the deadgrep buffer associated with PROCESS as complete."
-  (let ((buffer (process-buffer process)))
+  (let ((buffer (process-buffer process))
+        (finished-p (string= output "finished\n")))
     (when (buffer-live-p buffer)
       (with-current-buffer buffer
         ;; rg has terminated, so stop the spinner.
         (spinner-stop deadgrep--spinner)
 
-        (deadgrep--insert-output "" t)
+        (deadgrep--insert-output "" finished-p)
 
         ;; Report any errors that occurred.
         (unless (member output
                         (list
                          "exited abnormally with code 1\n"
+                         "interrupt\n"
                          "finished\n"))
           (save-excursion
             (let ((inhibit-read-only t))
@@ -833,11 +835,25 @@ Keys are interned filenames, so they compare with `eq'.")
 
 (define-key deadgrep-mode-map (kbd "TAB") #'deadgrep-toggle-file-results)
 
+(defun deadgrep--interrupt-process ()
+  "Gracefully stop the rg process, synchronously."
+  (-when-let (proc (get-buffer-process (current-buffer)))
+    ;; Ensure that our process filter is not called again.
+    (set-process-filter proc #'ignore)
+
+    (interrupt-process proc)
+    ;; Wait for the process to terminate, so we know that
+    ;; `deadgrep--process-sentinel' has been called.
+    (while (process-live-p proc)
+      ;; `redisplay' can trigger process filters or sentinels.
+      (redisplay)
+      (sleep-for 0.1))))
+
 (defun deadgrep-kill-process ()
   "Kill the deadgrep process associated with the current buffer."
   (interactive)
   (if (get-buffer-process (current-buffer))
-      (interrupt-process)
+      (deadgrep--interrupt-process)
     (message "No process running.")))
 
 ;; Keybinding chosen to match `kill-compilation'.
@@ -917,12 +933,24 @@ This will either be a button, a filename, or a search result."
 (defun deadgrep-restart ()
   "Re-run ripgrep with the current search settings."
   (interactive)
+  ;; Stop the old search, so we don't carry on inserting results from
+  ;; the last thing we searched for.
+  (deadgrep--interrupt-process)
+
   (let ((start-point (point))
         (inhibit-read-only t))
+    ;; Reset UI: remove results, reset items hidden by TAB, and arrow
+    ;; position.
     (erase-buffer)
-    (setq deadgrep--current-file nil)
     (setq deadgrep--hidden-files nil)
     (set-marker overlay-arrow-position nil)
+
+    ;; Reset intermediate search state.
+    (setq deadgrep--current-file nil)
+    (setq deadgrep--spinner nil)
+    (setq deadgrep--remaining-output nil)
+    (setq deadgrep--current-file nil)
+    (setq deadgrep--debug-first-output nil)
 
     (deadgrep--write-heading)
     ;; If the point was in the heading, ensure that we restore its

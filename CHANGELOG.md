@@ -7,6 +7,10 @@ When visiting a result, highlight the last visited result with an
 arrow. This is particularly useful when using
 `deadgrep-visit-result-other-window` or `next-error`.
 
+Fixed several issues when restarting searches (pressing `g` or changing
+parameters). Previously, we would end up with results from the old
+search or errors.
+
 # v0.5
 
 When navigating to a matched line, flash the matched part of the line
