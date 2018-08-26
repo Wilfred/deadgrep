@@ -149,3 +149,10 @@ context arguments to ripgrep."
 (ert-deftest deadgrep-debug ()
   "Smoke test."
   (deadgrep-debug))
+
+(ert-deftest deadgrep--type-list ()
+  "Smoke test."
+  (should
+   (member
+    '("yaml" ("*.yaml" "*.yml"))
+    (deadgrep--type-list))))
