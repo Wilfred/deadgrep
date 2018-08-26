@@ -104,7 +104,8 @@ overflow on our regexp matchers if we don't apply this.")
 This is stored as a cons cell of integers (lines-before . lines-after).")
 (defvar-local deadgrep--initial-filename nil)
 
-(defvar-local deadgrep--current-file nil)
+(defvar-local deadgrep--current-file nil
+  "The file we're currently inserting results for.")
 (defvar-local deadgrep--spinner nil)
 (defvar-local deadgrep--remaining-output nil
   "We can't guarantee that our process filter will always receive whole lines.
