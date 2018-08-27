@@ -110,6 +110,8 @@ This is stored as a cons cell of integers (lines-before . lines-after).")
 (defvar-local deadgrep--remaining-output nil
   "We can't guarantee that our process filter will always receive whole lines.
 We save the last line here, in case we need to append more text to it.")
+(defvar-local deadgrep--postpone-start nil
+  "If non-nil, don't (re)start searches.")
 
 (defvar-local deadgrep--debug-command nil)
 (defvar-local deadgrep--debug-first-output nil)
@@ -933,6 +935,12 @@ This will either be a button, a filename, or a search result."
 (defun deadgrep-restart ()
   "Re-run ripgrep with the current search settings."
   (interactive)
+  ;; If we haven't started yet, start the search if we've been called
+  ;; by the user.
+  (when (and deadgrep--postpone-start
+             (called-interactively-p 'interactive))
+    (setq deadgrep--postpone-start nil))
+
   ;; Stop the old search, so we don't carry on inserting results from
   ;; the last thing we searched for.
   (deadgrep--interrupt-process)
@@ -957,10 +965,12 @@ This will either be a button, a filename, or a search result."
     ;; position.
     (goto-char (min (point-max) start-point))
 
-    (deadgrep--start
-     deadgrep--search-term
-     deadgrep--search-type
-     deadgrep--search-case)))
+    (if deadgrep--postpone-start
+        (deadgrep--write-postponed)
+      (deadgrep--start
+       deadgrep--search-term
+       deadgrep--search-type
+       deadgrep--search-case))))
 
 (defun deadgrep--read-search-term ()
   "Read a search term from the minibuffer.
@@ -995,12 +1005,23 @@ for a string, offering the current word as a default."
   (let ((projectile-require-project-root nil))
     (projectile-project-root)))
 
+(defun deadgrep--write-postponed ()
+  (let* ((inhibit-read-only t)
+         (restart-key
+          (where-is-internal #'deadgrep-restart deadgrep-mode-map t)))
+    (save-excursion
+      (goto-char (point-max))
+      (insert
+       (format "Press %s to start the search."
+               (key-description restart-key))))))
+
 ;;;###autoload
-(defun deadgrep ()
-  "Start a ripgrep search for SEARCH-TERM."
-  (interactive)
-  (let* ((search-term (deadgrep--read-search-term))
-         (dir (funcall deadgrep-project-root-function))
+(defun deadgrep (search-term)
+  "Start a ripgrep search for SEARCH-TERM.
+If called with a prefix argument, create the results buffer but
+don't actually start the search."
+  (interactive (list (deadgrep--read-search-term)))
+  (let* ((dir (funcall deadgrep-project-root-function))
          (buf (deadgrep--buffer
                search-term
                dir
@@ -1026,10 +1047,18 @@ for a string, offering the current word as a default."
       (setq deadgrep--search-case prev-search-case))
 
     (deadgrep--write-heading)
-    (deadgrep--start
-     search-term
-     deadgrep--search-type
-     deadgrep--search-case)))
+
+    (if current-prefix-arg
+        ;; Don't start the search, just create the buffer and inform
+        ;; the user how to start when they're ready.
+        (progn
+          (setq deadgrep--postpone-start t)
+          (deadgrep--write-postponed))
+      ;; Start the search immediately.
+      (deadgrep--start
+       search-term
+       deadgrep--search-type
+       deadgrep--search-case))))
 
 (defun deadgrep-next-error (arg reset)
   "Move to the next error.

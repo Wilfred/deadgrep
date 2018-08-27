@@ -11,6 +11,10 @@ Fixed several issues when restarting searches (pressing `g` or changing
 parameters). Previously, we would end up with results from the old
 search or errors.
 
+Calling deadgrep with a prefix, e.g. `C-u M-x deadgrep`, will now open
+a results buffer without starting a search. This is handy if you want
+to tweak the parameters before starting a search.
+
 # v0.5
 
 When navigating to a matched line, flash the matched part of the line

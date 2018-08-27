@@ -50,6 +50,7 @@ or copy it into your `~/.emacs.d`.
 | <kbd>g</kbd>                  | Re-run the search                              |
 | <kbd>TAB</kbd>                | Expand/collapse results for a file             |
 | <kbd>C-c</kbd> <kbd>C-k</kbd> | Stop a running search                          |
+| <kbd>C-u</kbd>                | A prefix argument prevents searches from starting automatically. |
 
 ### Minibuffer
 
