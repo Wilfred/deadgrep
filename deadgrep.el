@@ -951,7 +951,8 @@ This will either be a button, a filename, or a search result."
     ;; position.
     (erase-buffer)
     (setq deadgrep--hidden-files nil)
-    (set-marker overlay-arrow-position nil)
+    (when overlay-arrow-position
+      (set-marker overlay-arrow-position nil))
 
     ;; Reset intermediate search state.
     (setq deadgrep--current-file nil)
