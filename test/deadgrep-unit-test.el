@@ -156,3 +156,8 @@ context arguments to ripgrep."
    (member
     '("yaml" ("*.yaml" "*.yml"))
     (deadgrep--type-list))))
+
+(ert-deftest deadgrep-restart ()
+  "Smoke test."
+  (deadgrep "foo")
+  (deadgrep-restart))
