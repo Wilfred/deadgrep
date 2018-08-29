@@ -31,12 +31,12 @@
 (ert-deftest deadgrep-smoke-test ()
   (cl-letf (((symbol-function 'read-from-minibuffer)
              (lambda (&rest _args) "foo")))
-    (deadgrep)))
+    (deadgrep "foo")))
 
 (ert-deftest deadgrep-forward ()
   (cl-letf (((symbol-function 'read-from-minibuffer)
              (lambda (&rest _args) "a-unique-string")))
-    (deadgrep)
+    (deadgrep "foo")
 
     ;; Smoke test.
     (deadgrep-forward)
@@ -55,7 +55,7 @@
 (ert-deftest deadgrep-backward ()
   (cl-letf (((symbol-function 'read-from-minibuffer)
              (lambda (&rest _args) "a-unique-string")))
-    (deadgrep)
+    (deadgrep "foo")
 
     ;; Smoke test.
     (goto-char (point-max))
