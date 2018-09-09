@@ -916,6 +916,30 @@ This will either be a button, a filename, or a search result."
 (define-key deadgrep-mode-map (kbd "n") #'deadgrep-forward)
 (define-key deadgrep-mode-map (kbd "p") #'deadgrep-backward)
 
+(defmacro deadgrep--define-jump-command (name heading)
+  "Define an interactive command with NAME that jumps to HEADING."
+  (declare (indent defun))
+  `(defun ,name ()
+     ,(format "Jump to \"%s\"." heading)
+     (interactive)
+     (goto-char (point-min))
+     (when (re-search-forward (concat "^" ,heading ":") nil t)
+       (deadgrep--move t))))
+
+(deadgrep--define-jump-command deadgrep-jump-to-search "Search term")
+(deadgrep--define-jump-command deadgrep-jump-to-type "Search type")
+(deadgrep--define-jump-command deadgrep-jump-to-case "Case")
+(deadgrep--define-jump-command deadgrep-jump-to-context "Context")
+(deadgrep--define-jump-command deadgrep-jump-to-directory "Directory")
+(deadgrep--define-jump-command deadgrep-jump-to-files "Files")
+
+(define-key deadgrep-mode-map (kbd "j s") #'deadgrep-jump-to-search)
+(define-key deadgrep-mode-map (kbd "j t") #'deadgrep-jump-to-type)
+(define-key deadgrep-mode-map (kbd "j c") #'deadgrep-jump-to-case)
+(define-key deadgrep-mode-map (kbd "j x") #'deadgrep-jump-to-context)
+(define-key deadgrep-mode-map (kbd "j d") #'deadgrep-jump-to-directory)
+(define-key deadgrep-mode-map (kbd "j f") #'deadgrep-jump-to-files)
+
 (defun deadgrep--start (search-term search-type case)
   "Start a ripgrep search."
   (setq deadgrep--spinner (spinner-create 'progress-bar t))
