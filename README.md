@@ -51,6 +51,12 @@ or copy it into your `~/.emacs.d`.
 | <kbd>TAB</kbd>                | Expand/collapse results for a file             |
 | <kbd>C-c</kbd> <kbd>C-k</kbd> | Stop a running search                          |
 | <kbd>C-u</kbd>                | A prefix argument prevents searches from starting automatically. |
+| <kbd>j</kbd> <kbd>s</kbd>     | Jump to "Search term" heading                  |
+| <kbd>j</kbd> <kbd>t</kbd>     | Jump to "Search type" heading                  |
+| <kbd>j</kbd> <kbd>c</kbd>     | Jump to "Case" heading                         |
+| <kbd>j</kbd> <kbd>x</kbd>     | Jump to "Context" heading                      |
+| <kbd>j</kbd> <kbd>d</kbd>     | Jump to "Directory" heading                    |
+| <kbd>j</kbd> <kbd>f</kbd>     | Jump to "Files" heading                        |
 
 ### Minibuffer
 
