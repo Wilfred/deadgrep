@@ -146,6 +146,7 @@ We save the last line here, in case we need to append more text to it.")
          ((s-blank? line))
          ;; Lines of just -- are used as a context separator when
          ;; calling ripgrep with context flags.
+         ;; TODO: don't always use three ---.
          ((string= line "--")
           (insert
            (propertize "---\n"
