@@ -130,7 +130,8 @@ We save the last line here, in case we need to append more text to it.")
     (setq deadgrep--remaining-output nil))
 
   (let ((inhibit-read-only t)
-        (lines (s-lines output)))
+        (lines (s-lines output))
+        prev-line-num)
     ;; Process filters run asynchronously, and don't guarantee that
     ;; OUTPUT ends with a complete line. Save the last line for
     ;; later processing.
@@ -146,11 +147,16 @@ We save the last line here, in case we need to append more text to it.")
          ((s-blank? line))
          ;; Lines of just -- are used as a context separator when
          ;; calling ripgrep with context flags.
-         ;; TODO: don't always use three ---.
          ((string= line "--")
-          (insert
-           (propertize "---\n"
-                       'face 'deadgrep-meta-face)))
+          (let ((separator "--"))
+            ;; Try to make the separator length match the previous
+            ;; line numbers.
+            (when prev-line-num
+              (setq separator
+                    (s-repeat (log prev-line-num 10) "-")))
+            (insert
+             (propertize (concat separator "\n")
+                         'face 'deadgrep-meta-face))))
          ;; If we don't have a color code, ripgrep must be complaining
          ;; about something (e.g. zero matches for a
          ;; glob, or permission denied on some directories).
@@ -195,7 +201,9 @@ We save the last line here, in case we need to append more text to it.")
               (insert
                (propertize " ... (truncated)"
                            'face 'deadgrep-meta-face)))
-            (insert "\n"))))))))
+            (insert "\n")
+
+            (setq prev-line-num line-num))))))))
 
 (defun deadgrep--process-sentinel (process output)
   "Update the deadgrep buffer associated with PROCESS as complete."
