@@ -161,3 +161,32 @@ context arguments to ripgrep."
   "Smoke test."
   (deadgrep "foo")
   (deadgrep-restart))
+
+(ert-deftest deadgrep-jump ()
+  "Ensure we can jump to active button for the respective header."
+  (with-temp-buffer
+    (let ((deadgrep--search-term "foo")
+          (deadgrep--search-type 'string)
+          (deadgrep--search-case 'smart)
+          (deadgrep--context nil)
+          (deadgrep--file-type 'all)
+          (default-directory "/tmp"))
+      (deadgrep--write-heading)
+
+      (deadgrep-jump-to-search)
+      (should (equal (deadgrep--button-label) "change"))
+
+      (deadgrep-jump-to-type)
+      (should (equal (deadgrep--button-label) "words"))
+
+      (deadgrep-jump-to-case)
+      (should (equal (deadgrep--button-label) "sensitive"))
+
+      (deadgrep-jump-to-context)
+      (should (equal (deadgrep--button-label) "before"))
+
+      (deadgrep-jump-to-directory)
+      (should (equal (deadgrep--button-label) "/tmp"))
+
+      (deadgrep-jump-to-files)
+      (should (equal (deadgrep--button-label) "type")))))
