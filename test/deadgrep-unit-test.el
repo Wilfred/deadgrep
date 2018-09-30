@@ -18,8 +18,9 @@
     (should
      (not
       (eq (get-text-property 1 'face result)
-          'deadgrep-regexp-metachar-face))))
-  ;; Backslash escape sequence.
+          'deadgrep-regexp-metachar-face)))))
+
+(ert-deftest deadgrep--propertize-regexp--backslash ()
   (let ((result (deadgrep--propertize-regexp "\\b")))
     (should
      (eq (get-text-property 0 'face result)

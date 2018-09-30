@@ -15,6 +15,10 @@ Calling deadgrep with a prefix, e.g. `C-u M-x deadgrep`, will now open
 a results buffer without starting a search. This is handy if you want
 to tweak the parameters before starting a search.
 
+Added a face `deadgrep-search-term-face` to make the search term
+visually distinct from search options. Improved highlighting with
+`deadgrep-regexp-metachar-face`
+
 # v0.5
 
 When navigating to a matched line, flash the matched part of the line

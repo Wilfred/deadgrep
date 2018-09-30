@@ -82,6 +82,11 @@ overflow on our regexp matchers if we don't apply this.")
   "Face used for filename headings in results buffers."
   :group 'deadgrep)
 
+(defface deadgrep-search-term-face
+  '((t :inherit font-lock-variable-name-face))
+  "Face used for the search term in results buffers."
+  :group 'deadgrep)
+
 (defface deadgrep-regexp-metachar-face
   '((t :inherit
        ;; TODO: I've seen a more appropriate face in some themes,
@@ -525,7 +530,9 @@ search settings."
                         'face 'deadgrep-meta-face)
             (if (eq deadgrep--search-type 'regexp)
                 (deadgrep--propertize-regexp deadgrep--search-term)
-              deadgrep--search-term)
+              (propertize
+               deadgrep--search-term
+               'face 'deadgrep-search-term-face))
             " "
             (deadgrep--button "change" 'deadgrep-search-term)
             "\n"
@@ -627,8 +634,33 @@ Returns a copy of REGEXP with properties set."
         (escape-metachars
          '(?A ?b ?B ?d ?D ?p ?s ?S ?w ?W ?z))
         (prev-char nil))
+    ;; Put the standard search term face on every character
+    ;; individually.
+    (dotimes (i (length regexp))
+      (put-text-property
+       i (1+ i)
+       'face 'deadgrep-search-term-face
+       regexp))
+    ;; Put the metacharacter face on any character that isn't treated
+    ;; literally.
     (--each-indexed (string-to-list regexp)
       (cond
+       ;; Highlight everything between { and }.
+       ((and (eq it ?\{) (not (equal prev-char ?\\)))
+        (let ((closing-pos it-index))
+          ;; TODO: we have loops like this in several places, factor
+          ;; out.
+          (while (and (< closing-pos (length regexp))
+                      (not (eq (elt regexp closing-pos)
+                               ?\})))
+            (cl-incf closing-pos))
+          (cl-incf closing-pos)
+          (put-text-property
+           it-index closing-pos
+           'face
+           'deadgrep-regexp-metachar-face
+           regexp)))
+       ;; Highlight individual metachars.
        ((and (memq it metachars) (not (equal prev-char ?\\)))
         (put-text-property
          it-index (1+ it-index)
