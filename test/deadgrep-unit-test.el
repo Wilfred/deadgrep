@@ -162,3 +162,70 @@ context arguments to ripgrep."
   "Smoke test."
   (deadgrep "foo")
   (deadgrep-restart))
+
+(ert-deftest deadgrep--relevant-file-type ()
+  ;; Match on extension.
+  (should
+   (equal
+    (deadgrep--relevant-file-type
+     "foo.clj"
+     '(("clojure" ("*.cljs" "*.clj"))
+       ("py" ("*.py"))))
+    '("clojure" ("*.cljs" "*.clj"))))
+  ;; If there are multiple matches, take the match with the largest
+  ;; number of extensions.
+  (should
+   (equal
+    (deadgrep--relevant-file-type
+     "foo.ml"
+     '(("ml" ("*.ml"))
+       ("ocaml" ("*.ml" "*.mli"))))
+    '("ocaml" ("*.ml" "*.mli"))))
+  ;; If there are duplicates with different names, prefer the longer
+  ;; name.
+  (should
+   (equal
+    (deadgrep--relevant-file-type
+     "foo.md"
+     '(("md" ("*.md"))
+       ("markdown" ("*.md"))))
+    '("markdown" ("*.md"))))
+  ;; Return nil if we have no match or no file.
+  (should
+   (null
+    (deadgrep--relevant-file-type
+     "foo.bar"
+     '(("clojure" ("*.cljs" "*.clj"))
+       ("py" ("*.py"))))))
+  (should
+   (null
+    (deadgrep--relevant-file-type
+     nil
+     '(("clojure" ("*.cljs" "*.clj"))
+       ("py" ("*.py")))))))
+
+(ert-deftest deadgrep--glob-regexp ()
+  (should
+   (string=
+    (deadgrep--glob-regexp "abc")
+    "^abc$"))
+  (should
+   (string=
+    (deadgrep--glob-regexp "foo?")
+    "^foo.$"))
+  (should
+   (string=
+    (deadgrep--glob-regexp "foo*")
+    "^foo.*$"))
+  (should
+   (string=
+    (deadgrep--glob-regexp "[ab]")
+    "^[ab]$"))
+  (should
+   (string=
+    (deadgrep--glob-regexp "[a-b]")
+    "^[a-b]$"))
+  (should
+   (string=
+    (deadgrep--glob-regexp "[?]")
+    "^[?]$")))

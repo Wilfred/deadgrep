@@ -107,7 +107,9 @@ overflow on our regexp matchers if we don't apply this.")
 (defvar-local deadgrep--context nil
   "When set, also show context of results.
 This is stored as a cons cell of integers (lines-before . lines-after).")
-(defvar-local deadgrep--initial-filename nil)
+(defvar-local deadgrep--initial-filename nil
+  "The filename of the buffer that deadgre was started from.
+Used to offer better default values for file options.")
 
 (defvar-local deadgrep--current-file nil
   "The file we're currently inserting results for.")
@@ -370,17 +372,16 @@ with Emacs text properties."
 
 (defun deadgrep--type-list ()
   "Query the rg executable for available file types."
-  ;; TODO: deduplicate. rg outputs both md and markdown.
   (let* ((output (shell-command-to-string (format "%s --type-list" deadgrep-executable)))
          (lines (s-lines (s-trim output)))
-         (types-and-exts
+         (types-and-globs
           (--map
            (s-split (rx ": ") it)
            lines)))
     (-map
-     (-lambda ((type exts))
-       (list type (s-split (rx ", ") exts)))
-     types-and-exts)))
+     (-lambda ((type globs))
+       (list type (s-split (rx ", ") globs)))
+     types-and-globs)))
 
 (define-button-type 'deadgrep-file-type
   'action #'deadgrep--file-type
@@ -398,39 +399,86 @@ with Emacs text properties."
             file-type
             (s-join ", " extensions))))
 
+(defun deadgrep--glob-regexp (glob)
+  "Convert GLOB pattern to the equivalent elisp regexp."
+  (let* ((i 0)
+         (result "^"))
+    (while (< i (length glob))
+      (let* ((char (elt glob i)))
+        (cond
+         ;; ? matches a single char in globs.
+         ((eq char ??)
+          (setq result (concat result "."))
+          (cl-incf i))
+         ;; * matches zero or more of anything.
+         ((eq char ?*)
+          (setq result (concat result ".*"))
+          (cl-incf i))
+         ;; [ab] matches a literal a or b.
+         ;; [a-z] matches characters between a and z inclusive.
+         ;; [?] matches a literal ?.
+         ((eq char ?\[)
+          ;; Find the matching ].
+          (let ((j (1+ i)))
+            (while (and (< j (length glob))
+                        (not (eq (elt glob j) ?\])))
+              (cl-incf j))
+            (cl-incf j)
+            (setq result (concat result
+                                 (substring glob i j)))
+            (setq i (1+ j))))
+         (t
+          (setq result (concat result (char-to-string char)))
+          (cl-incf i)))))
+    (concat result "$")))
+
+(defun deadgrep--matches-globs-p (filename globs)
+  "Return non-nil if FILENAME matches any glob pattern in GLOBS."
+  (when filename
+    (--any (string-match-p (deadgrep--glob-regexp it) filename)
+           globs)))
+
+(defun deadgrep--relevant-file-type (filename types-and-globs)
+  "Try to find the most relevant item in TYPES-AND-GLOBS for FILENAME."
+  (let (;; Find all the items in TYPES-AND-GLOBS whose glob match
+        ;; FILENAME.
+        (matching (-filter (-lambda ((_type globs))
+                             (deadgrep--matches-globs-p filename globs))
+                           types-and-globs)))
+    (->> matching
+         ;; Prefer longer names, so "markdown" over "md" for the type
+         ;; name.
+         (-sort (-lambda ((type1 _) (type2 _))
+                  (< (length type1) (length type2))))
+         ;; Prefer types with more extensions, as they tend to be more
+         ;; common languages.
+         (-sort (-lambda ((_ globs1) (_ globs2))
+                  (< (length globs1) (length globs2))))
+         ;; Take the highest scoring matching.
+         (-last-item))))
+
 (defun deadgrep--read-file-type (filename)
   "Read a ripgrep file type, defaulting to the type that matches FILENAME."
-  (let* ((types-and-exts (deadgrep--type-list))
+  (let* (;; Get the list of types we can offer.
+         (types-and-globs (deadgrep--type-list))
+         ;; Build a list mapping the formatted types to the type name.
          (type-choices
           (-map
-           (-lambda ((type exts))
+           (-lambda ((type globs))
              (list
-              (deadgrep--format-file-type type exts)
-              type exts))
-           types-and-exts))
-         default
-         chosen)
-    ;; If we've been given a filename.
-    (when (and filename (file-name-extension filename))
-      ;; Try to find a file type that matches it.
-      (setq default
-            (car-safe
-             (-find
-              (-lambda ((_formatted-type . (_type-name extensions)))
-                (or
-                 ;; E.g. Ruby files include 'Gemfile'.
-                 (member filename extensions)
-                 ;; E.g. Ruby files include '*.rb'.
-                 ;; TODO: proper glob matching, e.g. for 'README*' too.
-                 (member
-                  (format "*.%s" (file-name-extension filename))
-                  extensions)))
-              type-choices))))
-    (setq chosen
-          (completing-read "File type: "
-                           type-choices
-                           nil t nil nil
-                           default))
+              (deadgrep--format-file-type type globs)
+              type))
+           types-and-globs))
+         ;; Work out the default type name based on the filename.
+         (default-type-and-globs
+           (deadgrep--relevant-file-type filename types-and-globs))
+         (default
+           (-when-let ((default-type default-globs) default-type-and-globs)
+             (deadgrep--format-file-type default-type default-globs)))
+         ;; Prompt the user for a file type.
+         (chosen
+          (completing-read
+           "File type: " type-choices nil t nil nil default)))
     (nth 1 (assoc chosen type-choices))))
 
 (defun deadgrep--file-type (button)

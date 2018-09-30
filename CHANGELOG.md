@@ -19,6 +19,9 @@ Added a face `deadgrep-search-term-face` to make the search term
 visually distinct from search options. Improved highlighting with
 `deadgrep-regexp-metachar-face`
 
+File type picker now makes better suggestions when there are multiple
+file types that match, or if ripgrep is using complex globs.
+
 # v0.5
 
 When navigating to a matched line, flash the matched part of the line
