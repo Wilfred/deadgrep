@@ -952,8 +952,6 @@ This will either be a button, a filename, or a search result."
   (interactive)
   (deadgrep--move nil))
 
-;; TODO: add the ability to fold results for a given file, just like
-;; magit.
 (define-key deadgrep-mode-map (kbd "n") #'deadgrep-forward)
 (define-key deadgrep-mode-map (kbd "p") #'deadgrep-backward)
 
