@@ -22,6 +22,9 @@ visually distinct from search options. Improved highlighting with
 File type picker now makes better suggestions when there are multiple
 file types that match, or if ripgrep is using complex globs.
 
+Fixed an issue where `M-x eval-buffer` on deadgrep.el would override
+custom keybindings.
+
 # v0.5
 
 When navigating to a matched line, flash the matched part of the line

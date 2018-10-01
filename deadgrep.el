@@ -768,6 +768,27 @@ Returns a list ordered by the most recently accessed."
       (setq buffer-read-only t))
     buf))
 
+(defvar deadgrep-mode-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map (kbd "RET") #'deadgrep-visit-result)
+    (define-key map (kbd "o") #'deadgrep-visit-result-other-window)
+    ;; TODO: we should still be able to click on buttons.
+
+    (define-key map (kbd "g") #'deadgrep-restart)
+
+    ;; TODO: this should work when point in anywhere in file, not just
+    ;; on its heading.
+    (define-key map (kbd "TAB") #'deadgrep-toggle-file-results)
+
+    ;; Keybinding chosen to match `kill-compilation'.
+    (define-key map (kbd "C-c C-k") #'deadgrep-kill-process)
+
+    (define-key map (kbd "n") #'deadgrep-forward)
+    (define-key map (kbd "p") #'deadgrep-backward)
+
+    map)
+  "Keymap for `deadgrep-mode'.")
+
 (define-derived-mode deadgrep-mode special-mode
   '("Deadgrep" (:eval (spinner-print deadgrep--spinner))))
 
@@ -870,12 +891,6 @@ buffer."
   (interactive)
   (deadgrep--visit-result #'find-file))
 
-(define-key deadgrep-mode-map (kbd "RET") #'deadgrep-visit-result)
-(define-key deadgrep-mode-map (kbd "o") #'deadgrep-visit-result-other-window)
-;; TODO: we should still be able to click on buttons.
-
-(define-key deadgrep-mode-map (kbd "g") #'deadgrep-restart)
-
 (defvar-local deadgrep--hidden-files nil
   "An alist recording which files currently have their lines
 hidden in this deadgrep results buffer.
@@ -924,8 +939,6 @@ Keys are interned filenames, so they compare with `eq'.")
       (setf (alist-get (intern file-name) deadgrep--hidden-files)
             (list start-pos end-pos)))))
 
-(define-key deadgrep-mode-map (kbd "TAB") #'deadgrep-toggle-file-results)
-
 (defun deadgrep--interrupt-process ()
   "Gracefully stop the rg process, synchronously."
   (-when-let (proc (get-buffer-process (current-buffer)))
@@ -946,9 +959,6 @@ Keys are interned filenames, so they compare with `eq'.")
   (if (get-buffer-process (current-buffer))
       (deadgrep--interrupt-process)
     (message "No process running.")))
-
-;; Keybinding chosen to match `kill-compilation'.
-(define-key deadgrep-mode-map (kbd "C-c C-k") #'deadgrep-kill-process)
 
 (defun deadgrep--item-p (pos)
   "Is there something at POS that we can interact with?"
@@ -999,9 +1009,6 @@ This will either be a button, a filename, or a search result."
 This will either be a button, a filename, or a search result."
   (interactive)
   (deadgrep--move nil))
-
-(define-key deadgrep-mode-map (kbd "n") #'deadgrep-forward)
-(define-key deadgrep-mode-map (kbd "p") #'deadgrep-backward)
 
 (defun deadgrep--start (search-term search-type case)
   "Start a ripgrep search."
