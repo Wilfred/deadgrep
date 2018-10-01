@@ -1,3 +1,7 @@
+# v0.7
+
+No changes yet.
+
 # v0.6
 
 `next-error` and `previous-error` now work, just like they do with
