@@ -6,7 +6,7 @@
 ;; URL: https://github.com/Wilfred/deadgrep
 ;; Keywords: tools
 ;; Version: 0.7
-;; Package-Requires: ((emacs "25.1") (dash "2.12.0") (s "1.11.0") (spinner "1.7.3") (projectile "0.14.0"))
+;; Package-Requires: ((emacs "25.1") (dash "2.12.0") (s "1.11.0") (spinner "1.7.3"))
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -35,7 +35,6 @@
 (require 's)
 (require 'dash)
 (require 'spinner)
-(require 'projectile)
 
 (defgroup deadgrep nil
   "A powerful text search UI using ripgrep."
@@ -1097,8 +1096,9 @@ for a string, offering the current word as a default."
 
 (defun deadgrep--project-root ()
   "Guess the project root of the given FILE-PATH."
-  (let ((projectile-require-project-root nil))
-    (projectile-project-root)))
+  (-if-let (project (project-current))
+      (cdr project)
+    default-directory))
 
 (defun deadgrep--write-postponed ()
   (let* ((inhibit-read-only t)
