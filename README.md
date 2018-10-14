@@ -83,6 +83,10 @@ settings you used in your last search.
 **Globbing and file types**: Deadgrep suggests file types and globbing
 options that match the file you started the search from.
 
+**Host**: If you're editing a remote file with Tramp, deadgrep will
+search the remote machine. This requires `rg` to be installed on that
+machine.
+
 ### Easy Filtering
 
 Didn't get the results you wanted? It's easy to change the search

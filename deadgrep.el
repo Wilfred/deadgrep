@@ -1017,7 +1017,7 @@ This will either be a button, a filename, or a search result."
                    search-term search-type case
                    deadgrep--context))
          (process
-          (start-process-shell-command
+          (start-file-process-shell-command
            (format "rg %s" search-term)
            (current-buffer)
            command)))

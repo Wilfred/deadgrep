@@ -1,6 +1,6 @@
 # v0.7
 
-No changes yet.
+Tramp support!
 
 # v0.6
 
