@@ -1195,6 +1195,7 @@ This is intended for use with `next-error-function', which see."
      (format "Platform: %s\n" system-type)
      (format "Emacs version: %s\n" emacs-version)
      (format "Command: %s\n" command)
+     (format "default-directory: %S\n" default-directory)
      (format "\nInitial output from ripgrep:\n%S" output)
      (format "\n\nPlease file bugs at https://github.com/Wilfred/deadgrep/issues/new"))))
 
