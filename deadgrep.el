@@ -371,7 +371,11 @@ with Emacs text properties."
 
 (defun deadgrep--type-list ()
   "Query the rg executable for available file types."
-  (let* ((output (shell-command-to-string (format "%s --type-list" deadgrep-executable)))
+  (let* ((output (with-output-to-string
+                   (with-current-buffer standard-output
+                     (process-file-shell-command
+                      (format "%s --type-list" deadgrep-executable)
+                      nil '(t nil)))))
          (lines (s-lines (s-trim output)))
          (types-and-globs
           (--map
