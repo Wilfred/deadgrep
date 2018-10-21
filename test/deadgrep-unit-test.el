@@ -80,6 +80,13 @@
     (should
      (equal filename "deadgrep.el"))
     (should
+     (equal line-num 123)))
+  (-let* ((raw-line
+           "[0m[35m./deadgrep.el[0m:[0m[32m123[0m:    (when ([0m[31m[1mbuffer-live[0m-p buffer)")
+          ((filename line-num _) (deadgrep--split-line raw-line)))
+    (should
+     (equal filename "deadgrep.el"))
+    (should
      (equal line-num 123))))
 
 (ert-deftest deadgrep--split-line--context ()

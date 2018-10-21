@@ -256,7 +256,10 @@ We save the last line here, in case we need to append more text to it.")
   (match-string 1 s))
 
 (defconst deadgrep--filename-regexp
-  (rx bos "\x1b[0m\x1b[3" (or "5" "6") "m" (group (+? anything)) "\x1b[")
+  (rx bos "\x1b[0m\x1b[3" (or "5" "6") "m"
+      (? "./")
+      (group (+? anything))
+      "\x1b[")
   "Extracts the filename from a ripgrep line with ANSI color sequences.
 We use the color sequences to extract the filename exactly, even
 if the path contains colons.")
