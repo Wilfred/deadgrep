@@ -236,3 +236,16 @@ context arguments to ripgrep."
    (string=
     (deadgrep--glob-regexp "[?]")
     "^[?]$")))
+
+(ert-deftest deadgrep--create-imenu-index ()
+  (with-temp-buffer
+    (deadgrep--insert-output "\
+[0m[35mtest/test-helper.el[0m:[0m[32m17[0m:	    (:exclude \"*-[0m[1m[31mtest[0m.el\")
+[0m[35mdocs/ALTERNATIVES.md[0m:[0m[32m45[0m:ag.el has a few [0m[1m[31mtest[0ms, but coverage is significantly lower than
+[0m[35mdocs/ALTERNATIVES.md[0m:[0m[32m62[0m:**Great for**: if you want a ripgrep tool with excellent [0m[1m[31mtest[0m
+[0m[35mtest/deadgrep-unit-test.el[0m:[0m[32m3[0m:(ert-def[0m[1m[31mtest[0m deadgrep--propertize-regexp ()
+")
+    (should (equal (deadgrep--create-imenu-index)
+                   '(("Files" . (("test/test-helper.el" . 1)
+                                 ("docs/ALTERNATIVES.md" . 55)
+                                 ("test/deadgrep-unit-test.el" . 213))))))))

@@ -122,6 +122,10 @@ We save the last line here, in case we need to append more text to it.")
 (defvar-local deadgrep--debug-command nil)
 (defvar-local deadgrep--debug-first-output nil)
 
+(defvar-local deadgrep--imenu-alist nil
+  "Alist that stores filename and position for each matched files.
+It is used to create `imenu' index.")
+
 (defconst deadgrep--position-column-width 5)
 
 (defconst deadgrep--color-code
@@ -193,9 +197,11 @@ We save the last line here, in case we need to append more text to it.")
             (cond
              ;; This is the first file we've seen, print the heading.
              ((null deadgrep--current-file)
+              (push (cons filename (point)) deadgrep--imenu-alist)
               (insert pretty-filename "\n"))
              ;; This is a new file, print the heading with a spacer.
              ((not (equal deadgrep--current-file filename))
+              (push (cons filename (1+ (point))) deadgrep--imenu-alist)
               (insert "\n" pretty-filename "\n")))
             (setq deadgrep--current-file filename)
 
@@ -1060,6 +1066,7 @@ This will either be a button, a filename, or a search result."
     (setq deadgrep--remaining-output nil)
     (setq deadgrep--current-file nil)
     (setq deadgrep--debug-first-output nil)
+    (setq deadgrep--imenu-alist nil)
 
     (deadgrep--write-heading)
     ;; If the point was in the heading, ensure that we restore its
@@ -1117,6 +1124,11 @@ for a string, offering the current word as a default."
        (format "Press %s to start the search."
                (key-description restart-key))))))
 
+(defun deadgrep--create-imenu-index ()
+  "Create `imenu' index for matched files."
+  (when deadgrep--imenu-alist
+    (list (cons "Files" (reverse deadgrep--imenu-alist)))))
+
 ;;;###autoload
 (defun deadgrep (search-term)
   "Start a ripgrep search for SEARCH-TERM.
@@ -1140,6 +1152,7 @@ don't actually start the search."
 
     (switch-to-buffer buf)
 
+    (setq imenu-create-index-function #'deadgrep--create-imenu-index)
     (setq next-error-function #'deadgrep-next-error)
 
     ;; If we have previous search settings, apply them to our new
