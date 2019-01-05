@@ -1166,11 +1166,12 @@ return the overridden value."
           (-lambda ((original . _))
             (equal (deadgrep--normalise-dirname original) path))
           deadgrep-project-root-overrides)))
-    (if override
-        (progn
-          (setq deadgrep--root-overriden t)
-          (cdr override))
-      path)))
+    (when override
+      (setq deadgrep--root-overriden t)
+      (setq path (cdr override))
+      (unless (stringp path)
+        (user-error "Bad override: expected a path string, but got: %S" path)))
+    path))
 
 (defun deadgrep--project-root ()
   "Guess the project root of the given FILE-PATH."
