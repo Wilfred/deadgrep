@@ -54,7 +54,25 @@ To disable cleanup entirely, set this variable to nil.")
 (defvar deadgrep-project-root-function
   #'deadgrep--project-root
   "Function called by `deadgrep' to work out the root directory
-to search from.")
+to search from.
+
+See also `deadgrep-project-root-overrides'.")
+
+(defvar deadgrep-project-root-overrides nil
+  "An alist associating project directories with the desired
+search directory.
+
+This is useful for large repos where you only want to search a
+subdirectory. It's also handy for nested repos where you want to
+search from the parent.
+
+This affects the behaviour of `deadgrep--project-root', so this
+variable has no effect if you change
+`deadgrep-project-root-function'.")
+
+(defvar-local deadgrep--root-overriden nil
+  "A boolean tracking whether `deadgrep-project-root-overrides'
+was used.")
 
 (defvar deadgrep-history
   nil
@@ -528,9 +546,11 @@ with Emacs text properties."
   'help-echo "Change base directory")
 
 (defun deadgrep--directory (_button)
+  "Prompt the user for a new search directory, then restart the search."
   (setq default-directory
         (expand-file-name
          (read-directory-name "Search files in: ")))
+  (setq deadgrep--root-overriden nil)
   (rename-buffer
    (deadgrep--buffer-name deadgrep--search-term default-directory))
   (deadgrep-restart))
@@ -656,6 +676,9 @@ search settings."
             (deadgrep--button
              (abbreviate-file-name default-directory)
              'deadgrep-directory)
+            (if deadgrep--root-overriden
+                (propertize " (from override)" 'face 'deadgrep-meta-face)
+              "")
             "\n"
             (propertize "Files: "
                         'face 'deadgrep-meta-face)
@@ -1108,11 +1131,34 @@ for a string, offering the current word as a default."
       (push search-term deadgrep-history))
     search-term))
 
+(defun deadgrep--normalise-dirname (path)
+  "Expand PATH and ensure that it doesn't end with a slash."
+  (let (file-name-handler-alist)
+    (directory-file-name (expand-file-name path))))
+
+(defun deadgrep--lookup-override (path)
+  "If PATH is present in `deadgrep-project-root-overrides',
+return the overridden value."
+  (setq path (deadgrep--normalise-dirname path))
+  (let ((override
+         (-first
+          (-lambda ((original . _))
+            (equal (deadgrep--normalise-dirname original) path))
+          deadgrep-project-root-overrides)))
+    (if override
+        (progn
+          (setq deadgrep--root-overriden t)
+          (cdr override))
+      path)))
+
 (defun deadgrep--project-root ()
   "Guess the project root of the given FILE-PATH."
-  (-if-let (project (project-current))
-      (cdr project)
-    default-directory))
+  (let ((root default-directory)
+        (project (project-current)))
+    (when project
+      (setq root (cdr project)))
+    (when root
+      (deadgrep--lookup-override root))))
 
 (defun deadgrep--write-postponed ()
   (let* ((inhibit-read-only t)

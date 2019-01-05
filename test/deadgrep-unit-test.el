@@ -249,3 +249,22 @@ context arguments to ripgrep."
                    '(("Files" . (("test/test-helper.el" . 1)
                                  ("docs/ALTERNATIVES.md" . 55)
                                  ("test/deadgrep-unit-test.el" . 213))))))))
+
+(ert-deftest deadgrep--lookup-override ()
+  (let ((deadgrep-project-root-overrides nil))
+    (should
+     (equal
+      (deadgrep--lookup-override "/foo/bar")
+      "/foo/bar")))
+  (let ((deadgrep-project-root-overrides
+         '(("/foo/bar" . "/overridden"))))
+    (should
+     (equal
+      (deadgrep--lookup-override "/foo/bar")
+      "/overridden")))
+  (let* ((deadgrep-project-root-overrides
+          `(("~/foo" . "/overridden"))))
+    (should
+     (equal
+      (deadgrep--lookup-override (expand-file-name "~/foo"))
+      "/overridden"))))

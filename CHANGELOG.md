@@ -2,6 +2,10 @@
 
 Tramp support!
 
+Added `deadgrep-project-root-overrides`. This enables you to change
+the root directory for a specific project without writing a whole custom
+function for `deadgrep-project-root-function`.
+
 # v0.6
 
 `next-error` and `previous-error` now work, just like they do with
