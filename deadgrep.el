@@ -477,9 +477,15 @@ with Emacs text properties."
          (-sort (-lambda ((type1 _) (type2 _))
                   (< (length type1) (length type2))))
          ;; Prefer types with more extensions, as they tend to be more
-         ;; common languages.
+         ;; common languages (e.g. 'ocaml' over 'ml').
          (-sort (-lambda ((_ globs1) (_ globs2))
                   (< (length globs1) (length globs2))))
+         ;; But prefer elisp over lisp for .el files.
+         (-sort (-lambda ((type1 _) (type2 _))
+                  ;; Return t if we're comparing elisp with lisp, nil
+                  ;; otherwise.
+                  (and (equal type1 "lisp")
+                       (equal type2 "elisp"))))
          ;; Take the highest scoring matching.
          (-last-item))))
 

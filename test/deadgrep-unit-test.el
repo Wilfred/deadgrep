@@ -211,6 +211,16 @@ context arguments to ripgrep."
      '(("clojure" ("*.cljs" "*.clj"))
        ("py" ("*.py")))))))
 
+(ert-deftest deadgrep--relevant-file-type-elisp ()
+  "We should prefer elisp over lisp for .el files."
+  (should
+   (equal
+    (deadgrep--relevant-file-type
+     "foo.el"
+     '(("elisp" ("*.el"))
+       ("lisp" ("*.el" "*.lisp"))))
+    '("elisp" ("*.el")))))
+
 (ert-deftest deadgrep--glob-regexp ()
   (should
    (string=
