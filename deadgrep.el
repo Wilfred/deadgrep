@@ -70,10 +70,6 @@ This affects the behaviour of `deadgrep--project-root', so this
 variable has no effect if you change
 `deadgrep-project-root-function'.")
 
-(defvar-local deadgrep--root-overriden nil
-  "A boolean tracking whether `deadgrep-project-root-overrides'
-was used.")
-
 (defvar deadgrep-history
   nil
   "A list of the previous search terms.")
@@ -550,7 +546,6 @@ with Emacs text properties."
   (setq default-directory
         (expand-file-name
          (read-directory-name "Search files in: ")))
-  (setq deadgrep--root-overriden nil)
   (rename-buffer
    (deadgrep--buffer-name deadgrep--search-term default-directory))
   (deadgrep-restart))
@@ -676,7 +671,7 @@ search settings."
             (deadgrep--button
              (abbreviate-file-name default-directory)
              'deadgrep-directory)
-            (if deadgrep--root-overriden
+            (if (get-text-property 0 'deadgrep-overridden default-directory)
                 (propertize " (from override)" 'face 'deadgrep-meta-face)
               "")
             "\n"
@@ -1167,10 +1162,10 @@ return the overridden value."
             (equal (deadgrep--normalise-dirname original) path))
           deadgrep-project-root-overrides)))
     (when override
-      (setq deadgrep--root-overriden t)
       (setq path (cdr override))
       (unless (stringp path)
-        (user-error "Bad override: expected a path string, but got: %S" path)))
+        (user-error "Bad override: expected a path string, but got: %S" path))
+      (setq path (propertize path 'deadgrep-overridden t)))
     path))
 
 (defun deadgrep--project-root ()
