@@ -52,6 +52,9 @@ or copy it into your `~/.emacs.d`.
 | <kbd>C-c</kbd> <kbd>C-k</kbd> | Stop a running search                          |
 | <kbd>C-u</kbd>                | A prefix argument prevents searches from starting automatically. |
 
+You can also use `M-x imenu` to move between files in a results
+buffer.
+
 ### Minibuffer
 
 You use the minibuffer to enter a new search term.

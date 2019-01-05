@@ -2,6 +2,8 @@
 
 Tramp support!
 
+Added imenu for moving between files in a results buffer.
+
 Added `deadgrep-project-root-overrides`. This enables you to change
 the root directory for a specific project without writing a whole custom
 function for `deadgrep-project-root-function`.
