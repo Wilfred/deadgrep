@@ -268,3 +268,17 @@ context arguments to ripgrep."
      (equal
       (deadgrep--lookup-override (expand-file-name "~/foo"))
       "/overridden"))))
+
+(ert-deftest deadgrep--buffer-position ()
+  (with-temp-buffer
+    (insert "foo\nbar\n")
+    (should
+     (equal
+      (deadgrep--buffer-position 1 0)
+      1))
+    ;; We should ignore any narrowing in effect.
+    (narrow-to-region (point-min) (1+ (point-min)))
+    (should
+     (equal
+      (deadgrep--buffer-position 2 1)
+      6))))

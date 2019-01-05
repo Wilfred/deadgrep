@@ -891,6 +891,17 @@ buffer."
 
     (nreverse positions)))
 
+(defun deadgrep--buffer-position (line-number column-offset)
+  "Return the position equivalent to LINE-NUMBER at COLUMN-OFFSET
+in the current buffer."
+  (save-restriction
+    (widen)
+    (goto-char (point-min))
+    (forward-line (1- line-number))
+    (forward-char column-offset)
+
+    (point)))
+
 (defun deadgrep--visit-result (open-fn)
   "Goto the search result at point."
   (interactive)
@@ -909,12 +920,22 @@ buffer."
 
       (funcall open-fn file-name)
       (goto-char (point-min))
+
       (when line-number
-        (forward-line (1- line-number))
-        (forward-char column-offset)
-        (-each match-positions
-          (-lambda ((start end))
-            (deadgrep--flash-column-offsets start end)))))))
+        (-let [destination-pos (deadgrep--buffer-position
+                                line-number column-offset)]
+          ;; Put point on the position of the match, widening the
+          ;; buffer if necessary.
+          (when (or (< destination-pos (point-min))
+                    (> destination-pos (point-max)))
+            (widen))
+          (goto-char destination-pos)
+
+          ;; Temporarily highlight the parts of the line that matched
+          ;; the search term.
+          (-each match-positions
+            (-lambda ((start end))
+              (deadgrep--flash-column-offsets start end))))))))
 
 (defun deadgrep-visit-result-other-window ()
   "Goto the search result at point, opening in another window."
