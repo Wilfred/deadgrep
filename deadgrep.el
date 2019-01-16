@@ -822,6 +822,8 @@ Returns a list ordered by the most recently accessed."
     (define-key map (kbd "n") #'deadgrep-forward)
     (define-key map (kbd "p") #'deadgrep-backward)
 
+    (define-key map (kbd "M-n") #'deadgrep-next-matching-text)
+    (define-key map (kbd "M-p") #'deadgrep-previous-matching-text)
     map)
   "Keymap for `deadgrep-mode'.")
 
@@ -1022,21 +1024,20 @@ Keys are interned filenames, so they compare with `eq'.")
   (or (button-at pos)
       (get-text-property pos 'deadgrep-filename)))
 
-(defun deadgrep--move (forward-p)
-  "Move to the next item.
-This will either be a button, a filename, or a search result."
+(defun deadgrep--move (forward-p pred)
+  "Move to the next position satisfying PRED."
   (interactive)
   (let ((pos (point)))
-    ;; If point is initially on an item, move past it.
-    (while (and (deadgrep--item-p pos)
+    ;; If point is initially on an entry satisfying the predicate, move past it.
+    (while (and (funcall pred pos)
                 (if forward-p
                     (< pos (point-max))
                   (> pos (point-min))))
       (if forward-p
           (cl-incf pos)
         (cl-decf pos)))
-    ;; Find the next item.
-    (while (and (not (deadgrep--item-p pos))
+    ;; Find the next entry.
+    (while (and (not (funcall pred pos))
                 (if forward-p
                     (< pos (point-max))
                   (> pos (point-min))))
@@ -1044,28 +1045,38 @@ This will either be a button, a filename, or a search result."
           (cl-incf pos)
         (cl-decf pos)))
     ;; Regardless of direction, ensure point is at the beginning of
-    ;; the item.
+    ;; the entry.
     (while (and (if forward-p
                     (< pos (point-max))
                   (> pos (point-min)))
-                (deadgrep--item-p (1- pos)))
+                (funcall pred (1- pos)))
       (cl-decf pos))
-    ;; If we reached an item (we aren't at the first/last item), then
+    ;; If we reached an entry (we aren't at the first/last entry), then
     ;; go to it.
-    (when (deadgrep--item-p pos)
+    (when (funcall pred pos)
       (goto-char pos))))
+
+(defun deadgrep-next-matching-text ()
+  "Move forward to the beginning of the next occurrence of matching text."
+  (interactive)
+  (deadgrep--move t 'deadgrep--match-face-p))
+
+(defun deadgrep-previous-matching-text ()
+  "Move forward to the beginning of the previous occurrence of matching text."
+  (interactive)
+  (deadgrep--move nil 'deadgrep--match-face-p))
 
 (defun deadgrep-forward ()
   "Move forward to the next item.
 This will either be a button, a filename, or a search result."
   (interactive)
-  (deadgrep--move t))
+  (deadgrep--move t 'deadgrep--item-p))
 
 (defun deadgrep-backward ()
   "Move backward to the previous item.
 This will either be a button, a filename, or a search result."
   (interactive)
-  (deadgrep--move nil))
+  (deadgrep--move nil 'deadgrep--item-p))
 
 (defun deadgrep--start (search-term search-type case)
   "Start a ripgrep search."

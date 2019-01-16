@@ -73,6 +73,43 @@
     (should
      (deadgrep--item-p (point)))))
 
+(ert-deftest deadgrep-next-matching-text ()
+  (cl-letf (((symbol-function 'read-from-minibuffer)
+             (lambda (&rest _args) "foo-a-unique-string-bar-foo")))
+    (deadgrep "foo")
+
+    (deadgrep-next-matching-text)
+
+    ;; Moving forward, when point is already on the last match, should
+    ;; not error.
+    (goto-char (point-max))
+    (deadgrep-next-matching-text)
+
+    ;; We should end up with point on a match.
+    (goto-char (point-min))
+    (deadgrep-next-matching-text)
+    (should
+     (deadgrep--match-face-p (point)))))
+
+(ert-deftest deadgrep-previous-matching-text ()
+  (cl-letf (((symbol-function 'read-from-minibuffer)
+             (lambda (&rest _args) "foo-a-unique-string-bar-foo")))
+    (deadgrep "foo")
+
+    (goto-char (point-max))
+    (deadgrep-previous-matching-text)
+
+    ;; Moving forward, when point is already on the first match, should
+    ;; not error.
+    (goto-char (point-min))
+    (deadgrep-previous-matching-text)
+
+    ;; We should end up with point on a match.
+    (goto-char (point-max))
+    (deadgrep-previous-matching-text)
+    (should
+     (deadgrep--match-face-p (point)))))
+
 (ert-deftest deadgrep--split-line ()
   (-let* ((raw-line
            "[0m[35mdeadgrep.el[0m:[0m[32m123[0m:    (when ([0m[31m[1mbuffer-live[0m-p buffer)")
