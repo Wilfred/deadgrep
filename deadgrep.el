@@ -1155,8 +1155,10 @@ for a string, offering the current word as a default."
 
 (defun deadgrep--normalise-dirname (path)
   "Expand PATH and ensure that it doesn't end with a slash."
-  (let (file-name-handler-alist)
-    (directory-file-name (expand-file-name path))))
+  (directory-file-name (if (file-remote-p path)
+                           path
+                         (let (file-name-handler-alist)
+                           (expand-file-name path)))))
 
 (defun deadgrep--lookup-override (path)
   "If PATH is present in `deadgrep-project-root-overrides',
