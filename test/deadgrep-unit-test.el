@@ -272,12 +272,18 @@ context arguments to ripgrep."
      (equal
       (deadgrep--lookup-override "/foo/bar")
       "/overridden")))
-  (let* ((deadgrep-project-root-overrides
-          `(("~/foo" . "/overridden"))))
+  (let ((deadgrep-project-root-overrides
+         '(("~/foo" . "/overridden"))))
     (should
      (equal
       (deadgrep--lookup-override (expand-file-name "~/foo"))
-      "/overridden"))))
+      "/overridden")))
+  (let ((deadgrep-project-root-overrides
+         '(("~/foo" . "/overridden"))))
+    (should
+     (equal
+      (deadgrep--lookup-override "~/bar")
+      "~/bar"))))
 
 (ert-deftest deadgrep--buffer-position ()
   (with-temp-buffer

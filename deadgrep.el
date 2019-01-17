@@ -1154,7 +1154,8 @@ for a string, offering the current word as a default."
     search-term))
 
 (defun deadgrep--normalise-dirname (path)
-  "Expand PATH and ensure that it doesn't end with a slash."
+  "Expand PATH and ensure that it doesn't end with a slash.
+If PATH is remote path, it is not expanded."
   (directory-file-name (if (file-remote-p path)
                            path
                          (let (file-name-handler-alist)
@@ -1162,13 +1163,14 @@ for a string, offering the current word as a default."
 
 (defun deadgrep--lookup-override (path)
   "If PATH is present in `deadgrep-project-root-overrides',
-return the overridden value."
-  (setq path (deadgrep--normalise-dirname path))
-  (let ((override
-         (-first
-          (-lambda ((original . _))
-            (equal (deadgrep--normalise-dirname original) path))
-          deadgrep-project-root-overrides)))
+return the overridden value.
+Otherwise, return PATH as is."
+  (let* ((normalised-path (deadgrep--normalise-dirname path))
+         (override
+          (-first
+           (-lambda ((original . _))
+             (equal (deadgrep--normalise-dirname original) normalised-path))
+           deadgrep-project-root-overrides)))
     (when override
       (setq path (cdr override))
       (unless (stringp path)
