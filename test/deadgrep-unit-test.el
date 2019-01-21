@@ -272,12 +272,18 @@ context arguments to ripgrep."
      (equal
       (deadgrep--lookup-override "/foo/bar")
       "/overridden")))
-  (let* ((deadgrep-project-root-overrides
-          `(("~/foo" . "/overridden"))))
+  (let ((deadgrep-project-root-overrides
+         '(("~/foo" . "/overridden"))))
     (should
      (equal
       (deadgrep--lookup-override (expand-file-name "~/foo"))
-      "/overridden"))))
+      "/overridden")))
+  (let ((deadgrep-project-root-overrides
+         '(("~/foo" . "/overridden"))))
+    (should
+     (equal
+      (deadgrep--lookup-override "~/bar")
+      "~/bar"))))
 
 (ert-deftest deadgrep--buffer-position ()
   (with-temp-buffer
@@ -292,3 +298,19 @@ context arguments to ripgrep."
      (equal
       (deadgrep--buffer-position 2 1)
       6))))
+
+(ert-deftest deadgrep--normalise-dirname--local-paths ()
+  (if (eq system-type 'windows-nt)
+      (progn
+        (should (equal (deadgrep--normalise-dirname "c:/foo/bar") "c:/foo/bar"))
+        (should (equal (deadgrep--normalise-dirname "c:/foo/bar/") "c:/foo/bar"))
+        (should (equal (deadgrep--normalise-dirname "c:/foo/bar/../baz") "c:/foo/baz")))
+    (should (equal (deadgrep--normalise-dirname "/foo/bar") "/foo/bar"))
+    (should (equal (deadgrep--normalise-dirname "/foo/bar/") "/foo/bar"))
+    (should (equal (deadgrep--normalise-dirname "/foo/bar/../baz") "/foo/baz"))))
+
+(ert-deftest deadgrep--normalise-dirname--remote-paths ()
+  (should (equal (deadgrep--normalise-dirname "/pscp:localhost:") "/pscp:localhost:"))
+  (should (equal (deadgrep--normalise-dirname "/pscp:localhost:/") "/pscp:localhost:/"))
+  (should (equal (deadgrep--normalise-dirname "/pscp:localhost:/foo/bar") "/pscp:localhost:/foo/bar"))
+  (should (equal (deadgrep--normalise-dirname "/pscp:localhost:/foo/bar/") "/pscp:localhost:/foo/bar")))
