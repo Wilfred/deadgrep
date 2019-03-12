@@ -121,7 +121,7 @@ overflow on our regexp matchers if we don't apply this.")
   "When set, also show context of results.
 This is stored as a cons cell of integers (lines-before . lines-after).")
 (defvar-local deadgrep--initial-filename nil
-  "The filename of the buffer that deadgre was started from.
+  "The filename of the buffer that deadgrep was started from.
 Used to offer better default values for file options.")
 
 (defvar-local deadgrep--current-file nil
