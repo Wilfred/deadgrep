@@ -323,3 +323,12 @@ accidentally edit it."
       (deadgrep--write-heading)
       (should
        (get-text-property (point-min) 'read-only)))))
+
+(ert-deftest deadgrep-edit-mode--preserve-variables ()
+  "Ensure that we don't clobber local variables when switching to
+edit mode."
+  (let ((buf (deadgrep--buffer "foo" "/" "blah.el")))
+    (with-current-buffer buf
+      (deadgrep-edit-mode)
+      (should
+       (equal deadgrep--search-term "foo")))))

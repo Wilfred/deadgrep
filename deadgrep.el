@@ -114,14 +114,10 @@ overflow on our regexp matchers if we don't apply this.")
   :group 'deadgrep)
 
 (defvar-local deadgrep--search-term nil)
-;; TODO: confirm if there are any more that need to be permanent.
-(put 'deadgrep--search-term 'permanent-local t)
 (defvar-local deadgrep--search-type 'string)
-(put 'deadgrep--search-type 'permanent-local t)
 (defvar-local deadgrep--search-case 'smart)
-(put 'deadgrep--search-case 'permanent-local t)
 (defvar-local deadgrep--file-type 'all)
-(put 'deadgrep--file-type 'permanent-local t)
+
 (defvar-local deadgrep--context nil
   "When set, also show context of results.
 This is stored as a cons cell of integers (lines-before . lines-after).")
@@ -851,6 +847,7 @@ Returns a list ordered by the most recently accessed."
     map)
   "Keymap for `deadgrep-mode'.")
 
+;; TODO: does this still inherit from text-mode?
 (defvar deadgrep-edit-mode-map
   (let ((map (make-sparse-keymap)))
     (set-keymap-parent map deadgrep-common-mode-map)
@@ -887,10 +884,19 @@ underlying file."
                 (insert inserted)))))))))
 
 ;; TODO: refuse to proceed if the search is still running.
-(define-derived-mode deadgrep-edit-mode text-mode
-  "DeadgrepEdit"
+(defun deadgrep-edit-mode ()
   "Major mode for editing the results files directly from a
-deadgrep results buffer."
+deadgrep results buffer.
+
+\\{deadgrep-edit-mode-map}"
+  (interactive)
+  ;; We deliberately don't use `define-derived-mode' here because we
+  ;; don't want to call `kill-all-local-variables'. Initialise the
+  ;; major mode manually.
+  (setq major-mode 'deadgrep-edit-mode)
+  (setq mode-name "DeadgrepEdit")
+  (use-local-map deadgrep-edit-mode-map)
+
   (setq buffer-read-only nil)
   (add-hook 'after-change-functions #'deadgrep--propagate-change nil t))
 
