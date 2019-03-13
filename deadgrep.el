@@ -859,15 +859,40 @@ Returns a list ordered by the most recently accessed."
 
 (define-derived-mode deadgrep-mode special-mode
   '("Deadgrep" (:eval (spinner-print deadgrep--spinner)))
-  "Major mode for deadgrep results buffers.")
+  "Major mode for deadgrep results buffers."
+  (remove-hook 'after-change-functions #'deadgrep--propagate-change t))
 
-;; TODO: refuse to proceed if the edit is still running.
+(defun deadgrep--propagate-change (beg end length)
+  "Repeat the last modification to the results buffer in the
+underlying file."
+  ;; We should never be called outside a edit buffer, but be
+  ;; defensive. Buggy functions in change hooks are painful.
+  (when (eq major-mode 'deadgrep-edit-mode)
+    (save-excursion
+      (goto-char (+ beg length))
+      (let* ((column (deadgrep--current-column))
+             (filename (deadgrep--filename))
+             (line-number (deadgrep--line-number))
+             (buf (find-file-noselect filename))
+             (inserted (buffer-substring beg end)))
+        (with-current-buffer buf
+          (save-excursion
+            (save-restriction
+              (goto-char
+               (deadgrep--buffer-position line-number column))
+              (if (> length 0)
+                  ;; We removed chars in the results buffer, so remove.
+                  (delete-char (- length))
+                ;; We inserted something, so insert the same chars.
+                (insert inserted)))))))))
+
+;; TODO: refuse to proceed if the search is still running.
 (define-derived-mode deadgrep-edit-mode text-mode
   "DeadgrepEdit"
   "Major mode for editing the results files directly from a
 deadgrep results buffer."
   (setq buffer-read-only nil)
-  (add-hook 'after-change-functions #'deadgrep--after-change nil t))
+  (add-hook 'after-change-functions #'deadgrep--propagate-change nil t))
 
 (defun deadgrep--current-column ()
   "Get the current column position in char terms.
