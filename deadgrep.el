@@ -944,12 +944,20 @@ in the current buffer."
 
     (point)))
 
+(defun deadgrep--filename ()
+  "Get the filename of the result at point."
+  (get-text-property (line-beginning-position) 'deadgrep-filename))
+
+(defun deadgrep--line-number ()
+  "Get the filename of the result at point."
+  (get-text-property (line-beginning-position) 'deadgrep-line-number))
+
 (defun deadgrep--visit-result (open-fn)
   "Goto the search result at point."
   (interactive)
   (let* ((pos (line-beginning-position))
-         (file-name (get-text-property pos 'deadgrep-filename))
-         (line-number (get-text-property pos 'deadgrep-line-number))
+         (file-name (deadgrep--filename))
+         (line-number (deadgrep--line-number))
          (column-offset (when line-number (deadgrep--current-column)))
          (match-positions (when line-number (deadgrep--match-positions))))
     (when file-name
@@ -998,9 +1006,8 @@ Keys are interned filenames, so they compare with `eq'.")
 (defun deadgrep-toggle-file-results ()
   "Show/hide the results of the file at point."
   (interactive)
-  (let* ((pos (line-beginning-position))
-         (file-name (get-text-property pos 'deadgrep-filename))
-         (line-number (get-text-property pos 'deadgrep-line-number)))
+  (let* ((file-name (deadgrep--filename))
+         (line-number (deadgrep--line-number)))
     (when (and file-name (not line-number))
       ;; We're on a file heading.
       (if (alist-get (intern file-name) deadgrep--hidden-files)
@@ -1008,8 +1015,7 @@ Keys are interned filenames, so they compare with `eq'.")
         (deadgrep--hide)))))
 
 (defun deadgrep--show ()
-  (-let* ((pos (line-beginning-position))
-          (file-name (get-text-property pos 'deadgrep-filename))
+  (-let* ((file-name (deadgrep--filename))
           ((start-pos end-pos) (alist-get (intern file-name) deadgrep--hidden-files)))
     (remove-overlays start-pos end-pos 'invisible t)
     (setf (alist-get (intern file-name) deadgrep--hidden-files)
@@ -1018,8 +1024,7 @@ Keys are interned filenames, so they compare with `eq'.")
 (defun deadgrep--hide ()
   "Hide the file results immediately after point."
   (save-excursion
-    (let* ((pos (line-beginning-position))
-           (file-name (get-text-property pos 'deadgrep-filename))
+    (let* ((file-name (deadgrep--filename))
            (start-pos
             (progn
               (forward-line)
@@ -1061,7 +1066,7 @@ Keys are interned filenames, so they compare with `eq'.")
 (defun deadgrep--item-p (pos)
   "Is there something at POS that we can interact with?"
   (or (button-at pos)
-      (get-text-property pos 'deadgrep-filename)))
+      (deadgrep--filename)))
 
 (defun deadgrep--move (forward-p)
   "Move to the next item.
