@@ -208,11 +208,16 @@ It is used to create `imenu' index.")
                    (propertize formatted-line-num
                                'face 'deadgrep-meta-face
                                'deadgrep-filename filename
-                               'deadgrep-line-number line-num))
+                               'deadgrep-line-number line-num
+                               'read-only t
+                               'front-sticky t
+                               'rear-nonsticky t))
                   (pretty-filename
                    (propertize filename
                                'face 'deadgrep-filename-face
-                               'deadgrep-filename filename)))
+                               'deadgrep-filename filename
+                               'read-only t
+                               'front-sticky t)))
             (cond
              ;; This is the first file we've seen, print the heading.
              ((null deadgrep--current-file)
@@ -611,7 +616,8 @@ to obtain ripgrep results."
 (defun deadgrep--write-heading ()
   "Write the deadgrep heading with buttons reflecting the current
 search settings."
-  (let ((inhibit-read-only t))
+  (let ((start-pos (point))
+        (inhibit-read-only t))
     (insert (propertize "Search term: "
                         'face 'deadgrep-meta-face)
             (if (eq deadgrep--search-type 'regexp)
@@ -704,7 +710,13 @@ search settings."
             (if (eq (car-safe deadgrep--file-type) 'glob)
                 (format ":%s" (cdr deadgrep--file-type))
               "")
-            "\n\n")))
+            "\n\n")
+    (put-text-property
+     start-pos (point)
+     'read-only t)
+    (put-text-property
+     start-pos (point)
+     'front-sticky t)))
 
 ;; TODO: could we do this in the minibuffer too?
 (defun deadgrep--propertize-regexp (regexp)

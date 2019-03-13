@@ -314,3 +314,12 @@ context arguments to ripgrep."
   (should (equal (deadgrep--normalise-dirname "/pscp:localhost:/") "/pscp:localhost:/"))
   (should (equal (deadgrep--normalise-dirname "/pscp:localhost:/foo/bar") "/pscp:localhost:/foo/bar"))
   (should (equal (deadgrep--normalise-dirname "/pscp:localhost:/foo/bar/") "/pscp:localhost:/foo/bar")))
+
+(ert-deftest deadgrep--write-heading--read-only ()
+  "Ensure that the heading is read only, so we can't
+accidentally edit it."
+  (let ((buf (deadgrep--buffer "foo" "/" "blah.el")))
+    (with-current-buffer buf
+      (deadgrep--write-heading)
+      (should
+       (get-text-property (point-min) 'read-only)))))
