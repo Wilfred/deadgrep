@@ -114,9 +114,14 @@ overflow on our regexp matchers if we don't apply this.")
   :group 'deadgrep)
 
 (defvar-local deadgrep--search-term nil)
+;; TODO: confirm if there are any more that need to be permanent.
+(put 'deadgrep--search-term 'permanent-local t)
 (defvar-local deadgrep--search-type 'string)
+(put 'deadgrep--search-type 'permanent-local t)
 (defvar-local deadgrep--search-case 'smart)
+(put 'deadgrep--search-case 'permanent-local t)
 (defvar-local deadgrep--file-type 'all)
+(put 'deadgrep--file-type 'permanent-local t)
 (defvar-local deadgrep--context nil
   "When set, also show context of results.
 This is stored as a cons cell of integers (lines-before . lines-after).")
@@ -805,9 +810,17 @@ Returns a list ordered by the most recently accessed."
       (setq buffer-read-only t))
     buf))
 
-(defvar deadgrep-mode-map
+(defvar deadgrep-common-mode-map
   (let ((map (make-sparse-keymap)))
     (define-key map (kbd "RET") #'deadgrep-visit-result)
+    map)
+  "Mode map for keybindings in both `deadgrep-mode' and
+  `deadgrep-edit-mode'.")
+
+(defvar deadgrep-mode-map
+  (let ((map (make-sparse-keymap)))
+    (set-keymap-parent map deadgrep-common-mode-map)
+
     (define-key map (kbd "o") #'deadgrep-visit-result-other-window)
     ;; TODO: we should still be able to click on buttons.
 
@@ -826,8 +839,23 @@ Returns a list ordered by the most recently accessed."
     map)
   "Keymap for `deadgrep-mode'.")
 
+(defvar deadgrep-edit-mode-map
+  (let ((map (make-sparse-keymap)))
+    (set-keymap-parent map deadgrep-common-mode-map)
+    map)
+  "Keymap for `deadgrep-edit-mode'.")
+
 (define-derived-mode deadgrep-mode special-mode
-  '("Deadgrep" (:eval (spinner-print deadgrep--spinner))))
+  '("Deadgrep" (:eval (spinner-print deadgrep--spinner)))
+  "Major mode for deadgrep results buffers.")
+
+;; TODO: refuse to proceed if the edit is still running.
+(define-derived-mode deadgrep-edit-mode text-mode
+  "DeadgrepEdit"
+  "Major mode for editing the results files directly from a
+deadgrep results buffer."
+  (setq buffer-read-only nil)
+  (add-hook 'after-change-functions #'deadgrep--after-change nil t))
 
 (defun deadgrep--current-column ()
   "Get the current column position in char terms.
