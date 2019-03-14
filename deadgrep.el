@@ -792,17 +792,22 @@ Returns a list ordered by the most recently accessed."
   "Create and initialise a search results buffer."
   (let* ((buf-name (deadgrep--buffer-name search-term directory))
          (buf (get-buffer buf-name)))
-    (unless buf
-      ;; If we need to create the buffer, ensure we don't exceed
+    (if buf
+        ;; There was already a buffer with this name. Reset its search
+        ;; state.
+        (with-current-buffer buf
+          (deadgrep--stop-and-reset))
+      ;; We need to create the buffer, ensure we don't exceed
       ;; `deadgrep-max-buffers' by killing the least recently used.
-      (when (numberp deadgrep-max-buffers)
-        (let* ((excess-buffers (-drop (1- deadgrep-max-buffers)
-                                      (deadgrep--buffers))))
-          ;; Kill buffers so we have one buffer less than the maximum
-          ;; before we create a new one.
-          (-each excess-buffers #'kill-buffer)))
+      (progn
+        (when (numberp deadgrep-max-buffers)
+          (let* ((excess-buffers (-drop (1- deadgrep-max-buffers)
+                                        (deadgrep--buffers))))
+            ;; Kill buffers so we have one buffer less than the maximum
+            ;; before we create a new one.
+            (-each excess-buffers #'kill-buffer)))
 
-      (setq buf (get-buffer-create buf-name)))
+        (setq buf (get-buffer-create buf-name))))
 
     (with-current-buffer buf
       (setq default-directory directory)
@@ -1160,21 +1165,13 @@ This will either be a button, a filename, or a search result."
     (set-process-filter process #'deadgrep--process-filter)
     (set-process-sentinel process #'deadgrep--process-sentinel)))
 
-(defun deadgrep-restart ()
-  "Re-run ripgrep with the current search settings."
-  (interactive)
-  ;; If we haven't started yet, start the search if we've been called
-  ;; by the user.
-  (when (and deadgrep--postpone-start
-             (called-interactively-p 'interactive))
-    (setq deadgrep--postpone-start nil))
-
+(defun deadgrep--stop-and-reset ()
+  "Terminate the current search and reset any search state."
   ;; Stop the old search, so we don't carry on inserting results from
   ;; the last thing we searched for.
   (deadgrep--interrupt-process)
 
-  (let ((start-point (point))
-        (inhibit-read-only t))
+  (let ((inhibit-read-only t))
     ;; Reset UI: remove results, reset items hidden by TAB, and arrow
     ;; position.
     (erase-buffer)
@@ -1188,8 +1185,21 @@ This will either be a button, a filename, or a search result."
     (setq deadgrep--remaining-output nil)
     (setq deadgrep--current-file nil)
     (setq deadgrep--debug-first-output nil)
-    (setq deadgrep--imenu-alist nil)
+    (setq deadgrep--imenu-alist nil)))
 
+(defun deadgrep-restart ()
+  "Re-run ripgrep with the current search settings."
+  (interactive)
+  ;; If we haven't started yet, start the search if we've been called
+  ;; by the user.
+  (when (and deadgrep--postpone-start
+             (called-interactively-p 'interactive))
+    (setq deadgrep--postpone-start nil))
+
+  (deadgrep--stop-and-reset)
+
+  (let ((start-point (point))
+        (inhibit-read-only t))
     (deadgrep--write-heading)
     ;; If the point was in the heading, ensure that we restore its
     ;; position.
