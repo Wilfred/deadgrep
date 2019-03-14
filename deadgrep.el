@@ -133,6 +133,8 @@ Used to offer better default values for file options.")
 We save the last line here, in case we need to append more text to it.")
 (defvar-local deadgrep--postpone-start nil
   "If non-nil, don't (re)start searches.")
+(defvar-local deadgrep--running nil
+  "If non-nil, a search is still running.")
 
 (defvar-local deadgrep--debug-command nil)
 (defvar-local deadgrep--debug-first-output nil)
@@ -243,6 +245,7 @@ It is used to create `imenu' index.")
         (finished-p (string= output "finished\n")))
     (when (buffer-live-p buffer)
       (with-current-buffer buffer
+        (setq deadgrep--running nil)
         ;; rg has terminated, so stop the spinner.
         (spinner-stop deadgrep--spinner)
 
@@ -823,17 +826,9 @@ Returns a list ordered by the most recently accessed."
       (setq buffer-read-only t))
     buf))
 
-(defvar deadgrep-common-mode-map
-  (let ((map (make-sparse-keymap)))
-    (define-key map (kbd "RET") #'deadgrep-visit-result)
-    map)
-  "Mode map for keybindings in both `deadgrep-mode' and
-  `deadgrep-edit-mode'.")
-
 (defvar deadgrep-mode-map
   (let ((map (make-sparse-keymap)))
-    (set-keymap-parent map deadgrep-common-mode-map)
-
+    (define-key map (kbd "RET") #'deadgrep-visit-result)
     (define-key map (kbd "o") #'deadgrep-visit-result-other-window)
     ;; TODO: we should still be able to click on buttons.
 
@@ -852,10 +847,9 @@ Returns a list ordered by the most recently accessed."
     map)
   "Keymap for `deadgrep-mode'.")
 
-;; TODO: does this still inherit from text-mode?
 (defvar deadgrep-edit-mode-map
   (let ((map (make-sparse-keymap)))
-    (set-keymap-parent map deadgrep-common-mode-map)
+    (define-key map (kbd "RET") #'deadgrep-visit-result)
     map)
   "Keymap for `deadgrep-edit-mode'.")
 
@@ -893,8 +887,8 @@ underlying file."
   ;; defensive. Buggy functions in change hooks are painful.
   (when (eq major-mode 'deadgrep-edit-mode)
     (save-excursion
-      (goto-char (+ beg length))
-      (-let* ((column (deadgrep--current-column))
+      (goto-char beg)
+      (-let* ((column (+ (deadgrep--current-column) length))
               (filename (deadgrep--filename))
               (line-number (deadgrep--line-number))
               ((buf . opened) (deadgrep--find-file filename))
@@ -916,22 +910,29 @@ underlying file."
             (basic-save-buffer)
             (kill-buffer buf)))))))
 
-;; TODO: refuse to proceed if the search is still running.
+(defvar deadgrep-edit-mode-hook nil)
+
 (defun deadgrep-edit-mode ()
   "Major mode for editing the results files directly from a
 deadgrep results buffer.
 
 \\{deadgrep-edit-mode-map}"
   (interactive)
+  (when deadgrep--running
+    (user-error "Can't edit a results buffer until the search is finished"))
   ;; We deliberately don't use `define-derived-mode' here because we
   ;; don't want to call `kill-all-local-variables'. Initialise the
   ;; major mode manually.
+  (run-hooks 'change-major-mode-hook)
   (setq major-mode 'deadgrep-edit-mode)
-  (setq mode-name "DeadgrepEdit")
+  (setq mode-name
+        '(:propertize "Deadgrep:Edit" face mode-line-emphasis))
   (use-local-map deadgrep-edit-mode-map)
 
   (setq buffer-read-only nil)
-  (add-hook 'after-change-functions #'deadgrep--propagate-change nil t))
+  (add-hook 'after-change-functions #'deadgrep--propagate-change nil t)
+
+  (run-mode-hooks 'deadgrep-edit-mode-hook))
 
 (defun deadgrep--current-column ()
   "Get the current column position in char terms.
@@ -1180,6 +1181,7 @@ This will either be a button, a filename, or a search result."
 (defun deadgrep--start (search-term search-type case)
   "Start a ripgrep search."
   (setq deadgrep--spinner (spinner-create 'progress-bar t))
+  (setq deadgrep--running t)
   (spinner-start deadgrep--spinner)
   (let* ((command (deadgrep--format-command
                    search-term search-type case
