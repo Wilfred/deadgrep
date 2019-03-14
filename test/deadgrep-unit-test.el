@@ -30,48 +30,42 @@
          'deadgrep-regexp-metachar-face))))
 
 (ert-deftest deadgrep-smoke-test ()
-  (cl-letf (((symbol-function 'read-from-minibuffer)
-             (lambda (&rest _args) "foo")))
-    (deadgrep "foo")))
+  (deadgrep "foo"))
 
 (ert-deftest deadgrep-forward ()
-  (cl-letf (((symbol-function 'read-from-minibuffer)
-             (lambda (&rest _args) "a-unique-string")))
-    (deadgrep "foo")
+  (deadgrep "foo")
 
-    ;; Smoke test.
-    (deadgrep-forward)
+  ;; Smoke test.
+  (deadgrep-forward)
 
-    ;; Moving forward, when point is already on the last item, should
-    ;; not error.
-    (goto-char (point-max))
-    (deadgrep-forward)
+  ;; Moving forward, when point is already on the last item, should
+  ;; not error.
+  (goto-char (point-max))
+  (deadgrep-forward)
 
-    ;; We should end up with point on an item.
-    (goto-char (point-min))
-    (deadgrep-forward)
-    (should
-     (deadgrep--item-p (point)))))
+  ;; We should end up with point on an item.
+  (goto-char (point-min))
+  (deadgrep-forward)
+  (should
+   (deadgrep--item-p (point))))
 
 (ert-deftest deadgrep-backward ()
-  (cl-letf (((symbol-function 'read-from-minibuffer)
-             (lambda (&rest _args) "a-unique-string")))
-    (deadgrep "foo")
+  (deadgrep "foo")
 
-    ;; Smoke test.
-    (goto-char (point-max))
-    (deadgrep-backward)
+  ;; Smoke test.
+  (goto-char (point-max))
+  (deadgrep-backward)
 
-    ;; Moving backward, when point is already on the first item, should
-    ;; not error.
-    (goto-char (point-min))
-    (deadgrep-backward)
+  ;; Moving backward, when point is already on the first item, should
+  ;; not error.
+  (goto-char (point-min))
+  (deadgrep-backward)
 
-    ;; We should end up with point on an item.
-    (goto-char (point-max))
-    (deadgrep-backward)
-    (should
-     (deadgrep--item-p (point)))))
+  ;; We should end up with point on an item.
+  (goto-char (point-max))
+  (deadgrep-backward)
+  (should
+   (deadgrep--item-p (point))))
 
 (ert-deftest deadgrep--split-line ()
   (-let* ((raw-line
@@ -314,3 +308,21 @@ context arguments to ripgrep."
   (should (equal (deadgrep--normalise-dirname "/pscp:localhost:/") "/pscp:localhost:/"))
   (should (equal (deadgrep--normalise-dirname "/pscp:localhost:/foo/bar") "/pscp:localhost:/foo/bar"))
   (should (equal (deadgrep--normalise-dirname "/pscp:localhost:/foo/bar/") "/pscp:localhost:/foo/bar")))
+
+(ert-deftest deadgrep--write-heading--read-only ()
+  "Ensure that the heading is read only, so we can't
+accidentally edit it."
+  (let ((buf (deadgrep--buffer "foo" "/" "blah.el")))
+    (with-current-buffer buf
+      (deadgrep--write-heading)
+      (should
+       (get-text-property (point-min) 'read-only)))))
+
+(ert-deftest deadgrep-edit-mode--preserve-variables ()
+  "Ensure that we don't clobber local variables when switching to
+edit mode."
+  (let ((buf (deadgrep--buffer "foo" "/" "blah.el")))
+    (with-current-buffer buf
+      (deadgrep-edit-mode)
+      (should
+       (equal deadgrep--search-term "foo")))))

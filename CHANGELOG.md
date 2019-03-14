@@ -1,5 +1,9 @@
 # v0.7
 
+**Experimental**: It's now possible to edit results buffers! Try
+`M-x deadgrep-edit-mode` in a results buffer. This feature is still
+experimental, so configuration or command names may change.
+
 Tramp support!
 
 Added imenu for moving between files in a results buffer.
