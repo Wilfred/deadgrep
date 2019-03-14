@@ -864,6 +864,28 @@ Returns a list ordered by the most recently accessed."
   "Major mode for deadgrep results buffers."
   (remove-hook 'after-change-functions #'deadgrep--propagate-change t))
 
+(defun deadgrep--find-file (path)
+  "Open PATH in a buffer, and return a cons cell
+\(BUF . OPENED). OPENED is nil if there was aleady a buffer for
+this path."
+  (let* ((initial-buffers (buffer-list))
+         (opened nil)
+         ;; Skip running find-file-hook since it may prompt the user.
+         (find-file-hook nil)
+         ;; If we end up opening a buffer, don't bother with file
+         ;; variables. It prompts the user, and we discard the buffer
+         ;; afterwards anyway.
+         (enable-local-variables nil)
+         ;; Bind `auto-mode-alist' to nil, so we open the buffer in
+         ;; `fundamental-mode' if it isn't already open.
+         (auto-mode-alist nil)
+         ;; Use `find-file-noselect' so we still decode bytes from the
+         ;; underlying file.
+         (buf (find-file-noselect path)))
+    (unless (-contains-p initial-buffers buf)
+      (setq opened t))
+    (cons buf opened)))
+
 (defun deadgrep--propagate-change (beg end length)
   "Repeat the last modification to the results buffer in the
 underlying file."
@@ -872,21 +894,27 @@ underlying file."
   (when (eq major-mode 'deadgrep-edit-mode)
     (save-excursion
       (goto-char (+ beg length))
-      (let* ((column (deadgrep--current-column))
-             (filename (deadgrep--filename))
-             (line-number (deadgrep--line-number))
-             (buf (find-file-noselect filename))
-             (inserted (buffer-substring beg end)))
+      (-let* ((column (deadgrep--current-column))
+              (filename (deadgrep--filename))
+              (line-number (deadgrep--line-number))
+              ((buf . opened) (deadgrep--find-file filename))
+              (inserted (buffer-substring beg end)))
         (with-current-buffer buf
           (save-excursion
             (save-restriction
+              (widen)
               (goto-char
                (deadgrep--buffer-position line-number column))
               (if (> length 0)
                   ;; We removed chars in the results buffer, so remove.
                   (delete-char (- length))
                 ;; We inserted something, so insert the same chars.
-                (insert inserted)))))))))
+                (insert inserted))))
+          ;; If we weren't visiting this file before, just save it and
+          ;; close it.
+          (when opened
+            (basic-save-buffer)
+            (kill-buffer buf)))))))
 
 ;; TODO: refuse to proceed if the search is still running.
 (defun deadgrep-edit-mode ()
