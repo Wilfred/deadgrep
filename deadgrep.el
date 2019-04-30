@@ -1009,9 +1009,10 @@ in the current buffer."
 
     (point)))
 
-(defun deadgrep--filename ()
-  "Get the filename of the result at point."
-  (get-text-property (line-beginning-position) 'deadgrep-filename))
+(defun deadgrep--filename (&optional pos)
+  "Get the filename of the result at point POS.
+If POS is nil, use the beginning position of the current line."
+  (get-text-property (or pos (line-beginning-position)) 'deadgrep-filename))
 
 (defun deadgrep--line-number ()
   "Get the filename of the result at point."
@@ -1131,7 +1132,7 @@ Keys are interned filenames, so they compare with `eq'.")
 (defun deadgrep--item-p (pos)
   "Is there something at POS that we can interact with?"
   (or (button-at pos)
-      (deadgrep--filename)))
+      (deadgrep--filename pos)))
 
 (defun deadgrep--move (forward-p)
   "Move to the next item.
