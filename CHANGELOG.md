@@ -1,3 +1,7 @@
+# v0.8
+
+No changes yet.
+
 # v0.7
 
 **Experimental**: It's now possible to edit results buffers! Try
