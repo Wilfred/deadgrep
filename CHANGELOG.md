@@ -14,6 +14,9 @@ function for `deadgrep-project-root-function`.
 
 Search results in narrowed buffers are now handled correctly.
 
+Fixed an issue where `n` and `p` (`deadgrep-forward` and
+`deadgrep-backward`) did not work.
+
 # v0.6
 
 `next-error` and `previous-error` now work, just like they do with
