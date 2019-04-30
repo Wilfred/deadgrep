@@ -239,6 +239,9 @@ It is used to create `imenu' index.")
 
             (setq prev-line-num line-num))))))))
 
+(defvar deadgrep-finished-hook nil
+  "Hook run when `deadgrep' search is finished.")
+
 (defun deadgrep--process-sentinel (process output)
   "Update the deadgrep buffer associated with PROCESS as complete."
   (let ((buffer (process-buffer process))
@@ -262,6 +265,7 @@ It is used to create `imenu' index.")
               (goto-char (point-max))
               (insert output))))
 
+        (run-hooks 'deadgrep-finished-hook)
         (message "Deadgrep finished")))))
 
 (defun deadgrep--process-filter (process output)
