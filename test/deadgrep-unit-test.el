@@ -33,7 +33,8 @@
   (deadgrep "foo"))
 
 (ert-deftest deadgrep-forward ()
-  (deadgrep "foo")
+  (let ((current-prefix-arg t))
+    (deadgrep "foo"))
 
   ;; Smoke test.
   (deadgrep-forward)
@@ -50,7 +51,8 @@
    (deadgrep--item-p (point))))
 
 (ert-deftest deadgrep-backward ()
-  (deadgrep "foo")
+  (let ((current-prefix-arg t))
+    (deadgrep "foo"))
 
   ;; Smoke test.
   (goto-char (point-max))
