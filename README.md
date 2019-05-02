@@ -47,6 +47,7 @@ or copy it into your `~/.emacs.d`.
 | <kbd>RET</kbd>                | Visit the result, file or push button at point |
 | <kbd>o</kbd>                  | Visit the result in another window             |
 | <kbd>n</kbd> and <kbd>p</kbd> | Move between results or buttons                |
+| <kbd>N</kbd> and <kbd>P</kbd> | Move between search hits                       |
 | <kbd>g</kbd>                  | Re-run the search                              |
 | <kbd>TAB</kbd>                | Expand/collapse results for a file             |
 | <kbd>C-c</kbd> <kbd>C-k</kbd> | Stop a running search                          |

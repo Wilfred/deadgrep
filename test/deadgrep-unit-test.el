@@ -69,6 +69,19 @@
   (should
    (deadgrep--item-p (point))))
 
+(ert-deftest deadgrep-forward-match ()
+  (let ((current-prefix-arg t))
+    (deadgrep "foo"))
+
+  (deadgrep--insert-output "[0m[35m./foo.txt[0m:[0m[32m1[0m:[0m[1m[31mfoo[0mbaz[0m[1m[31mfoo[0mbaz\n")
+
+  (goto-char (point-min))
+  (deadgrep-forward-match)
+
+  (should
+   (eq (get-text-property (point) 'face)
+       'deadgrep-match-face)))
+
 (ert-deftest deadgrep--split-line ()
   (-let* ((raw-line
            "[0m[35mdeadgrep.el[0m:[0m[32m123[0m:    (when ([0m[31m[1mbuffer-live[0m-p buffer)")

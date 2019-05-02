@@ -1,6 +1,12 @@
 # v0.8
 
-No changes yet.
+Added commands `deadgrep-forward-match` and `deadgrep-backward-match`
+(bound to `N` and `P`) which move to the beginning of the matched
+text, not just the match line. This is particularly useful when using
+deadgrep with keyboard macros.
+
+Unlike `deadgrep-forward` and `deadgrep-backward`, these commands
+ignore buttons and file headers.
 
 # v0.7
 
