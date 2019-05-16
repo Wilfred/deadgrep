@@ -41,8 +41,13 @@
   :group 'tools
   :group 'matching)
 
-(defvar deadgrep-executable
-  (executable-find "rg"))
+(defcustom deadgrep-executable
+  "rg"
+  "The rg executable used by deadgrep.
+This will be looked up on `exec-path' if it isn't an absolute
+path to the binary."
+  :type 'string
+  :group 'deadgrep)
 
 (defvar deadgrep-max-buffers
   4

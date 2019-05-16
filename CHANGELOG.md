@@ -1,5 +1,10 @@
 # v0.8
 
+The default value for `deagrep-exectable` is now `"rg"`, rather than
+explicitly searching for the binary when the library is loaded. This
+is hopefully less surprising. `deadgrep-executable` is also now
+exposed to Customize.
+
 Added commands `deadgrep-forward-match` and `deadgrep-backward-match`
 (bound to `N` and `P`) which move to the beginning of the matched
 text, not just the match line. This is particularly useful when using
