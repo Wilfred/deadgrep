@@ -50,6 +50,27 @@
   (should
    (deadgrep--item-p (point))))
 
+(ert-deftest deadgrep-forward-filename ()
+  (deadgrep "foo")
+
+  (sleep-for 0.5)
+
+  ;; Smoke test.
+  (deadgrep-forward-filename)
+
+  ;; Moving forward, when point is already on the last item should signal.
+  (goto-char (point-max))
+  (should-error
+   (deadgrep-forward-filename)
+   :type 'end-of-buffer)
+
+  ;; We should end up with point on an item.
+  (goto-char (point-min))
+  (deadgrep-forward-filename)
+
+  (should
+   (deadgrep--filename-p (point))))
+
 (ert-deftest deadgrep-backward ()
   (let ((current-prefix-arg t))
     (deadgrep "foo"))
@@ -68,6 +89,27 @@
   (deadgrep-backward)
   (should
    (deadgrep--item-p (point))))
+
+(ert-deftest deadgrep-backward-filename ()
+  (deadgrep "foo")
+
+  (sleep-for 0.5)
+
+  ;; Smoke test.
+  (goto-char (point-max))
+  (deadgrep-backward-filename)
+
+  ;; Moving backward, when point is already on the first item should signal.
+  (goto-char (point-min))
+  (should-error
+   (deadgrep-backward-filename)
+   :type 'beginning-of-buffer)
+
+  ;; We should end up with point on an item.
+  (goto-char (point-max))
+  (deadgrep-backward-filename)
+  (should
+   (deadgrep--filename-p (point))))
 
 (ert-deftest deadgrep-forward-match ()
   (let ((current-prefix-arg t))
