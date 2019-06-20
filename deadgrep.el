@@ -854,6 +854,8 @@ Returns a list ordered by the most recently accessed."
     (define-key map (kbd "p") #'deadgrep-backward)
     (define-key map (kbd "N") #'deadgrep-forward-match)
     (define-key map (kbd "P") #'deadgrep-backward-match)
+    (define-key map (kbd "M-n") #'deadgrep-forward-filename)
+    (define-key map (kbd "M-p") #'deadgrep-backward-filename)
 
     map)
   "Keymap for `deadgrep-mode'.")
@@ -1145,6 +1147,10 @@ Keys are interned filenames, so they compare with `eq'.")
   (or (button-at pos)
       (deadgrep--filename pos)))
 
+(defun deadgrep--filename-p (pos)
+  "Is there a filename at POS that we can interact with?"
+  (eq (get-text-property pos 'face) 'deadgrep-filename-face))
+
 (defun deadgrep--move (forward-p)
   "Move to the next item.
 This will either be a button, a filename, or a search result."
@@ -1192,24 +1198,34 @@ also `deadgrep-backward-match'."
   (interactive)
   (deadgrep--move nil))
 
-(defun deadgrep--move-match (forward-p)
+(defun deadgrep-forward-filename ()
+  "Move forward to the next filename."
+  (interactive)
+  (deadgrep--move-match t 'deadgrep-filename-face))
+
+(defun deadgrep-backward-filename ()
+  "Move backward to the previous filename."
+  (interactive)
+  (deadgrep--move-match nil 'deadgrep-filename-face))
+
+(defun deadgrep--move-match (forward-p face)
   "Move point to the beginning of the next/previous match."
   (interactive)
   (let ((start-pos (point)))
     ;; Move over the current match, if we were already on one.
     (while (eq (get-text-property (point) 'face)
-               'deadgrep-match-face)
+               face)
       (if forward-p (forward-char) (backward-char)))
     (condition-case err
         (progn
           ;; Move point to the next match, which may be on the same line.
           (while (not (eq (get-text-property (point) 'face)
-                          'deadgrep-match-face))
+                          face))
             (if forward-p (forward-char) (backward-char)))
           ;; Ensure point is at the beginning of the match.
           (unless forward-p
             (while (eq (get-text-property (point) 'face)
-                       'deadgrep-match-face)
+                       face)
               (backward-char))
             (forward-char)))
       ;; Don't move point beyond the last match. However, it's still
@@ -1227,12 +1243,12 @@ also `deadgrep-backward-match'."
 Note that a result line may contain more than one match, or zero
 matches (if the result line has been truncated)."
   (interactive)
-  (deadgrep--move-match t))
+  (deadgrep--move-match t 'deadgrep-match-face))
 
 (defun deadgrep-backward-match ()
   "Move point backward to the beginning of previous match."
   (interactive)
-  (deadgrep--move-match nil))
+  (deadgrep--move-match nil 'deadgrep-match-face))
 
 (defun deadgrep--start (search-term search-type case)
   "Start a ripgrep search."
