@@ -380,3 +380,13 @@ edit mode."
       (deadgrep-edit-mode)
       (should
        (equal deadgrep--search-term "foo")))))
+
+(ert-deftest deadgrep--read-search-term ()
+  "When region is active, return the region."
+  (with-temp-buffer
+    (insert "foo")
+    (set-mark (point-min))
+    (should
+     (string=
+      (deadgrep--read-search-term)
+      "foo"))))
