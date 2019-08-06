@@ -32,97 +32,94 @@
 (ert-deftest deadgrep-smoke-test ()
   (deadgrep "foo"))
 
+(defmacro with-temp-deadgrep-buf (&rest body)
+  "Execute BODY in the context of a deadgrep results buffer with
+some results."
+  `(with-temp-buffer
+     (deadgrep-mode)
+     (setq deadgrep--search-term ";; version")
+     (deadgrep--write-heading)
+     (deadgrep--insert-output
+      "[0m[35m./deadgrep.el[0m:[0m[32m8[0m:[0m[1m[31m;; Version[0m: 0.8"
+      t)
+     (goto-char (point-min))
+     ,@body))
+
 (ert-deftest deadgrep-forward ()
-  (let ((current-prefix-arg t))
-    (deadgrep "foo"))
+  (with-temp-deadgrep-buf
+   ;; Smoke test.
+   (deadgrep-forward)
 
-  ;; Smoke test.
-  (deadgrep-forward)
+   ;; Moving forward, when point is already on the last item, should
+   ;; not error.
+   (goto-char (point-max))
+   (deadgrep-forward)
 
-  ;; Moving forward, when point is already on the last item, should
-  ;; not error.
-  (goto-char (point-max))
-  (deadgrep-forward)
-
-  ;; We should end up with point on an item.
-  (goto-char (point-min))
-  (deadgrep-forward)
-  (should
-   (deadgrep--item-p (point))))
+   ;; We should end up with point on an item.
+   (goto-char (point-min))
+   (deadgrep-forward)
+   (should
+    (deadgrep--item-p (point)))))
 
 (ert-deftest deadgrep-forward-filename ()
-  (deadgrep "foo")
-
-  (sleep-for 0.5)
-
-  ;; Smoke test.
-  (deadgrep-forward-filename)
-
-  ;; Moving forward, when point is already on the last item should signal.
-  (goto-char (point-max))
-  (should-error
+  (with-temp-deadgrep-buf
+   ;; Smoke test.
    (deadgrep-forward-filename)
-   :type 'end-of-buffer)
 
-  ;; We should end up with point on an item.
-  (goto-char (point-min))
-  (deadgrep-forward-filename)
+   ;; Moving forward, when point is already on the last item should signal.
+   (goto-char (point-max))
+   (should-error
+    (deadgrep-forward-filename)
+    :type 'end-of-buffer)
 
-  (should
-   (deadgrep--filename-p (point))))
+   ;; We should end up with point on an item.
+   (goto-char (point-min))
+   (deadgrep-forward-filename)
+
+   (should
+    (deadgrep--filename-p (point)))))
 
 (ert-deftest deadgrep-backward ()
-  (let ((current-prefix-arg t))
-    (deadgrep "foo"))
+  (with-temp-deadgrep-buf
+   ;; Smoke test.
+   (goto-char (point-max))
+   (deadgrep-backward)
 
-  ;; Smoke test.
-  (goto-char (point-max))
-  (deadgrep-backward)
+   ;; Moving backward, when point is already on the first item, should
+   ;; not error.
+   (goto-char (point-min))
+   (deadgrep-backward)
 
-  ;; Moving backward, when point is already on the first item, should
-  ;; not error.
-  (goto-char (point-min))
-  (deadgrep-backward)
-
-  ;; We should end up with point on an item.
-  (goto-char (point-max))
-  (deadgrep-backward)
-  (should
-   (deadgrep--item-p (point))))
+   ;; We should end up with point on an item.
+   (goto-char (point-max))
+   (deadgrep-backward)
+   (should
+    (deadgrep--item-p (point)))))
 
 (ert-deftest deadgrep-backward-filename ()
-  (deadgrep "foo")
-
-  (sleep-for 0.5)
-
-  ;; Smoke test.
-  (goto-char (point-max))
-  (deadgrep-backward-filename)
-
-  ;; Moving backward, when point is already on the first item should signal.
-  (goto-char (point-min))
-  (should-error
+  (with-temp-deadgrep-buf
+   ;; Smoke test.
+   (goto-char (point-max))
    (deadgrep-backward-filename)
-   :type 'beginning-of-buffer)
 
-  ;; We should end up with point on an item.
-  (goto-char (point-max))
-  (deadgrep-backward-filename)
-  (should
-   (deadgrep--filename-p (point))))
+   ;; Moving backward, when point is already on the first item should signal.
+   (goto-char (point-min))
+   (should-error
+    (deadgrep-backward-filename)
+    :type 'beginning-of-buffer)
+
+   ;; We should end up with point on an item.
+   (goto-char (point-max))
+   (deadgrep-backward-filename)
+   (should
+    (deadgrep--filename-p (point)))))
 
 (ert-deftest deadgrep-forward-match ()
-  (let ((current-prefix-arg t))
-    (deadgrep "foo"))
-
-  (deadgrep--insert-output "[0m[35m./foo.txt[0m:[0m[32m1[0m:[0m[1m[31mfoo[0mbaz[0m[1m[31mfoo[0mbaz\n")
-
-  (goto-char (point-min))
-  (deadgrep-forward-match)
-
-  (should
-   (eq (get-text-property (point) 'face)
-       'deadgrep-match-face)))
+  (with-temp-deadgrep-buf
+   (deadgrep-forward-match)
+   (should
+    (eq (get-text-property (point) 'face)
+        'deadgrep-match-face))))
 
 (ert-deftest deadgrep--split-line ()
   (-let* ((raw-line
