@@ -27,7 +27,7 @@ script:
   - cask exec ert-runner
 
 after_success:
-  - codecov
+  - bash <(curl -s https://codecov.io/bash)
 
 notifications:
   email: false
