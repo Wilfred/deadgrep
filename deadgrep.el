@@ -1412,7 +1412,7 @@ don't actually start the search."
         (setq prev-search-type deadgrep--search-type)
         (setq prev-search-case deadgrep--search-case)))
 
-    (switch-to-buffer buf)
+    (switch-to-buffer-other-window buf)
 
     (setq imenu-create-index-function #'deadgrep--create-imenu-index)
     (setq next-error-function #'deadgrep-next-error)

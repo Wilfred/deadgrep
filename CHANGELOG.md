@@ -1,6 +1,9 @@
 # v0.9
 
-Nothing yet.
+Results buffers are now opened with `switch-to-buffer-other-window`.
+
+This enables deadgrep to work with the popwin package, and ensures that deadgrep
+respects the value of `pop-up-frames`.
 
 # v0.8
 
