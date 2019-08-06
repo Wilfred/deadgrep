@@ -21,6 +21,9 @@ script:
   - emacs --version
   - cask exec ert-runner
 
+after_success:
+  - codecov
+
 notifications:
   email: false
 
