@@ -16,5 +16,9 @@
 (undercover "deadgrep.el"
 	    (:exclude "*-test.el")
 	    (:report-file "/tmp/undercover-report.json"))
+(undercover "deadgrep.el"
+	    (:exclude "*-test.el")
+            (:report-type :codecov)
+	    (:report-file "/tmp/undercover-report.json"))
 
 ;;; test-helper.el ends here
