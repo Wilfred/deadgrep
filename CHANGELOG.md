@@ -13,6 +13,10 @@ deadgrep with keyboard macros.
 Unlike `deadgrep-forward` and `deadgrep-backward`, these commands
 ignore buttons and file headers.
 
+Added commands `deadgrep-forward-filename` and
+`deadgrep-backward-filename` (bound to `M-n` and `M-p`) to move point
+between file headers.
+
 # v0.7
 
 **Experimental**: It's now possible to edit results buffers! Try
