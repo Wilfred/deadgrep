@@ -1,3 +1,7 @@
+# Use Trusty as Emacs 26.x is failing on Xenial
+# https://github.com/rejeep/evm/issues/125
+dist: trusty
+
 language: rust
 rust:
   - stable
@@ -16,6 +20,7 @@ env:
   - EVM_EMACS=emacs-25.2-travis
   - EVM_EMACS=emacs-25.3-travis
   - EVM_EMACS=emacs-26.1-travis
+  - EVM_EMACS=emacs-26.2-travis
   # - EVM_EMACS=emacs-git-snapshot-travis
 script:
   - emacs --version
