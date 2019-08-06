@@ -1216,7 +1216,7 @@ also `deadgrep-backward-match'."
     (while (eq (get-text-property (point) 'face)
                face)
       (if forward-p (forward-char) (backward-char)))
-    (condition-case err
+    (condition-case nil
         (progn
           ;; Move point to the next match, which may be on the same line.
           (while (not (eq (get-text-property (point) 'face)
