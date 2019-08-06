@@ -1,3 +1,7 @@
+# v0.9
+
+Nothing yet.
+
 # v0.8
 
 The default value for `deagrep-exectable` is now `"rg"`, rather than
