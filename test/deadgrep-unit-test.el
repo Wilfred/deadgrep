@@ -391,3 +391,18 @@ edit mode."
      (string=
       (deadgrep--read-search-term)
       "foo"))))
+
+(ert-deftest deadgrep--matches-glob-p ()
+  ;; Match normal globs.
+  (should
+   (deadgrep--matches-globs-p "foo.bar" '("*.bar")))
+  (should
+   (deadgrep--matches-globs-p "foo.bar" '("*.quux" "*.bar")))
+  ;; Return nil if no match.
+  (should
+   (not
+    (deadgrep--matches-globs-p "foo.bar" '("*.stuff"))))
+  ;; Don't confuse glob . (literal) with regexp . (matches any char)
+  (should
+   (not
+    (deadgrep--matches-globs-p "foo.py" '("*.y")))))

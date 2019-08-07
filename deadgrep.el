@@ -450,6 +450,10 @@ with Emacs text properties."
     (while (< i (length glob))
       (let* ((char (elt glob i)))
         (cond
+         ;; . matches a literal . in globs.
+         ((eq char ?.)
+          (setq result (concat result "\\."))
+          (cl-incf i))
          ;; ? matches a single char in globs.
          ((eq char ??)
           (setq result (concat result "."))

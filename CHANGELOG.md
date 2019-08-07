@@ -5,6 +5,9 @@ Results buffers are now opened with `switch-to-buffer-other-window`.
 This enables deadgrep to work with the popwin package, and ensures that deadgrep
 respects the value of `pop-up-frames`.
 
+Fixed an issue with the file type suggestion not offering the correct
+type for the initial file.
+
 # v0.8
 
 The default value for `deagrep-exectable` is now `"rg"`, rather than
