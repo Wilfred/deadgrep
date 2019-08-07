@@ -385,6 +385,7 @@ edit mode."
   "When region is active, return the region."
   (with-temp-buffer
     (insert "foo")
+    (transient-mark-mode t)
     (set-mark (point-min))
     (should
      (string=
