@@ -406,3 +406,9 @@ edit mode."
   (should
    (not
     (deadgrep--matches-globs-p "foo.py" '("*.y")))))
+
+(ert-deftest deadgrep-kill-all-buffers--kills-buffers ()
+  (deadgrep--buffer "foo" "/" "blah.el")
+  (deadgrep--buffer "bar" "/" "blah.el")
+  (call-interactively #'deadgrep-kill-all-buffers)
+  (should (not (deadgrep--buffers))))

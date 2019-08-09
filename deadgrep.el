@@ -1485,5 +1485,11 @@ This is intended for use with `next-error-function', which see."
      (format "\nInitial output from ripgrep:\n%S" output)
      (format "\n\nPlease file bugs at https://github.com/Wilfred/deadgrep/issues/new"))))
 
+(defun deadgrep-kill-all-buffers ()
+  "Kill all open deadgrep buffers."
+  (interactive)
+  (dolist (buffer (deadgrep--buffers))
+    (kill-buffer buffer)))
+
 (provide 'deadgrep)
 ;;; deadgrep.el ends here

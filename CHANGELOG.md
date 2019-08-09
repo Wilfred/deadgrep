@@ -1,3 +1,8 @@
+# UNRELEASED
+
+Added command `deadgrep-kill-all-buffers` which kills all open deadgrep
+buffers.
+
 # v0.9
 
 Results buffers are now opened with `switch-to-buffer-other-window`.

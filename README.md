@@ -57,6 +57,12 @@ or copy it into your `~/.emacs.d`.
 You can also use `M-x imenu` to move between files in a results
 buffer.
 
+### Additional interactive commands
+
+| Name                        | Action                          |
+| ---                         | ---                             |
+| `deadgrep-kill-all-buffers` | Kill all open deadgrep buffers. |
+
 ### Minibuffer
 
 You use the minibuffer to enter a new search term.
