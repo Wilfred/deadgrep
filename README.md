@@ -46,6 +46,7 @@ or copy it into your `~/.emacs.d`.
 | ---                               | ---                                                              |
 | <kbd>RET</kbd>                    | Visit the result, file or push button at point                   |
 | <kbd>o</kbd>                      | Visit the result in another window                               |
+| <kbd>O</kbd>                      | Show the result in another window, keeping focus in results list |
 | <kbd>n</kbd> and <kbd>p</kbd>     | Move between results or buttons                                  |
 | <kbd>N</kbd> and <kbd>P</kbd>     | Move between search hits                                         |
 | <kbd>M-n</kbd> and <kbd>M-p</kbd> | Move between file headers                                        |

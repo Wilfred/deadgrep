@@ -843,6 +843,7 @@ Returns a list ordered by the most recently accessed."
   (let ((map (make-sparse-keymap)))
     (define-key map (kbd "RET") #'deadgrep-visit-result)
     (define-key map (kbd "o") #'deadgrep-visit-result-other-window)
+    (define-key map (kbd "O") #'deadgrep-show-result-other-window)
     ;; TODO: we should still be able to click on buttons.
 
     (define-key map (kbd "g") #'deadgrep-restart)
@@ -1074,6 +1075,13 @@ If POS is nil, use the beginning position of the current line."
   "Goto the search result at point, opening in another window."
   (interactive)
   (deadgrep--visit-result #'find-file-other-window))
+
+(defun deadgrep-show-result-other-window ()
+  "Show the search result at point in another window."
+  (interactive)
+  (let ((deadgrep-current-buffer (current-buffer)))
+    (deadgrep--visit-result #'find-file-other-window)
+    (pop-to-buffer deadgrep-current-buffer)))
 
 (defun deadgrep-visit-result ()
   "Goto the search result at point."
