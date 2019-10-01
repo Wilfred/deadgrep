@@ -79,7 +79,7 @@ Deadgrep works hard to minimise your keystrokes.
 
 **Search term**: If the region is active, deadgrep uses that.
 
-**Search directory**: If your current file is in a git project,
+**Search directory**: If your current file is in a VCS repository,
 deadgrep uses that for your search directory.
 
 **Regexp and case sensitivity options**: Deadgrep re-uses whatever
