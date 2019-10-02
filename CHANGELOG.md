@@ -8,6 +8,8 @@ respects the value of `pop-up-frames`.
 Fixed an issue with the file type suggestion not offering the correct
 type for the initial file.
 
+Fixed a crash when rg emitted an error when searching binary files.
+
 # v0.8
 
 The default value for `deagrep-exectable` is now `"rg"`, rather than

@@ -189,10 +189,12 @@ It is used to create `imenu' index.")
             (insert
              (propertize (concat separator "\n")
                          'face 'deadgrep-meta-face))))
-         ;; If we don't have a color code, ripgrep must be complaining
-         ;; about something (e.g. zero matches for a
-         ;; glob, or permission denied on some directories).
-         ((not (s-matches-p deadgrep--color-code line))
+         ;; If we have a warning or don't have a color code, ripgrep
+         ;; must be complaining about something (e.g. zero matches for
+         ;; a glob, or permission denied on some directories).
+         ((or
+           (s-starts-with-p "WARNING: " line)
+           (not (s-matches-p deadgrep--color-code line)))
           (when deadgrep--current-file
             (setq deadgrep--current-file nil)
             (insert "\n"))
