@@ -635,14 +635,6 @@ to obtain ripgrep results."
 
     (nreverse args)))
 
-(defun deadgrep--format-command (search-term search-type case context)
-  "Return a command string that we can execute in a shell
-to obtain ripgrep results."
-  (format
-   "%s %s"
-   deadgrep-executable
-   (s-join " " (deadgrep--arguments search-term search-type case context))))
-
 (defun deadgrep--write-heading ()
   "Write the deadgrep heading with buttons reflecting the current
 search settings."
@@ -1277,14 +1269,16 @@ matches (if the result line has been truncated)."
   (setq deadgrep--spinner (spinner-create 'progress-bar t))
   (setq deadgrep--running t)
   (spinner-start deadgrep--spinner)
-  (let* ((command (deadgrep--format-command
-                   search-term search-type case
-                   deadgrep--context))
+  (let* ((args (deadgrep--arguments
+                search-term search-type case
+                deadgrep--context))
+         (command (format "%s %s" deadgrep-executable (s-join " " args)))
          (process
-          (start-file-process-shell-command
-           (format "rg %s" search-term)
-           (current-buffer)
-           command)))
+          (apply #'start-file-process
+                 (format "rg %s" search-term)
+                 (current-buffer)
+                 deadgrep-executable
+                 args)))
     (setq deadgrep--debug-command command)
     (set-process-filter process #'deadgrep--process-filter)
     (set-process-sentinel process #'deadgrep--process-sentinel)))
