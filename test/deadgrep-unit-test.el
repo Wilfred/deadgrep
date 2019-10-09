@@ -423,17 +423,17 @@ edit mode."
 (ert-deftest deadgrep--format-command ()
   (should
    (equal (deadgrep--format-command "foo" 'regexp 'smart nil)
-          "rg --color=ansi --line-number --no-heading --with-filename  --smart-case   -- foo ."))
+          "rg --color=ansi --line-number --no-heading --with-filename --smart-case -- foo ."))
 
   (let ((deadgrep--file-type '(type . "elisp")))
     (should
      (equal (deadgrep--format-command "foo" 'string 'sensitive '(1 . 0))
-            "rg --color=ansi --line-number --no-heading --with-filename --fixed-strings --case-sensitive --type elisp --before-context 1 --after-context 0 -- foo .")))
+            "rg --color=ansi --line-number --no-heading --with-filename --fixed-strings --case-sensitive --type=elisp --before-context=1 --after-context=0 -- foo .")))
 
   (let ((deadgrep--file-type '(glob . "*.el")))
     (should
      (equal (deadgrep--format-command "foo" 'words 'ignore '(3 . 2))
-            "rg --color=ansi --line-number --no-heading --with-filename --fixed-strings --word-regexp --ignore-case --type-add 'custom:*.el' --type custom --before-context 3 --after-context 2 -- foo ."))))
+            "rg --color=ansi --line-number --no-heading --with-filename --fixed-strings --word-regexp --ignore-case --type-add=custom:*.el --type=custom --before-context=3 --after-context=2 -- foo ."))))
 
 (ert-deftest deadgrep--format-command-error-cases ()
   (should-error

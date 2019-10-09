@@ -586,46 +586,62 @@ with Emacs text properties."
   (setq text (substring-no-properties text))
   (apply #'make-text-button text nil :type type properties))
 
+(defun deadgrep--arguments (search-term search-type case context)
+  "Return a list of command line arguments that we can execute in a shell
+to obtain ripgrep results."
+  (let (args)
+    (push "--color=ansi" args)
+    (push "--line-number" args)
+    (push "--no-heading" args)
+    (push "--with-filename" args)
+
+    (cond
+     ((eq search-type 'string)
+      (push "--fixed-strings" args))
+     ((eq search-type 'words)
+      (push "--fixed-strings" args)
+      (push "--word-regexp" args))
+     ((eq search-type 'regexp))
+     (t
+      (error "Unknown search type: %s" search-type)))
+
+    (cond
+     ((eq case 'smart)
+      (push "--smart-case" args))
+     ((eq case 'sensitive)
+      (push "--case-sensitive" args))
+     ((eq case 'ignore)
+      (push "--ignore-case" args))
+     (t
+      (error "Unknown case: %s" case)))
+
+    (cond
+     ((eq deadgrep--file-type 'all))
+     ((eq (car-safe deadgrep--file-type) 'type)
+      (push (format "--type=%s" (cdr deadgrep--file-type)) args))
+     ((eq (car-safe deadgrep--file-type) 'glob)
+      (push (format "--type-add=custom:%s" (cdr deadgrep--file-type)) args)
+      (push "--type=custom" args))
+     (t
+      (error "Unknown file-type: %S" deadgrep--file-type)))
+
+    (when context
+      (push (format "--before-context=%s" (car context)) args)
+      (push (format "--after-context=%s" (cdr context)) args))
+
+    (push "--" args)
+    (push search-term args)
+    (push "." args)
+
+    (nreverse args)))
+
 (defun deadgrep--format-command (search-term search-type case context)
   "Return a command string that we can execute in a shell
 to obtain ripgrep results."
   (format
-   "%s --color=ansi --line-number --no-heading --with-filename %s %s %s %s -- %s ."
+   "%s %s"
    deadgrep-executable
-   (cond
-    ((eq search-type 'string)
-     "--fixed-strings")
-    ((eq search-type 'words)
-     "--fixed-strings --word-regexp")
-    ((eq search-type 'regexp)
-     "")
-    (t
-     (error "Unknown search type: %s" search-type)))
-   (cond
-    ((eq case 'smart)
-     "--smart-case")
-    ((eq case 'sensitive)
-     "--case-sensitive")
-    ((eq case 'ignore)
-     "--ignore-case")
-    (t
-     (error "Unknown case: %s" case)))
-   ;; TODO: pass this as an argument.
-   (cond
-    ((eq deadgrep--file-type 'all)
-     "")
-    ((eq (car-safe deadgrep--file-type) 'type)
-     (format "--type %s" (cdr deadgrep--file-type)))
-    ((eq (car-safe deadgrep--file-type) 'glob)
-     (format "--type-add 'custom:%s' --type custom"
-             (cdr deadgrep--file-type)))
-    (t
-     (error "Unknown file-type: %S" deadgrep--file-type)))
-   (if context
-       (format "--before-context %s --after-context %s"
-               (car context) (cdr context))
-     "")
-   (shell-quote-argument search-term)))
+   (s-join " " (deadgrep--arguments search-term search-type case context))))
 
 (defun deadgrep--write-heading ()
   "Write the deadgrep heading with buttons reflecting the current
