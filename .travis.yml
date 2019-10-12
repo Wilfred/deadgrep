@@ -14,6 +14,15 @@ before_install:
   - cargo install ripgrep || true
   - curl -fsSkL https://gist.github.com/rejeep/ebcd57c3af83b049833b/raw > x.sh && source ./x.sh
   - evm install $EVM_EMACS --use --skip
+  - |
+    case $EVM_EMACS in
+    emacs-25.*) EMACS_GNUPGHOME=.cask/$(expr $EVM_EMACS : 'emacs-\(.*\)-travis')/elpa/gnupg ;;
+    *) EMACS_GNUPGHOME=$HOME/.emacs.d/elpa/gnupg ;;
+    esac
+    mkdir -p "$EMACS_GNUPGHOME"
+    chmod 700 "$EMACS_GNUPGHOME"
+    wget 'https://git.savannah.gnu.org/cgit/emacs.git/plain/etc/package-keyring.gpg'
+    gpg --homedir "$EMACS_GNUPGHOME" --import package-keyring.gpg
   - cask --verbose
 env:
   - EVM_EMACS=emacs-25.1-travis
