@@ -794,7 +794,7 @@ Returns a copy of REGEXP with properties set."
 (defun deadgrep--buffer-name (search-term directory)
   ;; TODO: Handle buffers already existing with this name.
   (format "*deadgrep %s %s*"
-          search-term
+          (s-truncate 30 search-term)
           (abbreviate-file-name directory)))
 
 (defun deadgrep--buffers ()

@@ -3,6 +3,8 @@
 Added command `deadgrep-kill-all-buffers` which kills all open deadgrep
 buffers.
 
+UI improvements when search term is very long.
+
 # v0.9
 
 Results buffers are now opened with `switch-to-buffer-other-window`.
