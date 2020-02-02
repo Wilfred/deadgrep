@@ -5,6 +5,9 @@ buffers.
 
 UI improvements when search term is very long.
 
+Fixed issues on Windows hosts (see
+[#64](https://github.com/Wilfred/deadgrep/pull/64)).
+
 # v0.9
 
 Results buffers are now opened with `switch-to-buffer-other-window`.
