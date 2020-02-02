@@ -419,3 +419,29 @@ edit mode."
   (deadgrep--buffer "bar" "/" "blah.el")
   (call-interactively #'deadgrep-kill-all-buffers)
   (should (not (deadgrep--buffers))))
+
+(ert-deftest deadgrep--arguments ()
+  (should
+   (equal (deadgrep--arguments "foo" 'regexp 'smart nil)
+          '("--color=ansi" "--line-number" "--no-heading" "--with-filename" "--smart-case" "--" "foo" ".")))
+
+  (let ((deadgrep--file-type '(type . "elisp")))
+    (should
+     (equal (deadgrep--arguments "foo" 'string 'sensitive '(1 . 0))
+            '("--color=ansi" "--line-number" "--no-heading" "--with-filename" "--fixed-strings" "--case-sensitive" "--type=elisp" "--before-context=1" "--after-context=0" "--" "foo" "."))))
+
+  (let ((deadgrep--file-type '(glob . "*.el")))
+    (should
+     (equal (deadgrep--arguments "foo" 'words 'ignore '(3 . 2))
+            '("--color=ansi" "--line-number" "--no-heading" "--with-filename" "--fixed-strings" "--word-regexp" "--ignore-case" "--type-add=custom:*.el" "--type=custom" "--before-context=3" "--after-context=2" "--" "foo" ".")))))
+
+(ert-deftest deadgrep--arguments-error-cases ()
+  (should-error
+   (deadgrep--arguments "foo" 'foo 'smart nil))
+
+  (should-error
+   (deadgrep--arguments "foo" 'string 'bar '(1 . 0)))
+
+  (let ((deadgrep--file-type '(baz)))
+    (should-error
+     (deadgrep--arguments "foo" 'words 'ignore '(3 . 2)))))
