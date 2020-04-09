@@ -1,14 +1,4 @@
-# UNRELEASED
-
-Added command `deadgrep-kill-all-buffers` which kills all open deadgrep
-buffers.
-
-UI improvements when search term is very long.
-
-Fixed issues on Windows hosts (see
-[#64](https://github.com/Wilfred/deadgrep/pull/64)).
-
-# v0.9
+# v0.9 (not yet on MELPA stable)
 
 Results buffers are now opened with `switch-to-buffer-other-window`.
 
@@ -19,6 +9,14 @@ Fixed an issue with the file type suggestion not offering the correct
 type for the initial file.
 
 Fixed a crash when rg emitted an error when searching binary files.
+
+Added command `deadgrep-kill-all-buffers` which kills all open deadgrep
+buffers.
+
+UI improvements when search term is very long.
+
+Fixed issues on Windows hosts (see
+[#64](https://github.com/Wilfred/deadgrep/pull/64)).
 
 # v0.8
 
