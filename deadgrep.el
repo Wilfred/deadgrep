@@ -1479,6 +1479,9 @@ This is intended for use with `next-error-function', which see."
 (defun deadgrep-debug ()
   "Show a buffer with some debug information about the current search."
   (interactive)
+  (unless (eq major-mode 'deadgrep-mode)
+    (user-error "deadgrep-debug should be run in a deadgrep results buffer"))
+
   (let ((command deadgrep--debug-command)
         (output deadgrep--debug-first-output)
         (buf (get-buffer-create "*deadgrep debug*"))
