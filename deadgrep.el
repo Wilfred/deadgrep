@@ -347,7 +347,7 @@ color codes replaced with string properties."
 
 (defun deadgrep--propertize-hits (line-contents)
   "Given LINE-CONTENTS from ripgrep, replace ANSI color codes
-with Emacs text properties."
+with a text face property `deadgrep-match-face'."
   (replace-regexp-in-string
    deadgrep--hit-regexp
    (lambda (s)
