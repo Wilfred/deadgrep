@@ -345,6 +345,14 @@ color codes replaced with string properties."
    (deadgrep--propertize-hits
     (deadgrep--extract-regexp deadgrep--line-contents-regexp line))))
 
+(defun deadgrep--escape-backslash (s)
+  "Escape occurrences of backslashes in S.
+
+This differs from `regexp-quote', which outputs a regexp pattern.
+Instead, we provide a string suitable for REP in
+`replace-regexp-in-string'."
+  (s-replace "\\" "\\\\" s))
+
 (defun deadgrep--propertize-hits (line-contents)
   "Given LINE-CONTENTS from ripgrep, replace ANSI color codes
 with a text face property `deadgrep-match-face'."
@@ -352,7 +360,7 @@ with a text face property `deadgrep-match-face'."
    deadgrep--hit-regexp
    (lambda (s)
      (propertize
-      (match-string 1 s)
+      (deadgrep--escape-backslash (match-string 1 s))
       'face 'deadgrep-match-face))
    line-contents))
 

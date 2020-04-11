@@ -137,6 +137,11 @@ some results."
     (should
      (equal line-num 123))))
 
+(ert-deftest deadgrep--split-line--backslash ()
+  "Ensure we handle backslashes in results output correctly."
+  (deadgrep--split-line "[0m[35m./foo.txt[0m:[0m[32m3[0m:hello[0m[1m[31m\\.world[0m
+"))
+
 (ert-deftest deadgrep--split-line--context ()
   "Ensure we split a line correctly when using -A, -B or -C
 context arguments to ripgrep."
