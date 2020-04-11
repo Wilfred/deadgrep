@@ -211,7 +211,9 @@ context arguments to ripgrep."
 
 (ert-deftest deadgrep-debug ()
   "Smoke test."
-  (deadgrep-debug))
+  (with-temp-buffer
+    (setq major-mode 'deadgrep-mode)
+    (deadgrep-debug)))
 
 (ert-deftest deadgrep--type-list ()
   "Smoke test."
