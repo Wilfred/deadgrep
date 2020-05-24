@@ -915,24 +915,23 @@ Returns a list ordered by the most recently accessed."
   "Open PATH in a buffer, and return a cons cell
 \(BUF . OPENED). OPENED is nil if there was aleady a buffer for
 this path."
-  (save-match-data
-    (let* ((initial-buffers (buffer-list))
-           (opened nil)
-           ;; Skip running find-file-hook since it may prompt the user.
-           (find-file-hook nil)
-           ;; If we end up opening a buffer, don't bother with file
-           ;; variables. It prompts the user, and we discard the buffer
-           ;; afterwards anyway.
-           (enable-local-variables nil)
-           ;; Bind `auto-mode-alist' to nil, so we open the buffer in
-           ;; `fundamental-mode' if it isn't already open.
-           (auto-mode-alist nil)
-           ;; Use `find-file-noselect' so we still decode bytes from the
-           ;; underlying file.
-           (buf (save-match-data (find-file-noselect path))))
-      (unless (-contains-p initial-buffers buf)
-        (setq opened t))
-      (cons buf opened))))
+  (let* ((initial-buffers (buffer-list))
+         (opened nil)
+         ;; Skip running find-file-hook since it may prompt the user.
+         (find-file-hook nil)
+         ;; If we end up opening a buffer, don't bother with file
+         ;; variables. It prompts the user, and we discard the buffer
+         ;; afterwards anyway.
+         (enable-local-variables nil)
+         ;; Bind `auto-mode-alist' to nil, so we open the buffer in
+         ;; `fundamental-mode' if it isn't already open.
+         (auto-mode-alist nil)
+         ;; Use `find-file-noselect' so we still decode bytes from the
+         ;; underlying file.
+         (buf (find-file-noselect path)))
+    (unless (-contains-p initial-buffers buf)
+      (setq opened t))
+    (cons buf opened)))
 
 (defun deadgrep--propagate-change (beg end length)
   "Repeat the last modification to the results buffer in the
