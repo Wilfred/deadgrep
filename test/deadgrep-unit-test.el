@@ -395,6 +395,16 @@ edit mode."
       (should
        (equal deadgrep--search-term "foo")))))
 
+(ert-deftest deadgrep-edit-mode--preserve-variables-on-exit ()
+  "Ensure that we don't clobber local variables when leaving
+edit mode."
+  (let ((buf (deadgrep--buffer "foo" "/" "blah.el")))
+    (with-current-buffer buf
+      (deadgrep-edit-mode)
+      (deadgrep-mode)
+      (should
+       (equal deadgrep--search-term "foo")))))
+
 (ert-deftest deadgrep--read-search-term ()
   "When region is active, return the region."
   (with-temp-buffer

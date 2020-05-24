@@ -21,6 +21,10 @@ UI improvements when search term is very long.
 Fixed issues on Windows hosts (see
 [#64](https://github.com/Wilfred/deadgrep/pull/64)).
 
+Edit mode improvements: `deadgrep-edit-mode` now gives instructions
+when finished, and fixed a crash when switching back to
+`deadgrep-mode` and re-running a search.
+
 # v0.8
 
 The default value for `deagrep-exectable` is now `"rg"`, rather than

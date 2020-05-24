@@ -119,6 +119,10 @@ overflow on our regexp matchers if we don't apply this.")
   :group 'deadgrep)
 
 (defvar-local deadgrep--search-term nil)
+;; Ensure this variable is ignored by `kill-all-local-variables' when
+;; switching between `deadgrep-mode' and `deadgrep-edit-mode'.
+(put 'deadgrep--search-term 'permanent-local t)
+
 (defvar-local deadgrep--search-type 'string)
 (defvar-local deadgrep--search-case 'smart)
 (defvar-local deadgrep--file-type 'all)
