@@ -969,7 +969,8 @@ deadgrep results buffer.
   (setq buffer-read-only nil)
   (add-hook 'after-change-functions #'deadgrep--propagate-change nil t)
 
-  (run-mode-hooks 'deadgrep-edit-mode-hook))
+  (run-mode-hooks 'deadgrep-edit-mode-hook)
+  (message "Now editing, use `M-x deadgrep-mode' when finished"))
 
 (defun deadgrep--current-column ()
   "Get the current column position in char terms.
