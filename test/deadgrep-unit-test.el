@@ -361,6 +361,14 @@ context arguments to ripgrep."
       (deadgrep--buffer-position 2 1)
       6))))
 
+(ert-deftest deadgrep--buffer-position--preserves-point ()
+  "`deadgrep--buffer-position' should not move point."
+  (with-temp-buffer
+    (insert "foo\nbar\n")
+    (goto-char (point-min))
+    (deadgrep--buffer-position 2 1)
+    (should (equal (point) (point-min)))))
+
 (ert-deftest deadgrep--normalise-dirname--local-paths ()
   (if (eq system-type 'windows-nt)
       (progn
