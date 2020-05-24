@@ -134,6 +134,14 @@ You can always jump to exactly the position that point is on, even
 when searching files that contain tab characters. You can also
 navigate to the file itself from the file headings.
 
+## Beta Features
+
+You can now edit files directly from results buffers with `M-x
+deadgrep-edit-mode`.
+
+It is currently in beta, so you may also want to try [this pull
+request on wgrep](https://github.com/mhayashi1120/Emacs-wgrep/pull/58).
+
 ## Alternative Projects
 
 I believe that deadgrep is the best tool for doing Emacs text
