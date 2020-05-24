@@ -1055,13 +1055,14 @@ buffer."
 (defun deadgrep--buffer-position (line-number column-offset)
   "Return the position equivalent to LINE-NUMBER at COLUMN-OFFSET
 in the current buffer."
-  (save-restriction
-    (widen)
-    (goto-char (point-min))
-    (forward-line (1- line-number))
-    (forward-char column-offset)
+  (save-excursion
+    (save-restriction
+      (widen)
+      (goto-char (point-min))
+      (forward-line (1- line-number))
+      (forward-char column-offset)
 
-    (point)))
+      (point))))
 
 (defun deadgrep--filename (&optional pos)
   "Get the filename of the result at point POS.
