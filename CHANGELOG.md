@@ -1,4 +1,8 @@
-# v0.9 (not yet on MELPA stable)
+# v0.10
+
+No changes yet.
+
+# v0.9
 
 Results buffers are now opened with `switch-to-buffer-other-window`.
 
