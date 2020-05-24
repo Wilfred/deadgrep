@@ -918,7 +918,7 @@ this path."
 (defun deadgrep--propagate-change (beg end length)
   "Repeat the last modification to the results buffer in the
 underlying file."
-  ;; We should never be called outside a edit buffer, but be
+  ;; We should never be called outside an edit buffer, but be
   ;; defensive. Buggy functions in change hooks are painful.
   (when (eq major-mode 'deadgrep-edit-mode)
     (save-excursion
