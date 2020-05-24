@@ -124,15 +124,20 @@ overflow on our regexp matchers if we don't apply this.")
 (put 'deadgrep--search-term 'permanent-local t)
 
 (defvar-local deadgrep--search-type 'string)
+(put 'deadgrep--search-type 'permanent-local t)
 (defvar-local deadgrep--search-case 'smart)
+(put 'deadgrep--search-case 'permanent-local t)
 (defvar-local deadgrep--file-type 'all)
+(put 'deadgrep--file-type 'permanent-local t)
 
 (defvar-local deadgrep--context nil
   "When set, also show context of results.
 This is stored as a cons cell of integers (lines-before . lines-after).")
+(put 'deadgrep--context 'permanent-local t)
 (defvar-local deadgrep--initial-filename nil
   "The filename of the buffer that deadgrep was started from.
 Used to offer better default values for file options.")
+(put 'deadgrep--initial-filename 'permanent-local t)
 
 (defvar-local deadgrep--current-file nil
   "The file we're currently inserting results for.")
@@ -146,7 +151,9 @@ We save the last line here, in case we need to append more text to it.")
   "If non-nil, a search is still running.")
 
 (defvar-local deadgrep--debug-command nil)
+(put 'deadgrep--debug-command 'permanent-local t)
 (defvar-local deadgrep--debug-first-output nil)
+(put 'deadgrep--debug-first-output 'permanent-local t)
 
 (defvar-local deadgrep--imenu-alist nil
   "Alist that stores filename and position for each matched files.
