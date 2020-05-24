@@ -958,7 +958,7 @@ deadgrep results buffer.
   (when deadgrep--running
     (user-error "Can't edit a results buffer until the search is finished"))
   ;; We deliberately don't use `define-derived-mode' here because we
-  ;; don't want to call `kill-all-local-variables'. Initialise the
+  ;; want to check the previous value of `major-mode'. Initialise the
   ;; major mode manually.
   (run-hooks 'change-major-mode-hook)
   (setq major-mode 'deadgrep-edit-mode)
