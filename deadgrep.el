@@ -901,23 +901,24 @@ Returns a list ordered by the most recently accessed."
   "Open PATH in a buffer, and return a cons cell
 \(BUF . OPENED). OPENED is nil if there was aleady a buffer for
 this path."
-  (let* ((initial-buffers (buffer-list))
-         (opened nil)
-         ;; Skip running find-file-hook since it may prompt the user.
-         (find-file-hook nil)
-         ;; If we end up opening a buffer, don't bother with file
-         ;; variables. It prompts the user, and we discard the buffer
-         ;; afterwards anyway.
-         (enable-local-variables nil)
-         ;; Bind `auto-mode-alist' to nil, so we open the buffer in
-         ;; `fundamental-mode' if it isn't already open.
-         (auto-mode-alist nil)
-         ;; Use `find-file-noselect' so we still decode bytes from the
-         ;; underlying file.
-         (buf (find-file-noselect path)))
-    (unless (-contains-p initial-buffers buf)
-      (setq opened t))
-    (cons buf opened)))
+  (save-match-data
+    (let* ((initial-buffers (buffer-list))
+           (opened nil)
+           ;; Skip running find-file-hook since it may prompt the user.
+           (find-file-hook nil)
+           ;; If we end up opening a buffer, don't bother with file
+           ;; variables. It prompts the user, and we discard the buffer
+           ;; afterwards anyway.
+           (enable-local-variables nil)
+           ;; Bind `auto-mode-alist' to nil, so we open the buffer in
+           ;; `fundamental-mode' if it isn't already open.
+           (auto-mode-alist nil)
+           ;; Use `find-file-noselect' so we still decode bytes from the
+           ;; underlying file.
+           (buf (save-match-data (find-file-noselect path))))
+      (unless (-contains-p initial-buffers buf)
+        (setq opened t))
+      (cons buf opened))))
 
 (defun deadgrep--propagate-change (beg end length)
   "Repeat the last modification to the results buffer in the
@@ -964,17 +965,21 @@ deadgrep results buffer.
   ;; We deliberately don't use `define-derived-mode' here because we
   ;; want to check the previous value of `major-mode'. Initialise the
   ;; major mode manually.
-  (run-hooks 'change-major-mode-hook)
-  (setq major-mode 'deadgrep-edit-mode)
-  (setq mode-name
-        '(:propertize "Deadgrep:Edit" face mode-line-emphasis))
-  (use-local-map deadgrep-edit-mode-map)
+  (delay-mode-hooks
+    (kill-all-local-variables)
+    (setq major-mode 'deadgrep-edit-mode)
+    (setq mode-name
+          '(:propertize "Deadgrep:Edit" face mode-line-emphasis))
+    (use-local-map deadgrep-edit-mode-map)
+    ;; Done major mode manual initialise (copied from `define-derived-mode').
 
-  (setq buffer-read-only nil)
-  (add-hook 'after-change-functions #'deadgrep--propagate-change nil t)
+    ;; Allow editing, and propagate changes.
+    (setq buffer-read-only nil)
+    (add-hook 'after-change-functions #'deadgrep--propagate-change nil t)
 
-  (run-mode-hooks 'deadgrep-edit-mode-hook)
-  (message "Now editing, use `M-x deadgrep-mode' when finished"))
+    (message "Now editing, use `M-x deadgrep-mode' when finished"))
+
+  (run-mode-hooks 'deadgrep-edit-mode-hook))
 
 (defun deadgrep--current-column ()
   "Get the current column position in char terms.
