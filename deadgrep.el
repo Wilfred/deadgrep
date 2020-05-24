@@ -953,6 +953,8 @@ deadgrep results buffer.
 
 \\{deadgrep-edit-mode-map}"
   (interactive)
+  (unless (eq major-mode 'deadgrep-mode)
+    (user-error "deadgrep-edit-mode only works in deadgrep result buffers"))
   (when deadgrep--running
     (user-error "Can't edit a results buffer until the search is finished"))
   ;; We deliberately don't use `define-derived-mode' here because we
