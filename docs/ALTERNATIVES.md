@@ -20,9 +20,7 @@ This uses counsel's incremental searching UI.
 Emacs searches. I wrote it, but I've learnt a lot about good search
 UIs since I built ag.el.
 
-`ag` is not quite as fast as `rg`, so results come more slowly. Note
-that [`rg` currently doesn't support multiline
-searches](https://github.com/BurntSushi/ripgrep/issues/176), unlike `ag`.
+`ag` is not quite as fast as `rg`, so results come more slowly.
 
 ag.el has a lot of search commands to memorise:
 
