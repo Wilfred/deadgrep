@@ -933,7 +933,7 @@ underlying file."
   ;; We should never be called outside an edit buffer, but be
   ;; defensive. Buggy functions in change hooks are painful.
   (when (eq major-mode 'deadgrep-edit-mode)
-    (save-excursion
+    (save-mark-and-excursion
       (goto-char beg)
       (-let* ((column (+ (deadgrep--current-column) length))
               (filename (deadgrep--filename))
@@ -941,16 +941,13 @@ underlying file."
               ((buf . opened) (deadgrep--find-file filename))
               (inserted (buffer-substring beg end)))
         (with-current-buffer buf
-          (save-excursion
+          (save-mark-and-excursion
             (save-restriction
               (widen)
               (goto-char
                (deadgrep--buffer-position line-number column))
-              (if (> length 0)
-                  ;; We removed chars in the results buffer, so remove.
-                  (delete-char (- length))
-                ;; We inserted something, so insert the same chars.
-                (insert inserted))))
+              (delete-char (- length))
+              (insert inserted)))
           ;; If we weren't visiting this file before, just save it and
           ;; close it.
           (when opened
