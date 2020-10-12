@@ -90,6 +90,13 @@ results buffers.
 In extreme cases (100KiB+ single-line files), we can get a stack
 overflow on our regexp matchers if we don't apply this.")
 
+(defvar deadgrep-display-buffer-function
+  'switch-to-buffer-other-window
+  "Function used to show the deadgrep result buffer.
+
+This function is called with one argument, the results buffer to
+display.")
+
 (defface deadgrep-meta-face
   '((t :inherit font-lock-comment-face))
   "Face used for deadgrep UI text."
@@ -1453,30 +1460,31 @@ don't actually start the search."
         (setq prev-search-type deadgrep--search-type)
         (setq prev-search-case deadgrep--search-case)))
 
-    (switch-to-buffer-other-window buf)
+    (funcall deadgrep-display-buffer-function buf)
 
-    (setq imenu-create-index-function #'deadgrep--create-imenu-index)
-    (setq next-error-function #'deadgrep-next-error)
+    (with-current-buffer buf
+      (setq imenu-create-index-function #'deadgrep--create-imenu-index)
+      (setq next-error-function #'deadgrep-next-error)
 
-    ;; If we have previous search settings, apply them to our new
-    ;; search results buffer.
-    (when last-results-buf
-      (setq deadgrep--search-type prev-search-type)
-      (setq deadgrep--search-case prev-search-case))
+      ;; If we have previous search settings, apply them to our new
+      ;; search results buffer.
+      (when last-results-buf
+        (setq deadgrep--search-type prev-search-type)
+        (setq deadgrep--search-case prev-search-case))
 
-    (deadgrep--write-heading)
+      (deadgrep--write-heading)
 
-    (if current-prefix-arg
-        ;; Don't start the search, just create the buffer and inform
-        ;; the user how to start when they're ready.
-        (progn
-          (setq deadgrep--postpone-start t)
-          (deadgrep--write-postponed))
-      ;; Start the search immediately.
-      (deadgrep--start
-       search-term
-       deadgrep--search-type
-       deadgrep--search-case))))
+      (if current-prefix-arg
+          ;; Don't start the search, just create the buffer and inform
+          ;; the user how to start when they're ready.
+          (progn
+            (setq deadgrep--postpone-start t)
+            (deadgrep--write-postponed))
+        ;; Start the search immediately.
+        (deadgrep--start
+         search-term
+         deadgrep--search-type
+         deadgrep--search-case)))))
 
 (defun deadgrep-next-error (arg reset)
   "Move to the next error.
