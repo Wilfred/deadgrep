@@ -619,6 +619,7 @@ to obtain ripgrep results."
     (push "--color=ansi" args)
     (push "--line-number" args)
     (push "--no-heading" args)
+    (push "--no-column" args)
     (push "--with-filename" args)
 
     (cond
