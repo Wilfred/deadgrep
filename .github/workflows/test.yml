@@ -33,10 +33,10 @@ jobs:
         cask exec ert-runner
 
     - if: matrix.matrix.emacs_version == '27.1'
-        uses: actions/upload-artifact@v2
-          with:
-            name: undercover-report
-            path: /tmp/undercover-report.json
+      uses: actions/upload-artifact@v2
+      with:
+        name: undercover-report
+        path: /tmp/undercover-report.json
 
   finalize:
     runs-on: ubuntu-latest
