@@ -14,6 +14,9 @@ jobs:
           - '26.2'
           - '26.3'
     steps:
+    - name: Install xmllint
+      run: sudo apt-get install ripgrep
+
     - uses: actions/checkout@v1
     - uses: actions/setup-python@v2
     - uses: purcell/setup-emacs@master
