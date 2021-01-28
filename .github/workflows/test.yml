@@ -32,7 +32,7 @@ jobs:
         cask install
         cask exec ert-runner
 
-    - if: matrix.matrix.emacs_version == '27.1'
+    - if: matrix.emacs_version == '27.1'
       uses: actions/upload-artifact@v2
       with:
         name: undercover-report
