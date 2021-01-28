@@ -1,0 +1,25 @@
+name: Run test suite
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        emacs_version:
+          - '25.1'
+          - '25.2'
+          - '25.3'
+          - '26.1'
+          - '26.2'
+          - '26.3'
+    steps:
+    - uses: actions/checkout@v1
+    - uses: actions/setup-python@v1.1.1
+    - uses: purcell/setup-emacs@master
+      with:
+        version: ${{ matrix.emacs_version }}
+    - uses: conao3/setup-cask@master
+
+    - run: cask
+    - run: cask exec ert-runner
