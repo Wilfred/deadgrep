@@ -38,4 +38,5 @@ jobs:
     needs: test
     steps:
     - uses: codecov/codecov-action@v1
-      files: /tmp/undercover-report.json
+      with:
+        files: /tmp/undercover-report.json
