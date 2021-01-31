@@ -37,6 +37,4 @@ jobs:
     if: always()
     needs: test
     steps:
-    - uses: codecov/codecov-action@v1
-      with:
-        files: /tmp/undercover-report.json
+    - run: curl "https://coveralls.io/webhook?repo_name=$GITHUB_REPOSITORY&repo_token=${{ secrets.GITHUB_TOKEN }}" -d "payload[build_num]=$GITHUB_RUN_NUMBER&payload[status]=done"
