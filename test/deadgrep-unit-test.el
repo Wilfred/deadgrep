@@ -121,6 +121,14 @@ some results."
     (eq (get-text-property (point) 'face)
         'deadgrep-match-face))))
 
+(ert-deftest deadgrep-visit-result ()
+  "`deadgrep-visit-result' should open the file at point."
+  (with-temp-deadgrep-buf
+   (deadgrep-forward-match)
+   (deadgrep-visit-result)
+   (let ((buf-name (buffer-file-name)))
+     (should (s-ends-with-p "deadgrep.el" buf-name)))))
+
 (ert-deftest deadgrep--split-line ()
   (-let* ((raw-line
            "[0m[35mdeadgrep.el[0m:[0m[32m123[0m:    (when ([0m[31m[1mbuffer-live[0m-p buffer)")
