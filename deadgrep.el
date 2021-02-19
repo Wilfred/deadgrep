@@ -386,11 +386,18 @@ with a text face property `deadgrep-match-face'."
   'action #'deadgrep--search-term
   'help-echo "Change search term")
 
+(defun deadgrep--search-prompt (&optional default)
+  "."
+  (let ((kind (if (eq deadgrep--search-type 'regexp)
+                  "by regexp" "for text")))
+    (if default
+        (format "Search %s (default %s): " kind default)
+      (format "Search %s: " kind))))
+
 (defun deadgrep--search-term (_button)
   (setq deadgrep--search-term
-        ;; TODO: say string or regexp
         (read-from-minibuffer
-         "Search term: "
+         (deadgrep--search-prompt)
          deadgrep--search-term))
   (rename-buffer
    (deadgrep--buffer-name deadgrep--search-term default-directory) t)
@@ -1378,9 +1385,7 @@ for a string, offering the current word as a default."
              ;; TODO: prompt should say search string or search regexp
              ;; as appropriate.
              (prompt
-              (if sym
-                  (format "Search term (default %s): " sym-name)
-                "Search term: ")))
+              (deadgrep--search-prompt sym-name)))
         (setq search-term
               (read-from-minibuffer
                prompt nil nil nil 'deadgrep-history sym-name))
