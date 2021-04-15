@@ -466,7 +466,12 @@ edit mode."
   (let ((deadgrep--file-type '(glob . "*.el")))
     (should
      (equal (deadgrep--arguments "foo" 'words 'ignore '(3 . 2))
-            '("--color=ansi" "--line-number" "--no-heading" "--no-column" "--with-filename" "--fixed-strings" "--word-regexp" "--ignore-case" "--type-add=custom:*.el" "--type=custom" "--before-context=3" "--after-context=2" "--" "foo" ".")))))
+            '("--color=ansi" "--line-number" "--no-heading" "--no-column" "--with-filename" "--fixed-strings" "--word-regexp" "--ignore-case" "--type-add=custom:*.el" "--type=custom" "--before-context=3" "--after-context=2" "--" "foo" "."))))
+
+  (let ((deadgrep--search-skip-ignored nil))
+    (should
+     (equal (deadgrep--arguments "foo" 'regexp 'smart nil)
+          '("--color=ansi" "--line-number" "--no-heading" "--no-column" "--with-filename" "--smart-case" "--no-ignore" "--" "foo" ".")))))
 
 (ert-deftest deadgrep--arguments-error-cases ()
   (should-error
