@@ -509,7 +509,7 @@ with a text face property `deadgrep-match-face'."
             (cl-incf j)
             (setq result (concat result
                                  (substring glob i j)))
-            (setq i (1+ j))))
+            (setq i j)))
          (t
           (setq result (concat result (char-to-string char)))
           (cl-incf i)))))
