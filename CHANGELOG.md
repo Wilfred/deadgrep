@@ -1,3 +1,7 @@
+# v0.11
+
+No changes yet.
+
 # v0.10
 
 Fixed `query-replace` when editing deadgrep results (#60).
