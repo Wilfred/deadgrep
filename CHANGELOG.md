@@ -1,6 +1,18 @@
 # v0.10
 
-No changes yet.
+Fixed `query-replace` when editing deadgrep results (#60).
+
+Added `deadgrep-display-buffer-function` to control how the results
+buffer is displayed (#81).
+
+Fixed an issue where using `.ripgreprc` with `--column` could break
+deadgrep (#91).
+
+When starting a search, the prompt now informs whether you're in
+regexp or text mode.
+
+Fixed an issue with the type filter where some options were not
+auto-selected (#96).
 
 # v0.9
 
