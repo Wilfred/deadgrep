@@ -387,7 +387,7 @@ with a text face property `deadgrep-match-face'."
   'help-echo "Change search term")
 
 (defun deadgrep--search-prompt (&optional default)
-  "."
+  "The prompt shown to the user when starting a deadgrep search."
   (let ((kind (if (eq deadgrep--search-type 'regexp)
                   "by regexp" "for text")))
     (if default
