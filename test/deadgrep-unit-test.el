@@ -314,6 +314,10 @@ context arguments to ripgrep."
     "^[a-b]$"))
   (should
    (string=
+    (deadgrep--glob-regexp "[a]b")
+    "^[a]b$"))
+  (should
+   (string=
     (deadgrep--glob-regexp "[?]")
     "^[?]$")))
 
