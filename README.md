@@ -81,7 +81,7 @@ your search.
 
 ### Context Aware
 
-Deadgrep works hard to minimise your keystrokes.
+Deadgrep works hard to minimize your keystrokes.
 
 **Search term**: If the region is active, deadgrep uses that.
 
