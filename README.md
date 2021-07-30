@@ -14,6 +14,7 @@ deserves.
     - [Installation](#installation)
     - [Keybindings](#keybindings)
     - [Minibuffer](#minibuffer)
+    - [Easy Debugging](#easy-debugging)
 - [Features](#features)
     - [Super Fast](#super-fast)
     - [Context Aware](#context-aware)
@@ -69,6 +70,19 @@ You use the minibuffer to enter a new search term.
 
 You can also reuse a previous search term with <kbd>M-p</kbd> in the
 minibuffer. To edit the default search term, use <kbd>M-n</kbd>.
+
+### Easy Debugging
+
+The easiest way to debug search results is to review the actual `rg` command executed.
+
+Fortunately, the `deadgrep-debug` function makes it easy:
+
+- Move to the deadgrep results buffer.
+- Type `M-x deadgrep-debug`.
+- Strike `enter`, and the debug buffer will appear.
+- Move to the deadgrep debug buffer.
+
+Study the results to review the `rg` command string and other debugging information to assist you.
 
 ## Features
 
