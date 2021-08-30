@@ -610,7 +610,11 @@ with a text face property `deadgrep-match-face'."
   'help-echo "Change base directory")
 
 (defun deadgrep--directory (_button)
+  (deadgrep-directory))
+
+(defun deadgrep-directory ()
   "Prompt the user for a new search directory, then restart the search."
+  (interactive)
   (setq default-directory
         (expand-file-name
          (read-directory-name "Search files in: ")))
@@ -895,6 +899,7 @@ Returns a list ordered by the most recently accessed."
     ;; TODO: we should still be able to click on buttons.
 
     (define-key map (kbd "S") #'deadgrep-search-term)
+    (define-key map (kbd "D") #'deadgrep-directory)
     (define-key map (kbd "g") #'deadgrep-restart)
 
     ;; TODO: this should work when point is anywhere in the file, not

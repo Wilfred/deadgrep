@@ -1,7 +1,10 @@
 # v0.11
 
-Added a command `deadgrep-search-term` (bound to `S`) in `*deadgrep*`
-buffers to modify the existing search term.
+Added a command `deadgrep-search-term` (bound to `S` in `*deadgrep*`
+buffers) to change the current search term.
+
+Added a command `deadgrep-directory` (bound to `D` in `*deadgrep*`
+buffers) to change the current search directory.
 
 # v0.10
 
