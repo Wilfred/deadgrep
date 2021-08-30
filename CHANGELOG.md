@@ -1,6 +1,7 @@
 # v0.11
 
-No changes yet.
+Added a command `deadgrep-search-term` (bound to `S`) in `*deadgrep*`
+buffers to modify the existing search term.
 
 # v0.10
 

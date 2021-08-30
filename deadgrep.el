@@ -395,6 +395,11 @@ with a text face property `deadgrep-match-face'."
       (format "Search %s: " kind))))
 
 (defun deadgrep--search-term (_button)
+  (deadgrep-search-term))
+
+(defun deadgrep-search-term ()
+  "Change the current search term and restart the search."
+  (interactive)
   (setq deadgrep--search-term
         (read-from-minibuffer
          (deadgrep--search-prompt)
@@ -889,6 +894,7 @@ Returns a list ordered by the most recently accessed."
     (define-key map (kbd "o") #'deadgrep-visit-result-other-window)
     ;; TODO: we should still be able to click on buttons.
 
+    (define-key map (kbd "S") #'deadgrep-search-term)
     (define-key map (kbd "g") #'deadgrep-restart)
 
     ;; TODO: this should work when point is anywhere in the file, not

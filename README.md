@@ -50,6 +50,7 @@ or copy it into your `~/.emacs.d`.
 | <kbd>n</kbd> and <kbd>p</kbd>     | Move between results or buttons                                  |
 | <kbd>N</kbd> and <kbd>P</kbd>     | Move between search hits                                         |
 | <kbd>M-n</kbd> and <kbd>M-p</kbd> | Move between file headers                                        |
+| <kbd>S</kbd>                      | Change the search term                                                |
 | <kbd>g</kbd>                      | Re-run the search                                                |
 | <kbd>TAB</kbd>                    | Expand/collapse results for a file                               |
 | <kbd>C-c</kbd> <kbd>C-k</kbd>     | Stop a running search                                            |
