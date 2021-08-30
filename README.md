@@ -43,6 +43,8 @@ or copy it into your `~/.emacs.d`.
 
 ### Keybindings
 
+Navigating results:
+
 | Key                               | Action                                                           |
 | ---                               | ---                                                              |
 | <kbd>RET</kbd>                    | Visit the result, file or push button at point                   |
@@ -50,20 +52,25 @@ or copy it into your `~/.emacs.d`.
 | <kbd>n</kbd> and <kbd>p</kbd>     | Move between results or buttons                                  |
 | <kbd>N</kbd> and <kbd>P</kbd>     | Move between search hits                                         |
 | <kbd>M-n</kbd> and <kbd>M-p</kbd> | Move between file headers                                        |
-| <kbd>S</kbd>                      | Change the search term                                                |
+
+Starting/stopping a search:
+
+| Key                               | Action                                                           |
+| ---                               | ---                                                              |
+| <kbd>S</kbd>                      | Change the search term                                           |
+| <kbd>D</kbd>                      | Change the search directory                                      |
 | <kbd>g</kbd>                      | Re-run the search                                                |
 | <kbd>TAB</kbd>                    | Expand/collapse results for a file                               |
 | <kbd>C-c</kbd> <kbd>C-k</kbd>     | Stop a running search                                            |
-| <kbd>C-u</kbd>                    | A prefix argument prevents searches from starting automatically. |
-
-You can also use `M-x imenu` to move between files in a results
-buffer.
+| <kbd>C-u</kbd>                    | A prefix argument prevents search commands from starting automatically. |
 
 ### Additional interactive commands
 
-| Name                        | Action                          |
-| ---                         | ---                             |
-| `deadgrep-kill-all-buffers` | Kill all open deadgrep buffers. |
+| Name                        | Action                                                         |
+| ---                         | ---                                                            |
+| `imenu`                     | Move between files in a results buffer.                        |
+| `deadgrep-kill-all-buffers` | Kill all open deadgrep buffers.                                |
+| `deadgrep-debug`            | In a results buffer, view the `rg` command, output and environment used. |
 
 ### Minibuffer
 
