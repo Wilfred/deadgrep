@@ -891,8 +891,8 @@ Returns a list ordered by the most recently accessed."
 
     (define-key map (kbd "g") #'deadgrep-restart)
 
-    ;; TODO: this should work when point in anywhere in file, not just
-    ;; on its heading.
+    ;; TODO: this should work when point is anywhere in the file, not
+    ;; just on its heading.
     (define-key map (kbd "TAB") #'deadgrep-toggle-file-results)
 
     ;; Keybinding chosen to match `kill-compilation'.
