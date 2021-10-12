@@ -1457,12 +1457,19 @@ Otherwise, return PATH as is."
     (list (cons "Files" (reverse deadgrep--imenu-alist)))))
 
 ;;;###autoload
-(defun deadgrep (search-term)
-  "Start a ripgrep search for SEARCH-TERM.
+(defun deadgrep (search-term &optional directory)
+  "Start a ripgrep search for SEARCH-TERM in DIRECTORY.
+
+If not provided, DIR defaults to the directory as determined by 
+`deadgrep-project-root-function'. 
+
+See also and `deadgrep-project-root-overrides'.
+
 If called with a prefix argument, create the results buffer but
 don't actually start the search."
   (interactive (list (deadgrep--read-search-term)))
-  (let* ((dir (funcall deadgrep-project-root-function))
+  (let* ((dir (or directory
+                  (funcall deadgrep-project-root-function)))
          (buf (deadgrep--buffer
                search-term
                dir
