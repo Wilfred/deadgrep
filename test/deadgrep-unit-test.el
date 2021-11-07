@@ -29,6 +29,10 @@
      (eq (get-text-property 1 'face result)
          'deadgrep-regexp-metachar-face))))
 
+(ert-deftest deadgrep--propertize-regexp--unbalanced ()
+  "Test that we handled unbalanced, malformed regexps robustly."
+  (deadgrep--propertize-regexp "a{"))
+
 (ert-deftest deadgrep-smoke-test ()
   (deadgrep "foo"))
 

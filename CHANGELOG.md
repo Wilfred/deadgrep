@@ -6,6 +6,9 @@ buffers) to change the current search term.
 Added a command `deadgrep-directory` (bound to `D` in `*deadgrep*`
 buffers) to change the current search directory.
 
+Fixed a crash in deadgrep when searching with malformed regular
+expressions (#103).
+
 # v0.10
 
 Fixed `query-replace` when editing deadgrep results (#60).

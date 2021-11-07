@@ -820,7 +820,9 @@ Returns a copy of REGEXP with properties set."
                       (not (eq (elt regexp closing-pos)
                                ?\})))
             (cl-incf closing-pos))
-          (cl-incf closing-pos)
+          ;; Step over the closing }, if we found one.
+          (unless (= closing-pos (length regexp))
+            (cl-incf closing-pos))
           (put-text-property
            it-index closing-pos
            'face
