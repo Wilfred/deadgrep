@@ -1463,7 +1463,7 @@ Otherwise, return PATH as is."
 If not provided, DIR defaults to the directory as determined by 
 `deadgrep-project-root-function'. 
 
-See also and `deadgrep-project-root-overrides'.
+See also `deadgrep-project-root-overrides'.
 
 If called with a prefix argument, create the results buffer but
 don't actually start the search."
