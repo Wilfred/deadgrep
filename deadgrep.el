@@ -1331,14 +1331,14 @@ matches (if the result line has been truncated)."
   (let* ((args (deadgrep--arguments
                 search-term search-type case
                 deadgrep--context))
-         (command (format "%s %s" deadgrep-executable (s-join " " args)))
          (process
           (apply #'start-file-process
                  (format "rg %s" search-term)
                  (current-buffer)
                  deadgrep-executable
                  args)))
-    (setq deadgrep--debug-command command)
+    (setq deadgrep--debug-command
+          (format "%s %s" deadgrep-executable (s-join " " args)))
     (set-process-filter process #'deadgrep--process-filter)
     (set-process-sentinel process #'deadgrep--process-sentinel)))
 
