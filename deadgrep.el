@@ -585,9 +585,7 @@ with a text face property `deadgrep-match-face'."
              (deadgrep--read-file-type deadgrep--initial-filename)))
         (setq deadgrep--file-type (cons 'type new-file-type))))
      ((eq button-type 'glob)
-      (let ((glob
-             (read-from-minibuffer
-              "Glob: "
+      (let* ((initial-value
               (cond
                ;; If we already have a glob pattern, edit it.
                ((eq (car-safe deadgrep--file-type) 'glob)
@@ -599,7 +597,16 @@ with a text face property `deadgrep-match-face'."
                 (format "*.%s"
                         (file-name-extension deadgrep--initial-filename)))
                (t
-                "*")))))
+                "*")))
+             (prompt
+              (if (string= initial-value "*")
+                  ;; Show an example to avoid confusion with regexp syntax.
+                  "Glob (e.g. *.js): "
+                "Glob: "))
+             (glob
+              (read-from-minibuffer
+               prompt
+               initial-value)))
         (setq deadgrep--file-type (cons 'glob glob))))
      (t
       (error "Unknown button type: %S" button-type))))
