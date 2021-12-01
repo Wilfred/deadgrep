@@ -1558,7 +1558,9 @@ This is intended for use with `next-error-function', which see."
     (setq buffer-read-only t)
 
     (insert
-     "About your environment:\n"
+     (propertize
+      "About your environment:\n"
+      'face 'deadgrep-filename-face)
      (format "Platform: %s\n" system-type)
      (format "Emacs version: %s\n" emacs-version)
      (format "Command: %s\n" command)
@@ -1567,8 +1569,13 @@ This is intended for use with `next-error-function', which see."
      (if (boundp 'tramp-remote-path)
 	 (format "tramp-remote-path: %S\n" tramp-remote-path)
        "")
-     (format "\nInitial output from ripgrep:\n%S" output)
-     (format "\n\nPlease file bugs at https://github.com/Wilfred/deadgrep/issues/new"))))
+     (propertize
+      "\nInitial output from ripgrep:\n"
+      'face 'deadgrep-filename-face)
+     (format "%S" output)
+     (propertize
+      "\n\nPlease file bugs at https://github.com/Wilfred/deadgrep/issues/new"
+      'face 'deadgrep-filename-face))))
 
 (defun deadgrep-kill-all-buffers ()
   "Kill all open deadgrep buffers."
