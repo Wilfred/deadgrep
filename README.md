@@ -1,4 +1,4 @@
-# Deadgrep: use ripgrep from Emacs
+# Deadgrep: use ripgrep from Emacs ☠️
 
 Deadgrep is the fast, beautiful text search that your Emacs
 deserves.
