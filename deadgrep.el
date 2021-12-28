@@ -1445,7 +1445,7 @@ Otherwise, return PATH as is."
   (let ((root default-directory)
         (project (project-current)))
     (when project
-      (-when-let ((roots (project-roots project)))
+      (-when-let (roots (project-roots project))
         (setq root (car roots))))
     (when root
       (deadgrep--lookup-override root))))
