@@ -83,9 +83,9 @@ variable has no effect if you change
   500
   "Truncate lines if they are longer than this.
 
-Emacs performance can be really poor long lines, so this ensures
-that searching minified files does not slow down movement in
-results buffers.
+Emacs performance can be really poor with long lines, so this
+ensures that searching minified files does not slow down movement
+in results buffers.
 
 In extreme cases (100KiB+ single-line files), we can get a stack
 overflow on our regexp matchers if we don't apply this.")
