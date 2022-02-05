@@ -1482,8 +1482,8 @@ Otherwise, return PATH as is."
 (defun deadgrep (search-term &optional directory)
   "Start a ripgrep search for SEARCH-TERM in DIRECTORY.
 
-If not provided, DIR defaults to the directory as determined by 
-`deadgrep-project-root-function'. 
+If not provided, DIR defaults to the directory as determined by
+`deadgrep-project-root-function'.
 
 See also `deadgrep-project-root-overrides'.
 
@@ -1580,7 +1580,7 @@ This is intended for use with `next-error-function', which see."
      (format "default-directory: %S\n" default-directory)
      (format "exec-path: %S\n" exec-path)
      (if (boundp 'tramp-remote-path)
-	 (format "tramp-remote-path: %S\n" tramp-remote-path)
+     (format "tramp-remote-path: %S\n" tramp-remote-path)
        "")
      (propertize
       "\nInitial output from ripgrep:\n"
