@@ -1,4 +1,6 @@
-# v0.11
+# v0.12
+
+# v0.11 (released April 18 2022)
 
 Added a command `deadgrep-search-term` (bound to `S` in `*deadgrep*`
 buffers) to change the current search term.
