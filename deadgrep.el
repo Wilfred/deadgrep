@@ -1464,6 +1464,8 @@ Otherwise, return PATH as is."
       (deadgrep--lookup-override root))))
 
 (defun deadgrep--write-postponed ()
+  "Write a message to the current buffer informing the user that
+deadgrep is ready but not yet searching."
   (let* ((inhibit-read-only t)
          (restart-key
           (where-is-internal #'deadgrep-restart deadgrep-mode-map t)))
