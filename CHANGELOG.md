@@ -1,5 +1,8 @@
 # v0.12
 
+Added a command `deadgrep-incremental` to provide as-you-type
+searching.
+
 # v0.11 (released April 18 2022)
 
 Added a command `deadgrep-search-term` (bound to `S` in `*deadgrep*`

@@ -181,6 +181,8 @@ It is used to create `imenu' index.")
   (rx "\x1b[" (+ digit) "m")
   "Regular expression for an ANSI color code.")
 
+(defvar deadgrep--incremental-active nil)
+
 (defun deadgrep--insert-output (output &optional finished)
   "Propertize OUTPUT from rigrep and write to the current buffer."
   ;; If we had an unfinished line from our last call, include that.
@@ -302,7 +304,8 @@ It is used to create `imenu' index.")
               (insert output))))
 
         (run-hooks 'deadgrep-finished-hook)
-        (message "Deadgrep finished")))))
+        (unless deadgrep--incremental-active
+          (message "Deadgrep finished"))))))
 
 (defun deadgrep--process-filter (process output)
   ;; Searches may see a lot of output, but it's really useful to have
@@ -1428,6 +1431,30 @@ for a string, offering the current word as a default."
     (unless (equal (car deadgrep-history) search-term)
       (push search-term deadgrep-history))
     search-term))
+
+(defun deadgrep-incremental ()
+  (interactive)
+  (catch 'break
+    (let ((deadgrep--incremental-active t)
+          (search-term (or deadgrep--search-term "")))
+      (while t
+        (let ((next-char
+               (read-char
+                ;; TODO: Use the same prompt format as other search options.
+                (format "%s %s"
+                        (apply #'propertize "Incremental Search (RET when done):" minibuffer-prompt-properties)
+                        search-term))))
+          (cond
+           ((eq next-char ?\C-m)
+            (throw 'break nil))
+           ((eq next-char ?\C-?)
+            (setq search-term (s-left -1 search-term)))
+           (t
+            (setq search-term (concat search-term (list next-char))))))
+        (when (> (length search-term) 2)
+          (setq deadgrep--search-term search-term)
+          (deadgrep-restart))))))
+
 
 (defun deadgrep--normalise-dirname (path)
   "Expand PATH and ensure that it doesn't end with a slash.
