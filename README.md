@@ -60,6 +60,7 @@ Starting/stopping a search:
 | <kbd>S</kbd>                  | Change the search term                                                  |
 | <kbd>I</kbd>                  | Switch to incremental search, re-running on every keystroke             |
 | <kbd>D</kbd>                  | Change the search directory                                             |
+| <kbd>^</kbd>                  | Re-run the search in the parent directory                               |
 | <kbd>g</kbd>                  | Re-run the search                                                       |
 | <kbd>TAB</kbd>                | Expand/collapse results for a file                                      |
 | <kbd>C-c</kbd> <kbd>C-k</kbd> | Stop a running search                                                   |

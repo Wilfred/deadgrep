@@ -643,6 +643,15 @@ with a text face property `deadgrep-match-face'."
    (deadgrep--buffer-name deadgrep--search-term default-directory))
   (deadgrep-restart))
 
+(defun deadgrep-parent-directory ()
+  "Restart the search in the parent directory."
+  (interactive)
+  (setq default-directory
+        (file-name-directory (directory-file-name default-directory)))
+  (rename-buffer
+   (deadgrep--buffer-name deadgrep--search-term default-directory))
+  (deadgrep-restart))
+
 (defun deadgrep--button (text type &rest properties)
   ;; `make-text-button' mutates the string to add properties, so copy
   ;; TEXT first.
@@ -923,6 +932,7 @@ Returns a list ordered by the most recently accessed."
 
     (define-key map (kbd "S") #'deadgrep-search-term)
     (define-key map (kbd "D") #'deadgrep-directory)
+    (define-key map (kbd "^") #'deadgrep-parent-directory)
     (define-key map (kbd "g") #'deadgrep-restart)
     (define-key map (kbd "I") #'deadgrep-incremental)
 

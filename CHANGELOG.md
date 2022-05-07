@@ -3,6 +3,9 @@
 Added a command `deadgrep-incremental` (bound to `I` in `*deadgrep*`
 buffers) to provide as-you-type searching.
 
+Added a command `deadgrep-parent-directory` (bound to `^` in `*deadgrep*`
+buffers) to re-run the current search in the parent directory.
+
 Fixed support for Emacs 27 and earlier.
 
 # v0.11 (released April 18 2022)
