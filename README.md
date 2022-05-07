@@ -55,14 +55,15 @@ Navigating results:
 
 Starting/stopping a search:
 
-| Key                               | Action                                                           |
-| ---                               | ---                                                              |
-| <kbd>S</kbd>                      | Change the search term                                           |
-| <kbd>D</kbd>                      | Change the search directory                                      |
-| <kbd>g</kbd>                      | Re-run the search                                                |
-| <kbd>TAB</kbd>                    | Expand/collapse results for a file                               |
-| <kbd>C-c</kbd> <kbd>C-k</kbd>     | Stop a running search                                            |
-| <kbd>C-u</kbd>                    | A prefix argument prevents search commands from starting automatically. |
+| Key                           | Action                                                                  |
+| ---                           | ---                                                                     |
+| <kbd>S</kbd>                  | Change the search term                                                  |
+| <kbd>I</kbd>                  | Switch to incremental search, re-running on every keystroke             |
+| <kbd>D</kbd>                  | Change the search directory                                             |
+| <kbd>g</kbd>                  | Re-run the search                                                       |
+| <kbd>TAB</kbd>                | Expand/collapse results for a file                                      |
+| <kbd>C-c</kbd> <kbd>C-k</kbd> | Stop a running search                                                   |
+| <kbd>C-u</kbd>                | A prefix argument prevents search commands from starting automatically. |
 
 ### Additional interactive commands
 

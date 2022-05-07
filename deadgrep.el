@@ -924,6 +924,7 @@ Returns a list ordered by the most recently accessed."
     (define-key map (kbd "S") #'deadgrep-search-term)
     (define-key map (kbd "D") #'deadgrep-directory)
     (define-key map (kbd "g") #'deadgrep-restart)
+    (define-key map (kbd "I") #'deadgrep-incremental)
 
     ;; TODO: this should work when point is anywhere in the file, not
     ;; just on its heading.
