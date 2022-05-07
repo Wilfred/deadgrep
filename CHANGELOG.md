@@ -1,7 +1,7 @@
 # v0.12
 
-Added a command `deadgrep-incremental` to provide as-you-type
-searching.
+Added a command `deadgrep-incremental` (bound to `I` in `*deadgrep*`
+buffers) to provide as-you-type searching.
 
 Fixed support for Emacs 27 and earlier.
 
