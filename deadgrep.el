@@ -1486,7 +1486,13 @@ Otherwise, return PATH as is."
   (let ((root default-directory)
         (project (project-current)))
     (when project
-      (setq root (project-root project)))
+      (cond ((fboundp 'project-root)
+             ;; This function was defined in Emacs 28.
+             (setq root (project-root project)))
+            (t
+             ;; Older Emacsen.
+             (-when-let (roots (project-roots project))
+               (setq root (car roots))))))
     (when root
       (deadgrep--lookup-override root))))
 
@@ -1627,3 +1633,7 @@ This is intended for use with `next-error-function', which see."
 
 (provide 'deadgrep)
 ;;; deadgrep.el ends here
+
+;; Local Variables:
+;; byte-compile-warnings: (not obsolete)
+;; End:

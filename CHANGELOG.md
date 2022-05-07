@@ -3,6 +3,8 @@
 Added a command `deadgrep-incremental` to provide as-you-type
 searching.
 
+Fixed support for Emacs 27 and earlier.
+
 # v0.11 (released April 18 2022)
 
 Added a command `deadgrep-search-term` (bound to `S` in `*deadgrep*`
