@@ -966,7 +966,7 @@ Returns a list ordered by the most recently accessed."
 
 (defun deadgrep--find-file (path)
   "Open PATH in a buffer, and return a cons cell
-\(BUF . OPENED). OPENED is nil if there was aleady a buffer for
+\(BUF . OPENED). OPENED is nil if there was already a buffer for
 this path."
   (let* ((initial-buffers (buffer-list))
          (opened nil)
