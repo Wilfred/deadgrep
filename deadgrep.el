@@ -924,6 +924,13 @@ Returns a list ordered by the most recently accessed."
       (setq buffer-read-only t))
     buf))
 
+(defun deadgrep-change-search-type ()
+  (interactive)
+  (cond
+   ((eq deadgrep--search-type 'string) (setq deadgrep--search-type 'words))
+   ((eq deadgrep--search-type 'words) (setq deadgrep--search-type 'regexp))
+   ((eq deadgrep--search-type 'regexp) (setq deadgrep--search-type 'string)))
+  (deadgrep-restart))
 (defvar deadgrep-mode-map
   (let ((map (make-sparse-keymap)))
     (define-key map (kbd "RET") #'deadgrep-visit-result)
@@ -931,6 +938,7 @@ Returns a list ordered by the most recently accessed."
     ;; TODO: we should still be able to click on buttons.
 
     (define-key map (kbd "S") #'deadgrep-search-term)
+    (define-key map (kbd "T") #'deadgrep-change-search-type)
     (define-key map (kbd "D") #'deadgrep-directory)
     (define-key map (kbd "^") #'deadgrep-parent-directory)
     (define-key map (kbd "g") #'deadgrep-restart)
