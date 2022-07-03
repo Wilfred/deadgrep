@@ -58,6 +58,8 @@ Starting/stopping a search:
 | Key                           | Action                                                                  |
 | ---                           | ---                                                                     |
 | <kbd>S</kbd>                  | Change the search term                                                  |
+| <kbd>T</kbd>                  | Move through available search types: string, words, regexp              |
+| <kbd>C</kbd>                  | Change case sensitivity: smart, sensitive, ignore                       |
 | <kbd>I</kbd>                  | Switch to incremental search, re-running on every keystroke             |
 | <kbd>D</kbd>                  | Change the search directory                                             |
 | <kbd>^</kbd>                  | Re-run the search in the parent directory                               |
