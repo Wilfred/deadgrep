@@ -1,4 +1,6 @@
-# v0.12
+# v0.13
+
+# v0.12 (released 1 November 2022)
 
 Added a command `deadgrep-incremental` (bound to `I` in `*deadgrep*`
 buffers) to provide as-you-type searching.
@@ -18,7 +20,7 @@ Fixed support for Emacs 27 and earlier.
 Fixed an issue where files were not correctly collapsed when searches
 had context.
 
-# v0.11 (released April 18 2022)
+# v0.11 (released 18 April 2022)
 
 Added a command `deadgrep-search-term` (bound to `S` in `*deadgrep*`
 buffers) to change the current search term.
