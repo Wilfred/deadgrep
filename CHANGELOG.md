@@ -6,7 +6,17 @@ buffers) to provide as-you-type searching.
 Added a command `deadgrep-parent-directory` (bound to `^` in `*deadgrep*`
 buffers) to re-run the current search in the parent directory.
 
+Added a command `deadgrep-cycle-search-type` (bound to `T` in
+`*deadgrep*` buffers) to cycle between string, word and regexp
+searches.
+
+Added a command `deadgrep-cycle-search-case` (bound to `C` in
+`*deadgrep*` buffers) to cycle between case sensitivity modes.
+
 Fixed support for Emacs 27 and earlier.
+
+Fixed an issue where files were not correctly collapsed when searches
+had context.
 
 # v0.11 (released April 18 2022)
 
