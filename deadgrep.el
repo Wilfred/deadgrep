@@ -668,6 +668,7 @@ to obtain ripgrep results."
     (push "--no-heading" args)
     (push "--no-column" args)
     (push "--with-filename" args)
+    (push "--no-config" args)
 
     (cond
      ((eq search-type 'string)
