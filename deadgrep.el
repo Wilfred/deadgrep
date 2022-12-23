@@ -1167,6 +1167,7 @@ If POS is nil, use the beginning position of the current line."
       ;; consistent with `compilation-next-error-function' and also
       ;; useful with `deadgrep-visit-result-other-window'.
       (setq overlay-arrow-position (copy-marker pos))
+      (setq next-error-last-buffer (current-buffer))
 
       (funcall open-fn file-name)
       (goto-char (point-min))
