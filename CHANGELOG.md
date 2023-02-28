@@ -3,6 +3,9 @@
 Deadgrep now includes `--no-config` in its default arguments, so
 creating a `~/.ripgreprc` will not break deadgrep searches.
 
+Fixed an issue where changing search directory could produce an error
+"buffer name is already in use".
+
 # v0.12 (released 1 November 2022)
 
 Added a command `deadgrep-incremental` (bound to `I` in `*deadgrep*`

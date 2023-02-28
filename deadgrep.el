@@ -641,7 +641,8 @@ with a text face property `deadgrep-match-face'."
         (expand-file-name
          (read-directory-name "Search files in: ")))
   (rename-buffer
-   (deadgrep--buffer-name deadgrep--search-term default-directory))
+   (deadgrep--buffer-name deadgrep--search-term default-directory)
+   t)
   (deadgrep-restart))
 
 (defun deadgrep-parent-directory ()
@@ -650,7 +651,8 @@ with a text face property `deadgrep-match-face'."
   (setq default-directory
         (file-name-directory (directory-file-name default-directory)))
   (rename-buffer
-   (deadgrep--buffer-name deadgrep--search-term default-directory))
+   (deadgrep--buffer-name deadgrep--search-term default-directory)
+   t)
   (deadgrep-restart))
 
 (defun deadgrep--button (text type &rest properties)
