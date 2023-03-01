@@ -173,3 +173,12 @@ request on wgrep](https://github.com/mhayashi1120/Emacs-wgrep/pull/58).
 I believe that deadgrep is the best tool for doing Emacs text
 searches, but there are some other great tools out there. See
 [ALTERNATIVES](docs/ALTERNATIVES.md) for a discussion.
+
+## Why the name?
+
+The name "deadgrep" is a pun on "R.I.P. grep", and ripgrep.el was
+already taken.
+
+R.I.P wasn't actually the intention of the name "ripgrep" (see [their
+FAQ](https://github.com/BurntSushi/ripgrep/blob/master/FAQ.md#what-does-the-rip-in-ripgrep-mean)),
+but deadgrep is easy to remember and type.
