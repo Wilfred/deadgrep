@@ -593,39 +593,44 @@ with a text face property `deadgrep-match-face'."
            "File type: " type-choices nil t nil nil default)))
     (nth 1 (assoc chosen type-choices))))
 
+(defun deadgrep---file-type ()
+  (deadgrep--read-file-type deadgrep--initial-filename))
+
+(defun deadgrep---file-glob ()
+  (let*
+      ((initial-value
+        (cond
+         ;; If we already have a glob pattern, edit it.
+         ((eq (car-safe deadgrep--file-type) 'glob)
+          (cdr deadgrep--file-type))
+         ;; If the initial file had a file name of the form
+         ;; foo.bar, offer *.bar as the initial glob.
+         ((and deadgrep--initial-filename
+               (file-name-extension deadgrep--initial-filename))
+          (format "*.%s"
+                  (file-name-extension deadgrep--initial-filename)))
+         (t
+          "*")))
+       (prompt
+        (if (string= initial-value "*")
+            ;; Show an example to avoid confusion with regexp syntax.
+            "Glob (e.g. *.js): "
+          "Glob: "))
+       (glob
+        (read-from-minibuffer
+         prompt
+         initial-value)))
+    glob))
+
 (defun deadgrep--file-type (button)
   (let ((button-type (button-get button 'file-type)))
     (cond
      ((eq button-type 'all)
       (setq deadgrep--file-type 'all))
      ((eq button-type 'type)
-      (let ((new-file-type
-             (deadgrep--read-file-type deadgrep--initial-filename)))
-        (setq deadgrep--file-type (cons 'type new-file-type))))
+      (setq deadgrep--file-type (cons 'type (deadgrep---file-type))))
      ((eq button-type 'glob)
-      (let* ((initial-value
-              (cond
-               ;; If we already have a glob pattern, edit it.
-               ((eq (car-safe deadgrep--file-type) 'glob)
-                (cdr deadgrep--file-type))
-               ;; If the initial file had a file name of the form
-               ;; foo.bar, offer *.bar as the initial glob.
-               ((and deadgrep--initial-filename
-                     (file-name-extension deadgrep--initial-filename))
-                (format "*.%s"
-                        (file-name-extension deadgrep--initial-filename)))
-               (t
-                "*")))
-             (prompt
-              (if (string= initial-value "*")
-                  ;; Show an example to avoid confusion with regexp syntax.
-                  "Glob (e.g. *.js): "
-                "Glob: "))
-             (glob
-              (read-from-minibuffer
-               prompt
-               initial-value)))
-        (setq deadgrep--file-type (cons 'glob glob))))
+      (setq deadgrep--file-type (cons 'glob (deadgrep---file-glob))))
      (t
       (error "Unknown button type: %S" button-type))))
   (deadgrep-restart))
@@ -930,6 +935,17 @@ Returns a list ordered by the most recently accessed."
       (setq buffer-read-only t))
     buf))
 
+(defun deadgrep-cycle-search-file ()
+  (interactive)
+  (cond
+   ((eq deadgrep--file-type 'all)
+    (setq deadgrep--file-type (cons 'type (deadgrep---file-type))))
+   ((eq (car-safe deadgrep--file-type) 'type)
+    (setq deadgrep--file-type (cons 'glob (deadgrep---file-glob))))
+   ((eq (car-safe deadgrep--file-type) 'glob)
+    (setq deadgrep--file-type 'all)))
+  (deadgrep-restart))
+
 (defun deadgrep-cycle-search-type ()
   (interactive)
   (cond
@@ -955,6 +971,7 @@ Returns a list ordered by the most recently accessed."
     (define-key map (kbd "S") #'deadgrep-search-term)
     (define-key map (kbd "T") #'deadgrep-cycle-search-type)
     (define-key map (kbd "C") #'deadgrep-cycle-search-case)
+    (define-key map (kbd "F") #'deadgrep-cycle-search-file)
     (define-key map (kbd "D") #'deadgrep-directory)
     (define-key map (kbd "^") #'deadgrep-parent-directory)
     (define-key map (kbd "g") #'deadgrep-restart)
