@@ -936,6 +936,7 @@ Returns a list ordered by the most recently accessed."
     buf))
 
 (defun deadgrep-cycle-search-file ()
+  "Cycle search file spec (all / type / glob)  and restart the search."
   (interactive)
   (cond
    ((eq deadgrep--file-type 'all)
@@ -947,6 +948,7 @@ Returns a list ordered by the most recently accessed."
   (deadgrep-restart))
 
 (defun deadgrep-cycle-search-type ()
+  "Cycle search type (string / words / regexp ) and restart the search."
   (interactive)
   (cond
    ((eq deadgrep--search-type 'string) (setq deadgrep--search-type 'words))
@@ -955,6 +957,7 @@ Returns a list ordered by the most recently accessed."
   (deadgrep-restart))
 
 (defun deadgrep-cycle-search-case ()
+  "Cycle search case (smart / sensitive/ ignore) and restart the search."
   (interactive)
   (cond
    ((eq deadgrep--search-case 'smart) (setq deadgrep--search-case 'sensitive))
