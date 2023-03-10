@@ -60,6 +60,7 @@ Starting/stopping a search:
 | <kbd>S</kbd>                  | Change the search term                                                  |
 | <kbd>T</kbd>                  | Cycle through available search types: string, words, regexp             |
 | <kbd>C</kbd>                  | Cycle through case sensitivity types: smart, sensitive, ignore          |
+| <kbd>F</kbd>                  | Cycle through file modes: all, type, glob                               |
 | <kbd>I</kbd>                  | Switch to incremental search, re-running on every keystroke             |
 | <kbd>D</kbd>                  | Change the search directory                                             |
 | <kbd>^</kbd>                  | Re-run the search in the parent directory                               |
