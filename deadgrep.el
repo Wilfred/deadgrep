@@ -593,10 +593,7 @@ with a text face property `deadgrep-match-face'."
            "File type: " type-choices nil t nil nil default)))
     (nth 1 (assoc chosen type-choices))))
 
-(defun deadgrep---file-type ()
-  (deadgrep--read-file-type deadgrep--initial-filename))
-
-(defun deadgrep---file-glob ()
+(defun deadgrep--read-file-glob ()
   (let*
       ((initial-value
         (cond
@@ -628,9 +625,10 @@ with a text face property `deadgrep-match-face'."
      ((eq button-type 'all)
       (setq deadgrep--file-type 'all))
      ((eq button-type 'type)
-      (setq deadgrep--file-type (cons 'type (deadgrep---file-type))))
+      (setq deadgrep--file-type
+            (cons 'type (deadgrep--read-file-type deadgrep--initial-filename))))
      ((eq button-type 'glob)
-      (setq deadgrep--file-type (cons 'glob (deadgrep---file-glob))))
+      (setq deadgrep--file-type (cons 'glob (deadgrep--read-file-glob))))
      (t
       (error "Unknown button type: %S" button-type))))
   (deadgrep-restart))
@@ -935,20 +933,21 @@ Returns a list ordered by the most recently accessed."
       (setq buffer-read-only t))
     buf))
 
-(defun deadgrep-cycle-search-file ()
-  "Cycle search file spec (all / type / glob)  and restart the search."
+(defun deadgrep-cycle-files ()
+  "Cycle which files are searched (all / type / glob) and restart the search."
   (interactive)
   (cond
    ((eq deadgrep--file-type 'all)
-    (setq deadgrep--file-type (cons 'type (deadgrep---file-type))))
+    (setq deadgrep--file-type
+          (cons 'type (deadgrep--read-file-type deadgrep--initial-filename))))
    ((eq (car-safe deadgrep--file-type) 'type)
-    (setq deadgrep--file-type (cons 'glob (deadgrep---file-glob))))
+    (setq deadgrep--file-type (cons 'glob (deadgrep--read-file-glob))))
    ((eq (car-safe deadgrep--file-type) 'glob)
     (setq deadgrep--file-type 'all)))
   (deadgrep-restart))
 
 (defun deadgrep-cycle-search-type ()
-  "Cycle search type (string / words / regexp ) and restart the search."
+  "Cycle the search type (string / words / regexp) and restart the search."
   (interactive)
   (cond
    ((eq deadgrep--search-type 'string) (setq deadgrep--search-type 'words))
@@ -957,7 +956,7 @@ Returns a list ordered by the most recently accessed."
   (deadgrep-restart))
 
 (defun deadgrep-cycle-search-case ()
-  "Cycle search case (smart / sensitive/ ignore) and restart the search."
+  "Cycle the search case (smart / sensitive / ignore) and restart the search."
   (interactive)
   (cond
    ((eq deadgrep--search-case 'smart) (setq deadgrep--search-case 'sensitive))
@@ -974,7 +973,7 @@ Returns a list ordered by the most recently accessed."
     (define-key map (kbd "S") #'deadgrep-search-term)
     (define-key map (kbd "T") #'deadgrep-cycle-search-type)
     (define-key map (kbd "C") #'deadgrep-cycle-search-case)
-    (define-key map (kbd "F") #'deadgrep-cycle-search-file)
+    (define-key map (kbd "F") #'deadgrep-cycle-files)
     (define-key map (kbd "D") #'deadgrep-directory)
     (define-key map (kbd "^") #'deadgrep-parent-directory)
     (define-key map (kbd "g") #'deadgrep-restart)
