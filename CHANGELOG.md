@@ -1,5 +1,21 @@
 # v0.13
 
+**Changed default keybindings**: `n` and `p` are now bound to
+`deadgrep-forward-match` and `deadgrep-backward-match` respectively,
+so they only move through matches, ignoring buttons and file
+names. This is more useful (matches are much more important than
+buttons) and consistent with other Emacs modes
+(e.g. compilation-mode).
+
+To restore the old keybindings:
+
+```
+(define-key deadgrep-mode-map (kbd "n") #'deadgrep-forward)
+(define-key deadgrep-mode-map (kbd "p") #'deadgrep-backward)
+(define-key deadgrep-mode-map (kbd "N") #'deadgrep-forward-match)
+(define-key deadgrep-mode-map (kbd "P") #'deadgrep-backward-match)
+```
+
 Deadgrep now includes `--no-config` in its default arguments, so
 creating a `~/.ripgreprc` will not break deadgrep searches.
 

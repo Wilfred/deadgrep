@@ -986,10 +986,8 @@ Returns a list ordered by the most recently accessed."
     ;; Keybinding chosen to match `kill-compilation'.
     (define-key map (kbd "C-c C-k") #'deadgrep-kill-process)
 
-    (define-key map (kbd "n") #'deadgrep-forward)
-    (define-key map (kbd "p") #'deadgrep-backward)
-    (define-key map (kbd "N") #'deadgrep-forward-match)
-    (define-key map (kbd "P") #'deadgrep-backward-match)
+    (define-key map (kbd "n") #'deadgrep-forward-match)
+    (define-key map (kbd "p") #'deadgrep-backward-match)
     (define-key map (kbd "M-n") #'deadgrep-forward-filename)
     (define-key map (kbd "M-p") #'deadgrep-backward-filename)
 

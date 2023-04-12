@@ -45,13 +45,15 @@ or copy it into your `~/.emacs.d`.
 
 Navigating results:
 
-| Key                               | Action                                                           |
-| ---                               | ---                                                              |
-| <kbd>RET</kbd>                    | Visit the result, file or push button at point                   |
-| <kbd>o</kbd>                      | Visit the result in another window                               |
-| <kbd>n</kbd> and <kbd>p</kbd>     | Move between results or buttons                                  |
-| <kbd>N</kbd> and <kbd>P</kbd>     | Move between search hits                                         |
-| <kbd>M-n</kbd> and <kbd>M-p</kbd> | Move between file headers                                        |
+| Key                               | Action                                         |
+| ---                               | ---                                            |
+| <kbd>RET</kbd>                    | Visit the result, file or push button at point |
+| <kbd>o</kbd>                      | Visit the result in another window             |
+| <kbd>n</kbd> and <kbd>p</kbd>     | Move between search hits                       |
+| <kbd>M-n</kbd> and <kbd>M-p</kbd> | Move between file headers                      |
+
+The commands `deadgrep-forward` and `deadgrep-backward` are also
+available to move between buttons as well as search hits.
 
 Starting/stopping a search:
 
