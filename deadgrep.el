@@ -1540,8 +1540,10 @@ Otherwise, return PATH as is."
   (let ((root default-directory)
         (project (project-current)))
     (when project
-      (cond ((fboundp 'project-root)
-             ;; This function was defined in Emacs 28.
+      (cond ((and (fboundp 'project-root)
+                  (>= emacs-major-version 28))
+             ;; `project-root' was added in Emacs 28, but projectile
+             ;; defines it unconditionally.
              (setq root (project-root project)))
             (t
              ;; Older Emacsen.
