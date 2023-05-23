@@ -168,8 +168,9 @@ navigate to the file itself from the file headings.
 You can now edit files directly from results buffers with `M-x
 deadgrep-edit-mode`.
 
-It is currently in beta, so you may also want to try [this pull
-request on wgrep](https://github.com/mhayashi1120/Emacs-wgrep/pull/58).
+It is currently in beta. Alternatively, package [wgrep](https://github.com/mhayashi1120/Emacs-wgrep)
+added support for editing deadgrep buffers in April 2023 via [wgrep-deadgrep](https://melpa.org/#/wgrep-deadgrep).
+(One feature unlocked that way is, e.g., the ability to delete a line in edit mode via `C-d`)
 
 ## Alternative Projects
 
