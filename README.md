@@ -13,6 +13,7 @@ deserves.
 - [Usage](#usage)
     - [Installation](#installation)
     - [Keybindings](#keybindings)
+    - [Additional interactive commands](#additional-interactive-commands)
     - [Minibuffer](#minibuffer)
     - [Easy Debugging](#easy-debugging)
 - [Features](#features)
@@ -20,7 +21,9 @@ deserves.
     - [Context Aware](#context-aware)
     - [Easy Filtering](#easy-filtering)
     - [Polish](#polish)
+- [Beta Features](#beta-features)
 - [Alternative Projects](#alternative-projects)
+- [Why the name?](#why-the-name)
 
 <!-- markdown-toc end -->
 
