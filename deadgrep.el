@@ -725,9 +725,27 @@ to obtain ripgrep results."
 
     (push "--" args)
     (push search-term args)
-    (push "." args)
+    (setq args (append
+                (deadgrep--shell-quote-filenames (deadgrep--files-to-search))
+                args))
+
+    (message (format "searching this: %s" (deadgrep--files-to-search)))
+
 
     (nreverse args)))
+
+(defun deadgrep--files-to-search ()
+  (cond
+   ((eq deadgrep--search-scope 'project) '("."))
+   ((eq deadgrep--search-scope 'project-open-buffers)
+    (deadgrep--filenames-of-open-files-in-project))
+   ((eq deadgrep--search-scope 'open-buffers)
+    (deadgrep--filenames-of-open-files))
+   (t
+    (error "search scope wasn't set correctly!" 'deadgrep--search-scope))))
+
+(defun deadgrep--shell-quote-filenames (filenames)
+  (-map (lambda (filename) (shell-quote-argument filename)) filenames))
 
 (defun deadgrep--write-heading ()
   "Write the deadgrep heading with buttons reflecting the current
