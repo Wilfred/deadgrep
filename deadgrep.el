@@ -148,6 +148,8 @@ display."
 (put 'deadgrep--search-case 'permanent-local t)
 (defvar-local deadgrep--file-type 'all)
 (put 'deadgrep--file-type 'permanent-local t)
+(defvar-local deadgrep--search-scope 'project)
+(put 'deadgrep--search-scope 'permanent-local t)
 
 (defvar-local deadgrep--context nil
   "When set, also show context of results.
@@ -440,9 +442,18 @@ with a text face property `deadgrep-match-face'."
   'case nil
   'help-echo "Change case sensitivity")
 
+(define-button-type 'deadgrep-search-scope
+  'action #'deadgrep--search-scope
+  'case nil
+  'help-echo "Change search scope")
+
 (defun deadgrep--case (button)
   (setq deadgrep--search-case (button-get button 'case))
   (deadgrep-restart))
+
+(defun deadgrep--scope (button)
+  (setq deadgrep--search-scope (button-get button 'scope))
+(deadgrep-restart))
 
 (define-button-type 'deadgrep-context
   'action #'deadgrep--context
@@ -767,6 +778,25 @@ search settings."
                 "ignore"
               (deadgrep--button "ignore" 'deadgrep-case
                                 'case 'ignore))
+            "\n"
+
+            (propertize "Scope: "
+                        'face 'deadgrep-meta-face)
+            (if (eq deadgrep--search-scope 'project)
+                "project"
+              (deadgrep--button "project" 'deadgrep-scope
+                                'scope 'project))
+            " "
+            (if (eq deadgrep--search-scope 'project-open-buffers)
+                "project open buffers"
+              (deadgrep--button "project open buffers" 'deadgrep-scope
+                                'scope 'project-open-buffers))
+            " "
+            (if (eq deadgrep--search-scope 'open-buffers)
+                "open buffers"
+              (deadgrep--button "open buffers" 'deadgrep-scope
+                                'scope 'open-buffers))
+
             "\n"
             (propertize "Context: "
                         'face 'deadgrep-meta-face)
