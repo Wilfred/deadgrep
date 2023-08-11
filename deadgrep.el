@@ -802,17 +802,17 @@ search settings."
                         'face 'deadgrep-meta-face)
             (if (eq deadgrep--search-scope 'project)
                 "project"
-              (deadgrep--button "project" 'deadgrep-scope
+              (deadgrep--button "project" 'deadgrep-search-scope
                                 'scope 'project))
             " "
             (if (eq deadgrep--search-scope 'project-open-buffers)
                 "project open buffers"
-              (deadgrep--button "project open buffers" 'deadgrep-scope
+              (deadgrep--button "project open buffers" 'deadgrep-search-scope
                                 'scope 'project-open-buffers))
             " "
             (if (eq deadgrep--search-scope 'open-buffers)
                 "open buffers"
-              (deadgrep--button "open buffers" 'deadgrep-scope
+              (deadgrep--button "open buffers" 'deadgrep-search-scope
                                 'scope 'open-buffers))
 
             "\n"
