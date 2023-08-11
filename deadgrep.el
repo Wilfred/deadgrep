@@ -994,6 +994,16 @@ Returns a list ordered by the most recently accessed."
    ((eq deadgrep--search-case 'ignore) (setq deadgrep--search-case 'smart)))
   (deadgrep-restart))
 
+(defun deadgrep-cycle-search-scope ()
+  (interactive)
+  (message "cycling")
+  (cond
+   ((eq deadgrep--search-scope 'project) (setq deadgrep--search-scope 'project-open-buffers))
+   ((eq deadgrep--search-scope 'project-open-buffers) (setq deadgrep--search-scope 'open-buffers))
+   ((eq deadgrep--search-scope 'open-buffers) (setq deadgrep--search-scope 'project)))
+  (deadgrep-restart))
+
+
 (defvar deadgrep-mode-map
   (let ((map (make-sparse-keymap)))
     (define-key map (kbd "RET") #'deadgrep-visit-result)
@@ -1004,6 +1014,7 @@ Returns a list ordered by the most recently accessed."
     (define-key map (kbd "T") #'deadgrep-cycle-search-type)
     (define-key map (kbd "C") #'deadgrep-cycle-search-case)
     (define-key map (kbd "F") #'deadgrep-cycle-files)
+    (define-key map (kbd "K") #'deadgrep-cycle-search-scope)
     (define-key map (kbd "D") #'deadgrep-directory)
     (define-key map (kbd "^") #'deadgrep-parent-directory)
     (define-key map (kbd "g") #'deadgrep-restart)
