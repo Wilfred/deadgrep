@@ -68,6 +68,7 @@ Starting/stopping a search:
 | <kbd>F</kbd>                  | Cycle through file modes: all, type, glob                               |
 | <kbd>I</kbd>                  | Switch to incremental search, re-running on every keystroke             |
 | <kbd>D</kbd>                  | Change the search directory                                             |
+| <kbd>K</kbd>                  | Cycle through scopes: directory, directory-and-open, open               |
 | <kbd>^</kbd>                  | Re-run the search in the parent directory                               |
 | <kbd>g</kbd>                  | Re-run the search                                                       |
 | <kbd>TAB</kbd>                | Expand/collapse results for a file                                      |
