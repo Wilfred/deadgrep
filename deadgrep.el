@@ -1687,6 +1687,23 @@ This is intended for use with `next-error-function', which see."
   (dolist (buffer (deadgrep--buffers))
     (kill-buffer buffer)))
 
+(defun deadgrep--filenames-of-open-files ()
+  "Get all open buffers that have a backing file"
+  (-map (lambda (buf)
+          (buffer-file-name buf))
+        (-filter (lambda (buffer) (buffer-file-name buffer))
+                 (buffer-list))))
+
+(defun deadgrep--filenames-of-open-files-in-project ()
+  "Get all buffers that have a backing file in the current project"
+  (let* ((candidates (deadgrep--filenames-of-open-files))
+         (prefix (cdr (project-current))))
+    (-filter (lambda (path)
+               (if (s-starts-with? prefix path)
+                   path
+                 nil))
+             candidates)))
+
 (provide 'deadgrep)
 ;;; deadgrep.el ends here
 
