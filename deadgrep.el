@@ -999,6 +999,8 @@ Returns a list ordered by the most recently accessed."
     ;; TODO: this should work when point is anywhere in the file, not
     ;; just on its heading.
     (define-key map (kbd "TAB") #'deadgrep-toggle-file-results)
+    (define-key map (kbd "S-C-i") #'deadgrep-toggle-all-file-results)
+    (define-key map (kbd "<backtab>") #'deadgrep-toggle-all-file-results)
 
     ;; Keybinding chosen to match `kill-compilation'.
     (define-key map (kbd "C-c C-k") #'deadgrep-kill-process)
@@ -1256,6 +1258,20 @@ Keys are interned filenames, so they compare with `eq'.")
       (if (alist-get (intern file-name) deadgrep--hidden-files)
           (deadgrep--show)
         (deadgrep--hide)))))
+
+(defun deadgrep-toggle-all-file-results ()
+  "Show/hide the results of all files."
+  (interactive)
+  (let ((should-show (cl-some #'cdr deadgrep--hidden-files)))
+    (save-excursion
+      (goto-char (point-min))
+      (while (not (eq (point) (point-max)))
+        (goto-char (or (next-single-property-change (point) 'deadgrep-filename)
+                       (point-max)))
+        (when (deadgrep--filename)
+          (if should-show
+              (deadgrep--show)
+            (deadgrep--hide)))))))
 
 (defun deadgrep--show ()
   (-let* ((file-name (deadgrep--filename))
