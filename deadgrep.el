@@ -986,6 +986,9 @@ Returns a list ordered by the most recently accessed."
     ;; Keybinding chosen to match `kill-compilation'.
     (define-key map (kbd "C-c C-k") #'deadgrep-kill-process)
 
+    ;; Keybinding chosen to match other tools, including `read-only-mode'.
+    (define-key map (kbd "C-x C-q") #'deadgrep-edit-mode)
+
     (define-key map (kbd "n") #'deadgrep-forward-match)
     (define-key map (kbd "p") #'deadgrep-backward-match)
     (define-key map (kbd "M-n") #'deadgrep-forward-filename)
@@ -997,6 +1000,7 @@ Returns a list ordered by the most recently accessed."
 (defvar deadgrep-edit-mode-map
   (let ((map (make-sparse-keymap)))
     (define-key map (kbd "RET") #'deadgrep-visit-result)
+    (define-key map (kbd "C-c C-c") #'deadgrep-mode) ;; exit edit mode
     map)
   "Keymap for `deadgrep-edit-mode'.")
 
