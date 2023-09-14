@@ -680,7 +680,7 @@ compressed files, or `--follow' to follow symlinks.
 
 Sometimes settings in your config file can cause problems, which
 is why `--no-config' is included here by default."
-  :type '(list string)
+  :type '(repeat string)
   :group 'deadgrep)
 
 (defun deadgrep--arguments (search-term search-type case context)
