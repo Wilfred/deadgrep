@@ -721,8 +721,7 @@ to obtain ripgrep results."
      ((eq (car-safe deadgrep--file-type) 'type)
       (push (format "--type=%s" (cdr deadgrep--file-type)) args))
      ((eq (car-safe deadgrep--file-type) 'glob)
-      (push (format "--type-add=custom:%s" (cdr deadgrep--file-type)) args)
-      (push "--type=custom" args))
+      (push (format "--glob=%s" (cdr deadgrep--file-type)) args))
      (t
       (error "Unknown file-type: %S" deadgrep--file-type)))
 
