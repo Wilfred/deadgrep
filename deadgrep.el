@@ -1082,6 +1082,13 @@ underlying file."
   :type 'hook
   :group 'deadgrep)
 
+(defcustom deadgrep-jump-to-match-column nil
+  "If non-nil, deadgrep will jump to the column of the first match.
+Otherwise, deadgrep will jump to the column matching the point in the
+*deadgrep ...* buffer."
+  :type 'hook
+  :group 'deadgrep)
+
 (defun deadgrep-edit-mode ()
   "Major mode for editing the results files directly from a
 deadgrep results buffer.
@@ -1203,7 +1210,8 @@ If POS is nil, use the beginning position of the current line."
          (file-name (deadgrep--filename))
          (line-number (deadgrep--line-number))
          (column-offset (when line-number (deadgrep--current-column)))
-         (match-positions (when line-number (deadgrep--match-positions))))
+         (match-positions (when line-number (deadgrep--match-positions)))
+         (match-column (when match-positions (caar match-positions))))
     (when file-name
       (when overlay-arrow-position
         (set-marker overlay-arrow-position nil))
@@ -1218,7 +1226,10 @@ If POS is nil, use the beginning position of the current line."
 
       (when line-number
         (-let [destination-pos (deadgrep--buffer-position
-                                line-number column-offset)]
+                                line-number
+                                (if deadgrep-jump-to-match-column
+                                    match-column
+                                  column-offset))]
           ;; Put point on the position of the match, widening the
           ;; buffer if necessary.
           (when (or (< destination-pos (point-min))
