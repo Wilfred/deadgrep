@@ -1276,13 +1276,16 @@ Keys are interned filenames, so they compare with `eq'.")
 (defun deadgrep-toggle-all-file-results ()
   "Show/hide the results of all files."
   (interactive)
-  (let ((should-show (cl-some #'cdr deadgrep--hidden-files)))
+  (let ((should-show (cl-some #'cdr deadgrep--hidden-files))
+        (seen-files nil))
     (save-excursion
       (goto-char (point-min))
       (while (not (eq (point) (point-max)))
         (goto-char (or (next-single-property-change (point) 'deadgrep-filename)
                        (point-max)))
-        (when (deadgrep--filename)
+        (when (and (deadgrep--filename)
+                   (not (member (deadgrep--filename) seen-files)))
+          (push (deadgrep--filename) seen-files)
           (if should-show
               (deadgrep--show)
             (deadgrep--hide)))))))
