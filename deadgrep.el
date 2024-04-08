@@ -1176,7 +1176,7 @@ buffer."
     (nreverse positions)))
 
 (defun deadgrep--buffer-position (line-number column-offset)
-  "Return the position equivalent to LINE-NUMBER at COLUMN-OFFSET
+  "Calculate the buffer position that corresponds to LINE-NUMBER at COLUMN-OFFSET
 in the current buffer."
   (save-excursion
     (save-restriction
