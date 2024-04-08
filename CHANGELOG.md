@@ -16,6 +16,9 @@ To restore the old keybindings:
 (define-key deadgrep-mode-map (kbd "P") #'deadgrep-backward-match)
 ```
 
+Pressing RET on a column number now moves point directly the match,
+not just the beginning of the line.
+
 Deadgrep now includes `--no-config` in its default arguments, so
 creating a `~/.ripgreprc` will not break deadgrep searches.
 

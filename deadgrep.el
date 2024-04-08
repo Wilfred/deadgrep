@@ -1058,7 +1058,8 @@ underlying file."
   (when (eq major-mode 'deadgrep-edit-mode)
     (save-mark-and-excursion
       (goto-char beg)
-      (-let* ((column (+ (deadgrep--current-column) length))
+      (-let* ((column (+ (or (deadgrep--current-column) 0)
+                         length))
               (filename (deadgrep--filename))
               (line-number (deadgrep--line-number))
               ((buf . opened) (deadgrep--find-file filename))
@@ -1130,9 +1131,9 @@ In this example, the column is 1."
       (while (not (equal (point) line-start))
         (cl-incf char-count)
         (backward-char 1)))
-    (max
-     (- char-count line-number-width)
-     0)))
+    (if (< char-count line-number-width)
+        nil
+      (- char-count line-number-width))))
 
 (defun deadgrep--flash-column-offsets (start end)
   "Temporarily highlight column offset from START to END."
@@ -1222,6 +1223,14 @@ If POS is nil, use the beginning position of the current line."
       (goto-char (point-min))
 
       (when line-number
+        ;; If point was on the line number rather than a specific
+        ;; position on the line, go the first match. This is generally
+        ;; what users want, especially when there are long lines.
+        (unless column-offset
+          (if-let (first-match-pos (car match-positions))
+              (setq column-offset (car first-match-pos))
+            (setq column-offset 0)))
+
         (-let [destination-pos (deadgrep--buffer-position
                                 line-number column-offset)]
           ;; Put point on the position of the match, widening the
