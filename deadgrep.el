@@ -1112,9 +1112,13 @@ deadgrep results buffer.
   (run-mode-hooks 'deadgrep-edit-mode-hook))
 
 (defun deadgrep--current-column ()
-  "Get the current column position in char terms.
-This treats tabs as 1 and ignores the line numbers in the results
-buffer."
+  "When point is on a result in a results buffer, return the column offset
+of the underlying file. Treats tabs as 1.
+
+foo.el
+123 h|ello world
+
+In this example, the column is 1."
   (let* ((line-start (line-beginning-position))
          (line-number
           (get-text-property line-start 'deadgrep-line-number))
