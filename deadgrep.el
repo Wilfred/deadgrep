@@ -1137,7 +1137,7 @@ buffer."
                    (+ line-start start)
                    (+ line-start end))))
     (overlay-put overlay 'face 'highlight)
-    (run-with-timer 1.0 nil 'delete-overlay overlay)))
+    (run-with-timer 1.5 nil 'delete-overlay overlay)))
 
 (defun deadgrep--match-face-p (pos)
   "Is there a match face at POS?"
