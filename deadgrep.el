@@ -1144,7 +1144,8 @@ buffer."
   (eq (get-text-property pos 'face) 'deadgrep-match-face))
 
 (defun deadgrep--match-positions ()
-  "Return a list of indexes of the current line's matches."
+  "Return a list of column offsets of the current line's matches.
+Each item in the list has the form (START-OFFSET END-OFFSET)."
   (let (positions)
     (save-excursion
       (beginning-of-line)
