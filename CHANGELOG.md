@@ -1,6 +1,10 @@
 # v0.13
 
+## Interface
+
 Deadgrep now includes the result count in the mode line.
+
+## Keybindings
 
 **Changed default keybindings**: `n` and `p` are now bound to
 `deadgrep-forward-match` and `deadgrep-backward-match` respectively,
@@ -20,6 +24,8 @@ To restore the old keybindings:
 
 Pressing RET on a column number now moves point directly the match,
 not just the beginning of the line.
+
+## Bugfixes
 
 Deadgrep now includes `--no-config` in its default arguments, so
 creating a `~/.ripgreprc` will not break deadgrep searches.
