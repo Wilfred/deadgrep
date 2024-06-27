@@ -1,5 +1,7 @@
 # v0.13
 
+Deadgrep now includes the result count in the mode line.
+
 **Changed default keybindings**: `n` and `p` are now bound to
 `deadgrep-forward-match` and `deadgrep-backward-match` respectively,
 so they only move through matches, ignoring buttons and file
