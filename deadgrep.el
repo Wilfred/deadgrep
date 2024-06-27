@@ -1,11 +1,11 @@
 ;;; deadgrep.el --- fast, friendly searching with ripgrep  -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2018  Wilfred Hughes
+;; Copyright (C) 2018-2024  Wilfred Hughes
 
 ;; Author: Wilfred Hughes <me@wilfred.me.uk>
 ;; URL: https://github.com/Wilfred/deadgrep
 ;; Keywords: tools
-;; Version: 0.13
+;; Version: 0.14
 ;; Package-Requires: ((emacs "25.1") (dash "2.12.0") (s "1.11.0") (spinner "1.7.3"))
 
 ;; This program is free software; you can redistribute it and/or modify
