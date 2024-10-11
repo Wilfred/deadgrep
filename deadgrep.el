@@ -1224,7 +1224,6 @@ If POS is nil, use the beginning position of the current line."
       ;; consistent with `compilation-next-error-function' and also
       ;; useful with `deadgrep-visit-result-other-window'.
       (setq overlay-arrow-position (copy-marker pos))
-      (setq next-error-last-buffer (current-buffer))
 
       (funcall open-fn file-name)
       (goto-char (point-min))
@@ -1670,6 +1669,7 @@ don't actually start the search."
     (with-current-buffer buf
       (setq imenu-create-index-function #'deadgrep--create-imenu-index)
       (setq next-error-function #'deadgrep-next-error)
+      (setq next-error-last-buffer buf)
 
       ;; If we have previous search settings, apply them to our new
       ;; search results buffer.
