@@ -1626,10 +1626,13 @@ deadgrep is ready but not yet searching."
                (key-description restart-key))))))
 
 (defun deadgrep--mode-line ()
-  (let ((s (if deadgrep--result-count
-               (format "Deadgrep:%s" deadgrep--result-count)
-             "Deadgrep")))
-    (concat s (spinner-print deadgrep--spinner))))
+  (let* ((s (if deadgrep--result-count
+                (format "Deadgrep:%s" deadgrep--result-count)
+              "Deadgrep"))
+         (spinner-str (spinner-print deadgrep--spinner)))
+    (if spinner-str
+        (concat s " " spinner-str)
+      s)))
 
 (defun deadgrep--create-imenu-index ()
   "Create `imenu' index for matched files."
