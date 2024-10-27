@@ -1,5 +1,10 @@
 # v0.14
 
+Added the ability to toggle whether deadgrep considers hidden files
+and/or .gitignore'd files.
+
+Deadgrep will now search hidden files (e.g. a file named `.foo`) by default.
+
 # v0.13 (released 27 June 2024)
 
 ## Interface
