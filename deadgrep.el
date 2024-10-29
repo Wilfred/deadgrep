@@ -877,7 +877,6 @@ search settings."
             " "
             (deadgrep--button ".gitignore items" 'deadgrep-vcs-skip-type)
             (if deadgrep--skip-if-vcs-ignore ":yes" ":no")
-            " "
             "\n\n")
     (put-text-property
      start-pos (point)
