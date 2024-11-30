@@ -1703,7 +1703,6 @@ don't actually start the search."
          prev-skip-if-vcs-ignore)
     ;; Find out what search settings were used last time.
     (when last-results-buf
-      ;; here certainly
       (with-current-buffer last-results-buf
         (setq prev-search-type deadgrep--search-type)
         (setq prev-search-case deadgrep--search-case)
