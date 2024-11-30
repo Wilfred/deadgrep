@@ -763,7 +763,13 @@ to obtain ripgrep results."
 
     (unless deadgrep--skip-if-hidden
       (push "--hidden" args))
-    (unless deadgrep--skip-if-vcs-ignore
+    (if deadgrep--skip-if-vcs-ignore
+        ;; By default, ripgrep searches .git even when it's respecting
+        ;; .gitignore, if --hidden is set. Ignore .git when we're
+        ;; using .gitignore.
+        ;;
+        ;; https://github.com/BurntSushi/ripgrep/issues/713
+        (push "--glob=!/.git" args)
       (push "--no-ignore-vcs" args))
 
     (push "--" args)
