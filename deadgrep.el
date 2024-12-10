@@ -1578,8 +1578,6 @@ for a string, offering the current word as a default."
       (let* ((sym (symbol-at-point))
              (sym-name (when sym
                          (substring-no-properties (symbol-name sym))))
-             ;; TODO: prompt should say search string or search regexp
-             ;; as appropriate.
              (prompt
               (deadgrep--search-prompt sym-name)))
         (setq search-term
