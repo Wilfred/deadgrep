@@ -476,6 +476,19 @@ edit mode."
      (equal (deadgrep--arguments "foo" 'words 'ignore '(3 . 2))
             '("--no-config" "--color=ansi" "--line-number" "--no-heading" "--no-column" "--with-filename" "--fixed-strings" "--word-regexp" "--ignore-case" "--glob=*.el" "--before-context=3" "--after-context=2" "--" "foo" ".")))))
 
+(ert-deftest deadgrep--arguments-custom-file-types ()
+  (let ((deadgrep-file-type-alist '((tests . "--type=TEST")
+                                    (no-tests . "--type-not=TEST"))))
+    (let ((deadgrep--file-type 'tests))
+      (should
+       (equal (deadgrep--arguments "foo" 'string 'sensitive '(1 . 0))
+              '("--no-config" "--color=ansi" "--line-number" "--no-heading" "--no-column" "--with-filename" "--fixed-strings" "--case-sensitive" "--type=TEST" "--before-context=1" "--after-context=0" "--" "foo" "."))))
+    (let ((deadgrep--file-type 'no-tests))
+      (should
+       (equal (deadgrep--arguments "foo" 'string 'sensitive '(1 . 0))
+              '("--no-config" "--color=ansi" "--line-number" "--no-heading" "--no-column" "--with-filename" "--fixed-strings" "--case-sensitive" "--type-not=TEST" "--before-context=1" "--after-context=0" "--" "foo" ".")))))
+  )
+
 (ert-deftest deadgrep--arguments-error-cases ()
   (should-error
    (deadgrep--arguments "foo" 'foo 'smart nil))
