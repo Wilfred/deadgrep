@@ -1,4 +1,17 @@
-# v0.13
+# v0.14
+
+Added the ability to toggle whether deadgrep considers hidden files
+and/or .gitignore'd files.
+
+Deadgrep will now search hidden files (e.g. a file named `.foo`) by default.
+
+# v0.13 (released 27 June 2024)
+
+## Interface
+
+Deadgrep now includes the result count in the mode line.
+
+## Keybindings
 
 **Changed default keybindings**: `n` and `p` are now bound to
 `deadgrep-forward-match` and `deadgrep-backward-match` respectively,
@@ -15,6 +28,11 @@ To restore the old keybindings:
 (define-key deadgrep-mode-map (kbd "N") #'deadgrep-forward-match)
 (define-key deadgrep-mode-map (kbd "P") #'deadgrep-backward-match)
 ```
+
+Pressing RET on a column number now moves point directly the match,
+not just the beginning of the line.
+
+## Bugfixes
 
 Deadgrep now includes `--no-config` in its default arguments, so
 creating a `~/.ripgreprc` will not break deadgrep searches.
