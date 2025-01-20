@@ -85,6 +85,43 @@ This affects the behaviour of `deadgrep--project-root', so this
 variable has no effect if you change
 `deadgrep-project-root-function'.")
 
+(defcustom deadgrep-extra-searched-directories nil
+  "Alist associating directory contexts to list of extra directories searched.
+
+Purpose:
+ Associates a list of directory(ies) searched when searching inside a
+ specific directory (the directory context).
+ For each context (the alist key), you can associate one or more extra
+ directory to search when deadgrep searches inside this context.
+
+Use case:
+ Whenever you need to search extra directories (like library directories)
+ located outside of your current focus, project or directory where the primary
+ search occurs.
+
+Important:
+ - The specified paths must be absolute.
+ - The Directory field is used as a *directory context* only.
+   If you want that directory to be searched, then put it inside
+   the list.
+ - This supports Tramp and the ability to search inside remote systems as long
+   as:
+    - The search program is available in the remote system.
+    - The directory context string identifies the remote system directory
+      with the Tramp-specific syntax:
+      - example: something like \"/ssh:user@host:/some/dir/path/\"
+    - In all cases (even for directories in the list of remote directory
+      context), the directories must:
+      - be absolute paths
+      - be exempt of Tramp remote host prefix: use the path as seen by the
+        remote host."
+  :group 'deadgrep
+  :type '(repeat
+	  (list
+	   (string :tag "Context directory")
+	   (repeat
+	    (string :tag "Extra searched absolute dirpath")))))
+
 (defvar deadgrep-history
   nil
   "A list of the previous search terms.")
@@ -774,7 +811,19 @@ to obtain ripgrep results."
 
     (push "--" args)
     (push search-term args)
-    (push "." args)
+
+    ;; When extra directories are identified for the current directory context
+    ;; use these directories instead of the current directory.  Otherwise
+    ;; search from the current directory as usual.
+    (let ((extra-dir-found nil))
+      (when deadgrep-extra-searched-directories
+	    (dolist (context-dirs deadgrep-extra-searched-directories)
+	      (when (string-equal default-directory (car context-dirs))
+	        (dolist (extra-dirpath (cadr context-dirs))
+	          (push extra-dirpath args)
+              (setq extra-dir-found t)))))
+      (unless extra-dir-found
+        (push "." args)))
 
     (nreverse args)))
 
