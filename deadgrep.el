@@ -112,15 +112,16 @@ Important:
       - example: something like \"/ssh:user@host:/some/dir/path/\"
     - In all cases (even for directories in the list of remote directory
       context), the directories must:
-      - be absolute paths
+      - be absolute paths,
       - be exempt of Tramp remote host prefix: use the path as seen by the
-        remote host."
+        remote host.
+      - The ~ is allowed. Directory names do not have to end with / but may."
   :group 'deadgrep
   :type '(repeat
-	  (list
-	   (string :tag "Context directory")
-	   (repeat
-	    (string :tag "Extra searched absolute dirpath")))))
+	      (list
+	       (string :tag "Context directory")
+	       (repeat
+	        (string :tag "Extra searched absolute dirpath")))))
 
 (defvar deadgrep-history
   nil
@@ -815,12 +816,17 @@ to obtain ripgrep results."
     ;; When extra directories are identified for the current directory context
     ;; use these directories instead of the current directory.  Otherwise
     ;; search from the current directory as usual.
-    (let ((extra-dir-found nil))
+    (let ((extra-dir-found nil)
+          (expanded-default-dir (file-name-as-directory
+                                 (expand-file-name default-directory))))
       (when deadgrep-extra-searched-directories
 	    (dolist (context-dirs deadgrep-extra-searched-directories)
-	      (when (string-equal default-directory (car context-dirs))
+	      (when (string-equal expanded-default-dir
+                              (file-name-as-directory (expand-file-name
+                                                       (car context-dirs))))
 	        (dolist (extra-dirpath (cadr context-dirs))
-	          (push extra-dirpath args)
+	          (push (file-name-as-directory (expand-file-name extra-dirpath))
+                    args)
               (setq extra-dir-found t)))))
       (unless extra-dir-found
         (push "." args)))
