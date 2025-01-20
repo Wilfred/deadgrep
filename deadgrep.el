@@ -118,10 +118,10 @@ Important:
       - The ~ is allowed. Directory names do not have to end with / but may."
   :group 'deadgrep
   :type '(repeat
-	      (list
-	       (string :tag "Context directory")
-	       (repeat
-	        (string :tag "Extra searched absolute dirpath")))))
+          (list
+           (string :tag "Context directory")
+           (repeat
+            (string :tag "Extra searched absolute dirpath")))))
 
 (defvar deadgrep-history
   nil
