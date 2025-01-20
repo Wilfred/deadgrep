@@ -820,12 +820,12 @@ to obtain ripgrep results."
           (expanded-default-dir (file-name-as-directory
                                  (expand-file-name default-directory))))
       (when deadgrep-extra-searched-directories
-	    (dolist (context-dirs deadgrep-extra-searched-directories)
-	      (when (string-equal expanded-default-dir
+        (dolist (context-dirs deadgrep-extra-searched-directories)
+          (when (string-equal expanded-default-dir
                               (file-name-as-directory (expand-file-name
                                                        (car context-dirs))))
-	        (dolist (extra-dirpath (cadr context-dirs))
-	          (push (file-name-as-directory (expand-file-name extra-dirpath))
+            (dolist (extra-dirpath (cadr context-dirs))
+              (push (file-name-as-directory (expand-file-name extra-dirpath))
                     args)
               (setq extra-dir-found t)))))
       (unless extra-dir-found
