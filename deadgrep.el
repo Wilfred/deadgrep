@@ -90,7 +90,7 @@ variable has no effect if you change
 
 Purpose:
  Associates a list of directory(ies) searched when searching inside a
- specific directory (the directory context).
+ specific directory tree (the directory context).
  For each context (the alist key), you can associate one or more extra
  directory to search when deadgrep searches inside this context.
 
@@ -101,9 +101,10 @@ Use case:
 
 Important:
  - The specified paths must be absolute.
- - The Directory field is used as a *directory context* only.
-   If you want that directory to be searched, then put it inside
-   the list.
+ - The *Context Directory* field identifies a directory tree used as a
+   context. Any of it's sub-directories are part of that context.
+   You can control whether each context directory tree is part of the
+   searched directory trees.
  - This supports Tramp and the ability to search inside remote systems as long
    as:
     - The search program is available in the remote system.
@@ -120,8 +121,9 @@ Important:
   :type '(repeat
           (list
            (string :tag "Context directory")
-           (repeat
-            (string :tag "Extra searched absolute dirpath")))))
+           (boolean :tag "Include this context directory tree in the search" t)
+           (repeat :tag "Searched directory trees"
+                   (string :tag "Extra searched absolute dirpath")))))
 
 (defvar deadgrep-history
   nil
@@ -753,6 +755,13 @@ is why `--no-config' is included here by default."
   :type '(repeat string)
   :group 'deadgrep)
 
+(defun deadgrep--is-subdir-of (path1 path2)
+  "Return t if PATH1 is a sub-directory of PATH2."
+  (let ((npath1 (directory-file-name (file-truename path1)))
+        (npath2 (directory-file-name (file-truename path2))))
+    (when (string-match-p (regexp-quote npath2) npath1)
+      t)))
+
 (defun deadgrep--arguments (search-term search-type case context)
   "Return a list of command line arguments that we can execute in a shell
 to obtain ripgrep results."
@@ -818,16 +827,19 @@ to obtain ripgrep results."
     ;; search from the current directory as usual.
     (let ((extra-dir-found nil)
           (expanded-default-dir (file-name-as-directory
-                                 (expand-file-name default-directory))))
+                                 (expand-file-name default-directory)))
+          (context-dirpath nil))
       (when deadgrep-extra-searched-directories
-        (dolist (context-dirs deadgrep-extra-searched-directories)
-          (when (string-equal expanded-default-dir
-                              (file-name-as-directory (expand-file-name
-                                                       (car context-dirs))))
-            (dolist (extra-dirpath (cadr context-dirs))
-              (push (file-name-as-directory (expand-file-name extra-dirpath))
-                    args)
-              (setq extra-dir-found t)))))
+        (dolist (context-srch-dirs deadgrep-extra-searched-directories)
+          (setq context-dirpath (file-name-as-directory
+                                 (expand-file-name (nth 0 context-srch-dirs))))
+          (when (deadgrep--is-subdir-of expanded-default-dir context-dirpath)
+            (when (nth 1 context-srch-dirs)
+              (push context-dirpath args)))
+          (dolist (extra-dirpath (nth 2 context-srch-dirs))
+            (push (file-name-as-directory (expand-file-name extra-dirpath))
+                  args)
+            (setq extra-dir-found t))))
       (unless extra-dir-found
         (push "." args)))
 
