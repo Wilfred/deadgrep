@@ -835,11 +835,11 @@ to obtain ripgrep results."
                                  (expand-file-name (nth 0 context-srch-dirs))))
           (when (deadgrep--is-subdir-of expanded-default-dir context-dirpath)
             (when (nth 1 context-srch-dirs)
-              (push context-dirpath args)))
-          (dolist (extra-dirpath (nth 2 context-srch-dirs))
-            (push (file-name-as-directory (expand-file-name extra-dirpath))
-                  args)
-            (setq extra-dir-found t))))
+              (push context-dirpath args))
+            (dolist (extra-dirpath (nth 2 context-srch-dirs))
+              (push (file-name-as-directory (expand-file-name extra-dirpath))
+                    args)
+              (setq extra-dir-found t)))))
       (unless extra-dir-found
         (push "." args)))
 
