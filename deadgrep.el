@@ -101,10 +101,13 @@ Use case:
 
 Important:
  - The specified paths must be absolute.
- - The *Context Directory* field identifies a directory tree used as a
-   context. Any of it's sub-directories are part of that context.
-   You can control whether each context directory tree is part of the
-   searched directory trees.
+ - The *Context Directory* field identifies a directory tree context.
+    - That directory and any of it's sub-directories are part of that
+      context.
+    - You can control whether the context directory tree is part of the
+      searched directory trees. It is by default, as identified by the
+      boolean flag for each context directory.
+      - Turn it off to prevent searches inside that directory tree.
  - This supports Tramp and the ability to search inside remote systems as long
    as:
     - The search program is available in the remote system.
@@ -116,7 +119,8 @@ Important:
       - be absolute paths,
       - be exempt of Tramp remote host prefix: use the path as seen by the
         remote host.
-      - The ~ is allowed. Directory names do not have to end with / but may."
+      - The ~ is allowed as the first character in paths
+      - Directory names do not have to end with / but may."
   :group 'deadgrep
   :type '(repeat
           (list
@@ -833,7 +837,8 @@ to obtain ripgrep results."
         (dolist (context-srch-dirs deadgrep-extra-searched-directories)
           (setq context-dirpath (file-name-as-directory
                                  (expand-file-name (nth 0 context-srch-dirs))))
-          (when (deadgrep--is-subdir-of expanded-default-dir context-dirpath)
+          (when (or (string= expanded-default-dir context-dirpath)
+		    (deadgrep--is-subdir-of expanded-default-dir context-dirpath))
             (when (nth 1 context-srch-dirs)
               (push context-dirpath args))
             (dolist (extra-dirpath (nth 2 context-srch-dirs))
