@@ -85,6 +85,19 @@ This affects the behaviour of `deadgrep--project-root', so this
 variable has no effect if you change
 `deadgrep-project-root-function'.")
 
+(defvar deadgrep--arguments-function #'deadgrep--arguments
+  "Function to generate ripgrep command line arguments.
+
+The function should take 4 arguments,
+search term, search type, case and context.
+And it should return a list of argument strings.")
+
+(defvar deadgrep--write-heading-function #'deadgrep--write-heading
+  "Function to write ripgrep heading text.
+
+The function should not take any argument.
+And its return value is not used.")
+
 (defvar deadgrep-history
   nil
   "A list of the previous search terms.")
@@ -1504,9 +1517,9 @@ matches (if the result line has been truncated)."
   (setq deadgrep--running t)
   (setq deadgrep--result-count 0)
   (spinner-start deadgrep--spinner)
-  (let* ((args (deadgrep--arguments
-                search-term search-type case
-                deadgrep--context))
+  (let* ((args (funcall deadgrep--arguments-function
+                        search-term search-type case
+                        deadgrep--context))
          (process
           (apply #'start-file-process
                  (format "rg %s" search-term)
@@ -1553,7 +1566,7 @@ matches (if the result line has been truncated)."
 
   (let ((start-point (point))
         (inhibit-read-only t))
-    (deadgrep--write-heading)
+    (funcall deadgrep--write-heading-function)
     ;; If the point was in the heading, ensure that we restore its
     ;; position.
     (goto-char (min (point-max) start-point))
@@ -1728,7 +1741,7 @@ don't actually start the search."
         (setq deadgrep--skip-if-hidden prev-skip-if-hidden)
         (setq deadgrep--skip-if-vcs-ignore prev-skip-if-vcs-ignore))
 
-      (deadgrep--write-heading)
+      (funcall deadgrep--write-heading-function)
 
       (if current-prefix-arg
           ;; Don't start the search, just create the buffer and inform
