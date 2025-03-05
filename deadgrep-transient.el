@@ -28,6 +28,9 @@
 (require 'deadgrep)
 (require 'transient)
 
+(defvar-local deadgrep-transient-directory nil
+  "Directory where `deadgrep-transisent' searches.")
+
 (transient-define-infix deadgrep-transient:--after-context ()
   :description "After context"
   :class 'transient-option
@@ -89,20 +92,55 @@
   :key "=v"
   :argument "--no-ignore-vcs")
 
+(defclass deadgrep-transient-directory-variable (transient-lisp-variable)
+  ())
+
+(cl-defmethod transient-init-value ((obj deadgrep-transient-directory-variable))
+  (funcall (oref obj set-value)
+           (oref obj variable)
+           (oset obj value (if deadgrep--search-term
+                               default-directory
+                             (funcall deadgrep-project-root-function)))))
+
+(cl-defmethod transient-format-value ((obj deadgrep-transient-directory-variable))
+  (propertize (prin1-to-string (abbreviate-file-name (oref obj value)))
+              'face 'transient-value))
+
+(transient-define-infix deadgrep-transient:directory ()
+  :description "Directory"
+  :class 'deadgrep-transient-directory-variable
+  :key "=d"
+  :variable 'deadgrep-transient-directory
+  :reader (lambda (prompt initial-input _history)
+            (read-directory-name prompt nil nil nil initial-input)))
+
 (defun deadgrep-transient-restart ()
+  "Restart deadgrep search with new options."
   (interactive)
   (let ((deadgrep--arguments-function #'deadgrep-transient--arguments))
+    (setq default-directory deadgrep-transient-directory)
     (deadgrep-transient--set-options transient-current-suffixes)
+    (rename-buffer
+     (deadgrep--buffer-name deadgrep--search-term default-directory)
+     t)
     (deadgrep-restart)))
 
+(defun deadgrep-transient-restart-with-new-term ()
+  "Restart deadgrep search with new options and new term."
+  (interactive)
+  (setq deadgrep--search-term
+        (read-from-minibuffer (deadgrep--search-prompt) deadgrep--search-term))
+  (deadgrep-transient-restart))
+
 (defun deadgrep-transient-search ()
-  "Search in the project root directory using transient arguments."
+  "Search in the current directory using transient arguments."
   (interactive)
   (let* ((deadgrep--arguments-function #'deadgrep-transient--arguments)
          (deadgrep--write-heading-function
           (lambda ()
             (deadgrep-transient--set-options transient-current-suffixes)
-            (deadgrep--write-heading))))
+            (deadgrep--write-heading)))
+         (deadgrep-project-root-function (lambda () deadgrep-transient-directory)))
     (call-interactively #'deadgrep)))
 
 (defun deadgrep-transient--set-options (suffixes)
@@ -163,12 +201,6 @@
     (when (or (/= before-context 0) (/= after-context 0))
       (setq deadgrep--context (cons before-context after-context)))))
 
-(defun deadgrep-transient-search-in-current ()
-  "Search the current directory using transient arguments."
-  (interactive)
-  (let ((deadgrep-project-root-function (lambda () default-directory)))
-    (call-interactively #'deadgrep-transient-search)))
-
 (defun deadgrep-transient--arguments (search-term &optional _search-type _case _context)
   "Format ripgrep command using SEARCH-TERM."
   (let ((args (copy-sequence deadgrep-extra-arguments)))
@@ -212,10 +244,12 @@
    (deadgrep-transient:--before-context)
    (deadgrep-transient:--after-context)
    ]
+  ["Environment"
+   (deadgrep-transient:directory)]
   ["Search"
    ("r" "Restart search" deadgrep-transient-restart :if (lambda () deadgrep--search-term))
-   ("g" "Search in project root" deadgrep-transient-search)
-   ("c" "Search in current directory" deadgrep-transient-search-in-current)])
+   ("s" "Restart search with new term" deadgrep-transient-restart-with-new-term :if (lambda () deadgrep--search-term))
+   ("n" "New search" deadgrep-transient-search)])
 
 (cl-defmethod transient-init-value ((obj deadgrep-transient-prefix))
   (let ((orig-args (deadgrep--arguments
