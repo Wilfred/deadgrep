@@ -209,7 +209,7 @@
     (push "--no-heading" args)
     (push "--no-column" args)
     (push "--with-filename" args)
-    (setq args (nconc (transient-args 'deadgrep-transient) args))
+    (setq args (nconc (transient-args 'deadgrep-transient-menu) args))
     (push "--" args)
     (push search-term args)
     (push "." args)
@@ -226,8 +226,8 @@
 (defclass deadgrep-transient-prefix (transient-prefix)
   ())
 
-(transient-define-prefix deadgrep-transient ()
-  "Start a ripgrep search"
+(transient-define-prefix deadgrep-transient-menu ()
+  "Deadgrep transient menu."
   :class 'deadgrep-transient-prefix
   ["Search Options"
    (deadgrep-transient:--fixed-strings)
@@ -270,7 +270,7 @@
                   (push arg globs)))
                (t (push arg args))))))))
 
-(define-key deadgrep-mode-map "t" #'deadgrep-transient)
+(define-key deadgrep-mode-map "t" #'deadgrep-transient-menu)
 
 (provide 'deadgrep-transient)
 ;;; deadgrep-transient.el ends here

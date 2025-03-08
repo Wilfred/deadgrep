@@ -145,8 +145,8 @@
 
 (ert-deftest deadgrep-transient--arguments-with-after-context ()
   (with-temp-buffer
-    (let* ((transient-current-suffixes (transient-suffixes 'deadgrep-transient))
-           (transient-current-command 'deadgrep-transient)
+    (let* ((transient-current-suffixes (transient-suffixes 'deadgrep-transient-menu))
+           (transient-current-command 'deadgrep-transient-menu)
            (deadgrep-extra-arguments '("--no-config"))
            (suffix (--first (eq (oref it command) 'deadgrep-transient:--after-context)
                             transient-current-suffixes)))
@@ -164,8 +164,8 @@
                         ".")))))))
 (ert-deftest deadgrep-transient--arguments-with-before-context ()
   (with-temp-buffer
-    (let* ((transient-current-suffixes (transient-suffixes 'deadgrep-transient))
-           (transient-current-command 'deadgrep-transient)
+    (let* ((transient-current-suffixes (transient-suffixes 'deadgrep-transient-menu))
+           (transient-current-command 'deadgrep-transient-menu)
            (deadgrep-extra-arguments '("--no-config"))
            (suffix (--first (eq (oref it command) 'deadgrep-transient:--before-context)
                             transient-current-suffixes)))
@@ -184,8 +184,8 @@
 
 (ert-deftest deadgrep-transient--arguments-without-fixed-strings ()
   (with-temp-buffer
-    (let* ((transient-current-suffixes (transient-suffixes 'deadgrep-transient))
-           (transient-current-command 'deadgrep-transient)
+    (let* ((transient-current-suffixes (transient-suffixes 'deadgrep-transient-menu))
+           (transient-current-command 'deadgrep-transient-menu)
            (deadgrep-extra-arguments '("--no-config"))
            (suffix (--first (eq (oref it command) 'deadgrep-transient:--fixed-strings)
                             transient-current-suffixes)))
@@ -202,8 +202,8 @@
 
 (ert-deftest deadgrep-transient--arguments-with-word-regexp ()
   (with-temp-buffer
-    (let* ((transient-current-suffixes (transient-suffixes 'deadgrep-transient))
-           (transient-current-command 'deadgrep-transient)
+    (let* ((transient-current-suffixes (transient-suffixes 'deadgrep-transient-menu))
+           (transient-current-command 'deadgrep-transient-menu)
            (deadgrep-extra-arguments '("--no-config"))
            (suffix (--first (eq (oref it command) 'deadgrep-transient:--word-regexp)
                             transient-current-suffixes)))
@@ -222,8 +222,8 @@
 
 (ert-deftest deadgrep-transient--arguments-with-type ()
   (with-temp-buffer
-    (let* ((transient-current-suffixes (transient-suffixes 'deadgrep-transient))
-           (transient-current-command 'deadgrep-transient)
+    (let* ((transient-current-suffixes (transient-suffixes 'deadgrep-transient-menu))
+           (transient-current-command 'deadgrep-transient-menu)
            (deadgrep-extra-arguments '("--no-config"))
            (suffix (--first (eq (oref it command) 'deadgrep-transient:--type)
                             transient-current-suffixes)))
@@ -242,8 +242,8 @@
 
 (ert-deftest deadgrep-transient--arguments-with-case-sensitive ()
   (with-temp-buffer
-    (let* ((transient-current-suffixes (transient-suffixes 'deadgrep-transient))
-           (transient-current-command 'deadgrep-transient)
+    (let* ((transient-current-suffixes (transient-suffixes 'deadgrep-transient-menu))
+           (transient-current-command 'deadgrep-transient-menu)
            (deadgrep-extra-arguments '("--no-config"))
            (suffix (--first (eq (oref it command) 'deadgrep-transient:--*-case)
                             transient-current-suffixes)))
@@ -261,8 +261,8 @@
 
 (ert-deftest deadgrep-transient--arguments-with-ignore-case ()
   (with-temp-buffer
-    (let* ((transient-current-suffixes (transient-suffixes 'deadgrep-transient))
-           (transient-current-command 'deadgrep-transient)
+    (let* ((transient-current-suffixes (transient-suffixes 'deadgrep-transient-menu))
+           (transient-current-command 'deadgrep-transient-menu)
            (deadgrep-extra-arguments '("--no-config"))
            (suffix (--first (eq (oref it command) 'deadgrep-transient:--*-case)
                             transient-current-suffixes)))
@@ -280,8 +280,8 @@
 
 (ert-deftest deadgrep-transient--arguments-with-glob ()
   (with-temp-buffer
-    (let* ((transient-current-suffixes (transient-suffixes 'deadgrep-transient))
-           (transient-current-command 'deadgrep-transient)
+    (let* ((transient-current-suffixes (transient-suffixes 'deadgrep-transient-menu))
+           (transient-current-command 'deadgrep-transient-menu)
            (deadgrep-extra-arguments '("--no-config"))
            (suffix (--first (eq (oref it command) 'deadgrep-transient:--glob)
                             transient-current-suffixes)))
@@ -312,8 +312,8 @@
 
 (ert-deftest deadgrep-transient--arguments-without-hidden ()
   (with-temp-buffer
-    (let* ((transient-current-suffixes (transient-suffixes 'deadgrep-transient))
-           (transient-current-command 'deadgrep-transient)
+    (let* ((transient-current-suffixes (transient-suffixes 'deadgrep-transient-menu))
+           (transient-current-command 'deadgrep-transient-menu)
            (deadgrep-extra-arguments '("--no-config"))
            (suffix (--first (eq (oref it command) 'deadgrep-transient:--hidden)
                             transient-current-suffixes)))
@@ -330,8 +330,8 @@
 
 (ert-deftest deadgrep-transient--arguments-with-no-ignore-vcs ()
   (with-temp-buffer
-    (let* ((transient-current-suffixes (transient-suffixes 'deadgrep-transient))
-           (transient-current-command 'deadgrep-transient)
+    (let* ((transient-current-suffixes (transient-suffixes 'deadgrep-transient-menu))
+           (transient-current-command 'deadgrep-transient-menu)
            (deadgrep-extra-arguments '("--no-config"))
            (suffix (--first (eq (oref it command) 'deadgrep-transient:--no-ignore-vcs)
                             transient-current-suffixes)))
