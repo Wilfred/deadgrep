@@ -119,9 +119,9 @@
 (defun deadgrep-transient-restart ()
   "Restart deadgrep search with new options."
   (interactive)
-  (let ((deadgrep--arguments-function #'deadgrep-transient--arguments))
+  (let ((deadgrep--arguments-function #'deadgrep-transient--arguments)
+        (deadgrep--write-heading-function #'deadgrep-transient--write-heading))
     (setq default-directory deadgrep-transient-directory)
-    (deadgrep-transient--set-options transient-current-suffixes)
     (rename-buffer
      (deadgrep--buffer-name deadgrep--search-term default-directory)
      t)
@@ -138,10 +138,7 @@
   "Search in the current directory using transient arguments."
   (interactive)
   (let* ((deadgrep--arguments-function #'deadgrep-transient--arguments)
-         (deadgrep--write-heading-function
-          (lambda ()
-            (deadgrep-transient--set-options transient-current-suffixes)
-            (deadgrep--write-heading)))
+         (deadgrep--write-heading-function #'deadgrep-transient--write-heading)
          (deadgrep-project-root-function (lambda () deadgrep-transient-directory)))
     (call-interactively #'deadgrep)))
 
@@ -217,6 +214,11 @@
     (push search-term args)
     (push "." args)
     (nreverse args)))
+
+(defun deadgrep-transient--write-heading ()
+  "Write the deadgrep heading with buttons reflecting the current transient settings."
+  (deadgrep-transient--set-options transient-current-suffixes)
+  (deadgrep--write-heading))
 
 (defun deadgrep-transient--read-file-type (_prompt _initial-input _history)
   "Read file type for `deadgrep-transient:--file-type'."
