@@ -56,7 +56,13 @@
      (list
       (deadgrep-transient-test-create-option 'deadgrep-transient:--before-context "4")
       (deadgrep-transient-test-create-option 'deadgrep-transient:--after-context "3")))
-    (should (equal deadgrep--context '(4 . 3)))))
+    (should (equal deadgrep--context '(4 . 3)))
+
+    (deadgrep-transient--set-options
+     (list
+      (deadgrep-transient-test-create-option 'deadgrep-transient:--before-context)
+      (deadgrep-transient-test-create-option 'deadgrep-transient:--after-context)))
+    (should (null deadgrep--context))))
 
 (ert-deftest deadgrep-transient--set-options-with-search-type ()
   (with-temp-buffer

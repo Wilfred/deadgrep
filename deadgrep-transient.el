@@ -147,6 +147,7 @@
 
 (defun deadgrep-transient--set-options (suffixes)
   "Set deadgrep options from transient SUFFIXES."
+  (setq deadgrep--context nil)
   (setq deadgrep--search-case 'sensitive)
   (setq deadgrep--search-type 'regexp)
   (setq deadgrep--file-type 'all)
