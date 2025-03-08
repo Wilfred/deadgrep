@@ -96,6 +96,7 @@
   ())
 
 (cl-defmethod transient-init-value ((obj deadgrep-transient-directory-variable))
+  "Initialize `deadgrep-transient' directory OBJ by `deadgrep-project-root-function'."
   (funcall (oref obj set-value)
            (oref obj variable)
            (oset obj value (if deadgrep--search-term
@@ -103,6 +104,7 @@
                              (funcall deadgrep-project-root-function)))))
 
 (cl-defmethod transient-format-value ((obj deadgrep-transient-directory-variable))
+  "Format `deadgrep-transient' directory OBJ with abbreviation."
   (propertize (prin1-to-string (abbreviate-file-name (oref obj value)))
               'face 'transient-value))
 
@@ -220,7 +222,8 @@
   (deadgrep--read-file-type (buffer-file-name)))
 
 (defun deadgrep-transient--read-glob (prompt initial-input history)
-  "Read glob pattern for `deadgrep-transient:--glob'."
+  "Read glob pattern for `deadgrep-transient:--glob'.
+PROMPT, INITIAL-INPUT and HISTORY are passed to `completing-read-multiple'."
   (completing-read-multiple prompt nil nil nil initial-input history))
 
 (defclass deadgrep-transient-prefix (transient-prefix)
@@ -252,6 +255,7 @@
    ("n" "New search" deadgrep-transient-search)])
 
 (cl-defmethod transient-init-value ((obj deadgrep-transient-prefix))
+  "Initialize `deadgrep-transient' OBJ from `deadgrep--arguments'."
   (let ((orig-args (deadgrep--arguments
                     deadgrep--search-term
                     deadgrep--search-type
