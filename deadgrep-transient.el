@@ -96,7 +96,7 @@
   ())
 
 (cl-defmethod transient-init-value ((obj deadgrep-transient-directory-variable))
-  "Initialize `deadgrep-transient' directory OBJ by `deadgrep-project-root-function'."
+  "Initialize deadgrep-transient directory OBJ by `deadgrep-project-root-function'."
   (funcall (oref obj set-value)
            (oref obj variable)
            (oset obj value (if deadgrep--search-term
@@ -104,7 +104,7 @@
                              (funcall deadgrep-project-root-function)))))
 
 (cl-defmethod transient-format-value ((obj deadgrep-transient-directory-variable))
-  "Format `deadgrep-transient' directory OBJ with abbreviation."
+  "Format deadgrep-transient directory OBJ with abbreviation."
   (propertize (prin1-to-string (abbreviate-file-name (oref obj value)))
               'face 'transient-value))
 
@@ -257,25 +257,39 @@ PROMPT, INITIAL-INPUT and HISTORY are passed to `completing-read-multiple'."
    ("s" "Restart search with new term" deadgrep-transient-restart-with-new-term :if (lambda () deadgrep--search-term))
    ("n" "New search" deadgrep-transient-search)])
 
+(cl-defmethod transient-default-value ((obj deadgrep-transient-prefix))
+  "Return the default value of deadgrep-transient OBJ from `deadgrep--arguments'."
+  (let ((orig-args (deadgrep--arguments nil 'string 'smart nil))
+        (args '()))
+    (catch 'break
+      (dolist (arg orig-args)
+        (cond
+         ((equal arg "--")
+          (throw 'break args))
+         (t (push arg args)))))))
+
 (cl-defmethod transient-init-value ((obj deadgrep-transient-prefix))
-  "Initialize `deadgrep-transient' OBJ from `deadgrep--arguments'."
-  (let ((orig-args (deadgrep--arguments
-                    deadgrep--search-term
-                    deadgrep--search-type
-                    deadgrep--search-case
-                    deadgrep--context))
-        (args '())
-        (globs '()))
-    (oset obj value
-          (catch 'break
-            (dolist (arg orig-args)
-              (cond
-               ((equal arg "--")
-                (throw 'break (append globs args)))
-               ((string-prefix-p "--glob=" arg)
-                (unless (member arg globs)
-                  (push arg globs)))
-               (t (push arg args))))))))
+  "Initialize deadgrep-transient OBJ from `deadgrep--arguments'.
+If the variable `deadgrep--search-term' is nil, the saved value is used."
+  (if deadgrep--search-term
+      (let ((orig-args (deadgrep--arguments
+                        deadgrep--search-term
+                        deadgrep--search-type
+                        deadgrep--search-case
+                        deadgrep--context))
+            (args '())
+            (globs '()))
+        (oset obj value
+              (catch 'break
+                (dolist (arg orig-args)
+                  (cond
+                   ((equal arg "--")
+                    (throw 'break (append globs args)))
+                   ((string-prefix-p "--glob=" arg)
+                    (unless (member arg globs)
+                      (push arg globs)))
+                   (t (push arg args)))))))
+    (cl-call-next-method)))
 
 (define-key deadgrep-mode-map "t" #'deadgrep-transient-menu)
 
