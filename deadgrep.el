@@ -85,6 +85,50 @@ This affects the behaviour of `deadgrep--project-root', so this
 variable has no effect if you change
 `deadgrep-project-root-function'.")
 
+(defcustom deadgrep-extra-searched-directories nil
+  "Alist associating directory contexts to list of extra directories searched.
+
+Purpose:
+ Associates a list of directory(ies) searched when searching inside a
+ specific directory tree (the directory context).
+ For each context (the alist key), you can associate one or more extra
+ directory to search when deadgrep searches inside this context.
+
+Use case:
+ Whenever you need to search extra directories (like library directories)
+ located outside of your current focus, project or directory where the primary
+ search occurs.
+
+Important:
+ - The specified paths must be absolute.
+ - The *Context Directory* field identifies a directory tree context.
+    - That directory and any of it's sub-directories are part of that
+      context.
+    - You can control whether the context directory tree is part of the
+      searched directory trees. It is by default, as identified by the
+      boolean flag for each context directory.
+      - Turn it off to prevent searches inside that directory tree.
+ - This supports Tramp and the ability to search inside remote systems as long
+   as:
+    - The search program is available in the remote system.
+    - The directory context string identifies the remote system directory
+      with the Tramp-specific syntax:
+      - example: something like \"/ssh:user@host:/some/dir/path/\"
+    - In all cases (even for directories in the list of remote directory
+      context), the directories must:
+      - be absolute paths,
+      - be exempt of Tramp remote host prefix: use the path as seen by the
+        remote host.
+      - The ~ is allowed as the first character in paths
+      - Directory names do not have to end with / but may."
+  :group 'deadgrep
+  :type '(repeat
+          (list
+           (string :tag "Context directory")
+           (boolean :tag "Include this context directory tree in the search" t)
+           (repeat :tag "Searched directory trees"
+                   (string :tag "Extra searched absolute dirpath")))))
+
 (defvar deadgrep-history
   nil
   "A list of the previous search terms.")
@@ -715,6 +759,13 @@ is why `--no-config' is included here by default."
   :type '(repeat string)
   :group 'deadgrep)
 
+(defun deadgrep--is-subdir-of (path1 path2)
+  "Return t if PATH1 is a sub-directory of PATH2."
+  (let ((npath1 (directory-file-name (file-truename path1)))
+        (npath2 (directory-file-name (file-truename path2))))
+    (when (string-match-p (regexp-quote npath2) npath1)
+      t)))
+
 (defun deadgrep--arguments (search-term search-type case context)
   "Return a list of command line arguments that we can execute in a shell
 to obtain ripgrep results."
@@ -774,7 +825,28 @@ to obtain ripgrep results."
 
     (push "--" args)
     (push search-term args)
-    (push "." args)
+
+    ;; When extra directories are identified for the current directory context
+    ;; use these directories instead of the current directory.  Otherwise
+    ;; search from the current directory as usual.
+    (let ((extra-dir-found nil)
+          (expanded-default-dir (file-name-as-directory
+                                 (expand-file-name default-directory)))
+          (context-dirpath nil))
+      (when deadgrep-extra-searched-directories
+        (dolist (context-srch-dirs deadgrep-extra-searched-directories)
+          (setq context-dirpath (file-name-as-directory
+                                 (expand-file-name (nth 0 context-srch-dirs))))
+          (when (or (string= expanded-default-dir context-dirpath)
+		    (deadgrep--is-subdir-of expanded-default-dir context-dirpath))
+            (when (nth 1 context-srch-dirs)
+              (push context-dirpath args))
+            (dolist (extra-dirpath (nth 2 context-srch-dirs))
+              (push (file-name-as-directory (expand-file-name extra-dirpath))
+                    args)
+              (setq extra-dir-found t)))))
+      (unless extra-dir-found
+        (push "." args)))
 
     (nreverse args)))
 
