@@ -148,6 +148,8 @@ display."
 (put 'deadgrep--search-case 'permanent-local t)
 (defvar-local deadgrep--file-type 'all)
 (put 'deadgrep--file-type 'permanent-local t)
+(defvar-local deadgrep--search-scope 'project)
+(put 'deadgrep--search-scope 'permanent-local t)
 
 (defvar-local deadgrep--skip-if-hidden nil
   "Whether deadgrep should ignore hidden files (e.g. files called .foo).")
@@ -454,9 +456,18 @@ with a text face property `deadgrep-match-face'."
   'case nil
   'help-echo "Change case sensitivity")
 
+(define-button-type 'deadgrep-search-scope
+  'action #'deadgrep--search-scope
+  'case nil
+  'help-echo "Change search scope")
+
 (defun deadgrep--case (button)
   (setq deadgrep--search-case (button-get button 'case))
   (deadgrep-restart))
+
+(defun deadgrep--scope (button)
+  (setq deadgrep--search-scope (button-get button 'scope))
+(deadgrep-restart))
 
 (define-button-type 'deadgrep-context
   'action #'deadgrep--context
@@ -774,9 +785,27 @@ to obtain ripgrep results."
 
     (push "--" args)
     (push search-term args)
-    (push "." args)
+    (setq args (append
+                (deadgrep--shell-quote-filenames (deadgrep--files-to-search))
+                args))
+
+    (message (format "searching this: %s" (deadgrep--files-to-search)))
+
 
     (nreverse args)))
+
+(defun deadgrep--files-to-search ()
+  (cond
+   ((eq deadgrep--search-scope 'project) '("."))
+   ((eq deadgrep--search-scope 'project-open-buffers)
+    (deadgrep--filenames-of-open-files-in-project))
+   ((eq deadgrep--search-scope 'open-buffers)
+    (deadgrep--filenames-of-open-files))
+   (t
+    (error "search scope wasn't set correctly!" 'deadgrep--search-scope))))
+
+(defun deadgrep--shell-quote-filenames (filenames)
+  (-map (lambda (filename) (shell-quote-argument filename)) filenames))
 
 (defun deadgrep--write-heading ()
   "Write the deadgrep heading with buttons reflecting the current
@@ -827,6 +856,25 @@ search settings."
                 "ignore"
               (deadgrep--button "ignore" 'deadgrep-case
                                 'case 'ignore))
+            "\n"
+
+            (propertize "Scope: "
+                        'face 'deadgrep-meta-face)
+            (if (eq deadgrep--search-scope 'project)
+                "project"
+              (deadgrep--button "project" 'deadgrep-search-scope
+                                'scope 'project))
+            " "
+            (if (eq deadgrep--search-scope 'project-open-buffers)
+                "project open buffers"
+              (deadgrep--button "project open buffers" 'deadgrep-search-scope
+                                'scope 'project-open-buffers))
+            " "
+            (if (eq deadgrep--search-scope 'open-buffers)
+                "open buffers"
+              (deadgrep--button "open buffers" 'deadgrep-search-scope
+                                'scope 'open-buffers))
+
             "\n"
             (propertize "Context: "
                         'face 'deadgrep-meta-face)
@@ -1032,6 +1080,16 @@ Returns a list ordered by the most recently accessed."
    ((eq deadgrep--search-case 'ignore) (setq deadgrep--search-case 'smart)))
   (deadgrep-restart))
 
+(defun deadgrep-cycle-search-scope ()
+  (interactive)
+  (message "cycling")
+  (cond
+   ((eq deadgrep--search-scope 'project) (setq deadgrep--search-scope 'project-open-buffers))
+   ((eq deadgrep--search-scope 'project-open-buffers) (setq deadgrep--search-scope 'open-buffers))
+   ((eq deadgrep--search-scope 'open-buffers) (setq deadgrep--search-scope 'project)))
+  (deadgrep-restart))
+
+
 (defvar deadgrep-mode-map
   (let ((map (make-sparse-keymap)))
     (define-key map (kbd "RET") #'deadgrep-visit-result)
@@ -1042,6 +1100,7 @@ Returns a list ordered by the most recently accessed."
     (define-key map (kbd "T") #'deadgrep-cycle-search-type)
     (define-key map (kbd "C") #'deadgrep-cycle-search-case)
     (define-key map (kbd "F") #'deadgrep-cycle-files)
+    (define-key map (kbd "K") #'deadgrep-cycle-search-scope)
     (define-key map (kbd "D") #'deadgrep-directory)
     (define-key map (kbd "^") #'deadgrep-parent-directory)
     (define-key map (kbd "g") #'deadgrep-restart)
@@ -1805,6 +1864,23 @@ This is intended for use with `next-error-function', which see."
   (interactive)
   (dolist (buffer (deadgrep--buffers))
     (kill-buffer buffer)))
+
+(defun deadgrep--filenames-of-open-files ()
+  "Get all open buffers that have a backing file"
+  (-map (lambda (buf)
+          (buffer-file-name buf))
+        (-filter (lambda (buffer) (buffer-file-name buffer))
+                 (buffer-list))))
+
+(defun deadgrep--filenames-of-open-files-in-project ()
+  "Get all buffers that have a backing file in the current project"
+  (let* ((candidates (deadgrep--filenames-of-open-files))
+         (prefix (cdr (project-current))))
+    (-filter (lambda (path)
+               (if (s-starts-with? prefix path)
+                   path
+                 nil))
+             candidates)))
 
 (provide 'deadgrep)
 ;;; deadgrep.el ends here
