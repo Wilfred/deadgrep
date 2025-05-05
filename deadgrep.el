@@ -109,6 +109,12 @@ display."
   :type 'function
   :group 'deadgrep)
 
+(defcustom deadgrep-show-heading
+  t
+  "Determines if the search heading should be shown or not."
+  :type 'boolean
+  :group 'deadgrep)
+
 (defface deadgrep-meta-face
   '((t :inherit font-lock-comment-face))
   "Face used for deadgrep UI text."
@@ -1553,7 +1559,7 @@ matches (if the result line has been truncated)."
 
   (let ((start-point (point))
         (inhibit-read-only t))
-    (deadgrep--write-heading)
+    (when deadgrep-show-heading (deadgrep--write-heading))
     ;; If the point was in the heading, ensure that we restore its
     ;; position.
     (goto-char (min (point-max) start-point))
@@ -1728,7 +1734,7 @@ don't actually start the search."
         (setq deadgrep--skip-if-hidden prev-skip-if-hidden)
         (setq deadgrep--skip-if-vcs-ignore prev-skip-if-vcs-ignore))
 
-      (deadgrep--write-heading)
+      (when deadgrep-show-heading (deadgrep--write-heading))
 
       (if current-prefix-arg
           ;; Don't start the search, just create the buffer and inform
