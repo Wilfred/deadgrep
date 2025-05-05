@@ -156,6 +156,24 @@ display."
   "Whether deadgrep should ignore files if they're listed in .gitignore.")
 (put 'deadgrep--skip-if-vcs-ignore 'permanent-local t)
 
+(defcustom deadgrep-file-type-alist
+  nil
+  "Alist defining predetermined file types.
+The key is a symbol which will be used as the name as the value
+of `deadgrep--file-type' and as the name of a button in the
+*deadgreap* buffer.  The value is a list of arguments to pass to rg.
+
+For example, to only search in test files you might add the
+following key-value pair.
+
+   (tests . (\"--type-add=TEST:*_test.cpp\"
+             \"--type=TEST\"))
+
+The types of `all', `type', and `glob' will always be available."
+  :type '(alist :key-type symbol
+                :value-type (repeat :tag "Arguments for rg" string))
+  :group 'deadgrep)
+
 (defvar-local deadgrep--context nil
   "When set, also show context of results.
 This is stored as a cons cell of integers (lines-before . lines-after).")
@@ -661,6 +679,8 @@ with a text face property `deadgrep-match-face'."
             (cons 'type (deadgrep--read-file-type deadgrep--initial-filename))))
      ((eq button-type 'glob)
       (setq deadgrep--file-type (cons 'glob (deadgrep--read-file-glob))))
+     ((alist-get button-type deadgrep-file-type-alist)
+      (setq deadgrep--file-type button-type))
      (t
       (error "Unknown button type: %S" button-type))))
   (deadgrep-restart))
@@ -754,6 +774,15 @@ to obtain ripgrep results."
       (push (format "--type=%s" (cdr deadgrep--file-type)) args))
      ((eq (car-safe deadgrep--file-type) 'glob)
       (push (format "--glob=%s" (cdr deadgrep--file-type)) args))
+     ((alist-get deadgrep--file-type deadgrep-file-type-alist)
+      (let ((a (alist-get deadgrep--file-type deadgrep-file-type-alist)))
+        (cond ((stringp a)
+               (push a args))
+              ((listp a)
+               (dolist (aa a)
+                 (push aa args)))
+              (t
+               (error "unknown argument type in deadgrep-file-type-alist: %s" a)))))
      (t
       (error "Unknown file-type: %S" deadgrep--file-type)))
 
@@ -883,6 +912,13 @@ search settings."
             " "
             (deadgrep--button ".gitignore items" 'deadgrep-vcs-skip-type)
             (if deadgrep--skip-if-vcs-ignore ":yes" ":no")
+            (cl-loop for alist-item in deadgrep-file-type-alist
+                     concat (concat " "
+                                    (if (eq deadgrep--file-type (car alist-item))
+                                        (symbol-name (car alist-item))
+                                      (deadgrep--button (symbol-name (car alist-item))
+                                                        'deadgrep-file-type
+                                                        'file-type (car alist-item)))))
             "\n\n")
     (put-text-property
      start-pos (point)
