@@ -168,12 +168,32 @@ navigate to the file itself from the file headings.
 
 ## Beta Features
 
+### Edit the results buffers
+
 You can now edit files directly from results buffers with `M-x
 deadgrep-edit-mode`.
 
 It is currently in beta. Alternatively, package [wgrep](https://github.com/mhayashi1120/Emacs-wgrep)
 added support for editing deadgrep buffers in April 2023 via [wgrep-deadgrep](https://melpa.org/#/wgrep-deadgrep).
 (One feature unlocked that way is, e.g., the ability to delete a line in edit mode via `C-d`)
+
+### Transient menu
+
+Deadgrep has an optional menu interface built with [transient](https://github.com/magit/transient).
+After loading `deadgrep-transient`, the menu can be opened by <kbd>t</kbd> in the results buffers.
+Or `M-x deadgrep-transient-menu` opens the menu from anywhere.
+
+It is currently in beta, as all the arguments in the menu are not corresponding to deadgrep options.
+
+You can add extra arguments by the transient API in the follow example.
+
+``` emacs-lisp
+(require 'deadgrep-transient)
+
+(transient-append-suffix 'deadgrep-transient-menu "-g" '("-L" "Follow" "--follow"))
+
+(transient-append-suffix 'deadgrep-transient-menu '(1) ["Input Options" ("-z" "Search Zip" "--search-zip")])
+```
 
 ## Alternative Projects
 
