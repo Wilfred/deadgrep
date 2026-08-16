@@ -19,9 +19,9 @@ jobs:
     - uses: conao3/setup-cask@master
 
     - name: Download ripgrep
-      run: curl -LO https://github.com/BurntSushi/ripgrep/releases/download/12.1.1/ripgrep_12.1.1_amd64.deb
+      run: curl -LO https://github.com/BurntSushi/ripgrep/releases/download/13.0.0/ripgrep_13.0.0_amd64.deb
     - name: Install ripgrep
-      run: sudo dpkg -i ripgrep_12.1.1_amd64.deb
+      run: sudo dpkg -i ripgrep_13.0.0_amd64.deb
 
     - uses: actions/checkout@v2
     - name: Test
