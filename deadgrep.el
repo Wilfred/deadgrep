@@ -1789,7 +1789,7 @@ This is intended for use with `next-error-function', which see."
 
     (while (and
             (not (zerop arg))
-            (not (eobp)))
+            (if direction (not (eobp)) (not (bobp))))
       (if direction
           (forward-line 1)
         (forward-line -1))
