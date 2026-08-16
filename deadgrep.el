@@ -226,7 +226,7 @@ It is used to create `imenu' index.")
             ;; line numbers.
             (when prev-line-num
               (setq separator
-                    (s-repeat (log prev-line-num 10) "-")))
+                    (s-repeat (length (number-to-string prev-line-num)) "-")))
             (insert
              (propertize (concat separator "\n")
                          'face 'deadgrep-meta-face
