@@ -323,7 +323,24 @@ context arguments to ripgrep."
   (should
    (string=
     (deadgrep--glob-regexp "[?]")
-    "^[?]$")))
+    "^[?]$"))
+  ;; Characters that are regexp metacharacters but not glob
+  ;; metacharacters should be treated literally.
+  (should
+   (string=
+    (deadgrep--glob-regexp "*.h++")
+    "^.*\\.h\\+\\+$")))
+
+(ert-deftest deadgrep--matches-glob-p--regexp-metachars ()
+  "Globs containing regexp metacharacters should be matched literally."
+  (should
+   (deadgrep--matches-globs-p "foo.h++" '("*.h++")))
+  (should
+   (not
+    (deadgrep--matches-globs-p "foo.h" '("*.h++"))))
+  (should
+   (not
+    (deadgrep--matches-globs-p "foo.hh" '("*.h++")))))
 
 (ert-deftest deadgrep--create-imenu-index ()
   (with-temp-buffer

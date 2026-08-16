@@ -600,7 +600,7 @@ WHICH-CONTEXT is a symbol, either \\='before or \\='after."
                                  (substring glob i j)))
             (setq i j)))
          (t
-          (setq result (concat result (char-to-string char)))
+          (setq result (concat result (regexp-quote (char-to-string char))))
           (cl-incf i)))))
     (concat result "$")))
 
