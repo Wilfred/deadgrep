@@ -1570,7 +1570,6 @@ matches (if the result line has been truncated)."
     (setq deadgrep--current-file nil)
     (setq deadgrep--spinner nil)
     (setq deadgrep--remaining-output nil)
-    (setq deadgrep--current-file nil)
     (setq deadgrep--debug-first-output nil)
     (setq deadgrep--imenu-alist nil)))
 
