@@ -325,6 +325,20 @@ context arguments to ripgrep."
     (deadgrep--glob-regexp "[?]")
     "^[?]$")))
 
+(ert-deftest deadgrep-next-error--backward-at-first-result ()
+  "Moving backward from the first result should terminate rather
+than looping forever."
+  (with-temp-deadgrep-buf
+   ;; Move point to the first result line.
+   (goto-char (point-max))
+   (deadgrep-backward-match)
+   (beginning-of-line)
+   ;; `previous-error' calls `next-error-function' with a negative
+   ;; argument. There are no results before point, so this should
+   ;; simply stop at the beginning of the buffer.
+   (deadgrep-next-error -1 nil)
+   (should (bobp))))
+
 (ert-deftest deadgrep--create-imenu-index ()
   (with-temp-buffer
     (deadgrep--insert-output "\
