@@ -325,6 +325,21 @@ context arguments to ripgrep."
     (deadgrep--glob-regexp "[?]")
     "^[?]$")))
 
+(ert-deftest deadgrep--insert-output--context-separator ()
+  "The -- separator between context groups should match the width
+of the previous line number, even for single-digit line numbers."
+  (with-temp-buffer
+    (deadgrep--insert-output
+     (concat
+      "\033[0m\033[35mf.txt\033[0m:\033[0m\033[32m1\033[0m:\033[0m\033[1m\033[31mhit\033[0m\n"
+      "--\n"
+      "\033[0m\033[35mf.txt\033[0m:\033[0m\033[32m9\033[0m:\033[0m\033[1m\033[31mhit\033[0m\n")
+     t)
+    (should
+     (equal
+      (buffer-substring-no-properties (point-min) (point-max))
+      "f.txt\n1    hit\n-\n9    hit\n"))))
+
 (ert-deftest deadgrep--create-imenu-index ()
   (with-temp-buffer
     (deadgrep--insert-output "\
