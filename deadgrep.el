@@ -1624,6 +1624,7 @@ for a string, offering the current word as a default."
     search-term))
 
 (defun deadgrep-incremental ()
+  "Read a search term interactively, updating the results after every keystroke."
   (interactive)
   (catch 'break
     (let ((deadgrep--incremental-active t)
@@ -1639,7 +1640,8 @@ for a string, offering the current word as a default."
            ((eq next-char ?\C-m)
             (throw 'break nil))
            ((eq next-char ?\C-?)
-            (setq search-term (s-left -1 search-term)))
+            (unless (s-blank? search-term)
+              (setq search-term (substring search-term 0 -1))))
            (t
             (setq search-term (concat search-term (list next-char))))))
         (when (> (length search-term) 2)
