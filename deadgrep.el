@@ -1311,7 +1311,7 @@ If POS is nil, use the beginning position of the current line."
         ;; position on the line, go the first match. This is generally
         ;; what users want, especially when there are long lines.
         (unless column-offset
-          (if-let (first-match-pos (car match-positions))
+          (-if-let (first-match-pos (car match-positions))
               (setq column-offset (car first-match-pos))
             (setq column-offset 0)))
 
