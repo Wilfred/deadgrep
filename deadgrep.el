@@ -64,6 +64,13 @@ To disable cleanup entirely, set this variable to nil."
           (const :tag "Disable cleanup" nil))
   :group 'deadgrep)
 
+(defcustom deadgrep-no-line-numbers nil
+  "If non-nil, don't display line numbers in the results buffer.
+When enabled, line numbers are hidden from view but still stored
+as text properties for navigation purposes."
+  :type 'boolean
+  :group 'deadgrep)
+
 (defcustom deadgrep-project-root-function
   #'deadgrep--project-root
   "Function called by `deadgrep' to work out the root directory
@@ -279,7 +286,14 @@ It is used to create `imenu' index.")
             ;; TODO: apply the invisible property if the user decided
             ;; to hide this filename before we finished finding
             ;; results in it.
-            (insert pretty-line-num content)
+            (if deadgrep-no-line-numbers
+                (insert (propertize content
+                                    'deadgrep-filename filename
+                                    'deadgrep-line-number line-num
+                                    'read-only t
+                                    'front-sticky t
+                                    'rear-nonsticky t))
+              (insert pretty-line-num content))
 
             (when (null deadgrep--result-count)
               (setq deadgrep--result-count 0))
@@ -727,6 +741,20 @@ WHICH-CONTEXT is a symbol, either \\='before or \\='after."
    t)
   (deadgrep-restart))
 
+(define-button-type 'deadgrep-toggle-line-numbers
+  'action #'deadgrep--toggle-line-numbers
+  'help-echo "Toggle line numbers display")
+
+(defun deadgrep-toggle-line-numbers ()
+  "Toggle display of line numbers in the current deadgrep buffer."
+  (interactive)
+  (setq deadgrep-no-line-numbers (not deadgrep-no-line-numbers))
+  (deadgrep-restart))
+
+(defun deadgrep--toggle-line-numbers (_button)
+  "Toggle line numbers display from button."
+  (deadgrep-toggle-line-numbers))
+
 (defun deadgrep--button (text type &rest properties)
   ;; `make-text-button' mutates the string to add properties, so copy
   ;; TEXT first.
@@ -917,6 +945,12 @@ search settings."
             " "
             (deadgrep--button ".gitignore items" 'deadgrep-vcs-skip-type)
             (if deadgrep--skip-if-vcs-ignore ":yes" ":no")
+            "\n"
+            (propertize "Line numbers: "
+                        'face 'deadgrep-meta-face)
+            (deadgrep--button
+             (if deadgrep-no-line-numbers "hidden" "shown")
+             'deadgrep-toggle-line-numbers)
             "\n\n")
     (put-text-property
      start-pos (point)
@@ -1209,8 +1243,10 @@ In this example, the column is 1."
          (line-number
           (get-text-property line-start 'deadgrep-line-number))
          (line-number-width
-          (max deadgrep--position-column-width
-               (length (number-to-string line-number))))
+          (if deadgrep-no-line-numbers
+              0
+            (max deadgrep--position-column-width
+                 (length (number-to-string line-number)))))
          (char-count 0))
     (save-excursion
       (while (not (equal (point) line-start))
@@ -1243,8 +1279,10 @@ Each item in the list has the form (START-OFFSET END-OFFSET)."
       (let* ((line-number
               (get-text-property (point) 'deadgrep-line-number))
              (line-number-width
-              (max deadgrep--position-column-width
-                   (length (number-to-string line-number))))
+              (if deadgrep-no-line-numbers
+                  0
+                (max deadgrep--position-column-width
+                     (length (number-to-string line-number)))))
              (i 0)
              (start-pos 0)
              (line-end-pos (line-end-position)))
