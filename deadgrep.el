@@ -290,7 +290,6 @@ It is used to create `imenu' index.")
                 (insert (propertize content
                                     'deadgrep-filename filename
                                     'deadgrep-line-number line-num
-                                    'read-only t
                                     'front-sticky t
                                     'rear-nonsticky t))
               (insert pretty-line-num content))
